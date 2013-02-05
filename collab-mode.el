@@ -17,5 +17,5 @@
   (interactive)
   (pop-to-buffer "*Users*" nil)
   (collab-users-mode)
-  (setq tabulated-list-entries '((nil ["User1"])))
+  (setq tabulated-list-entries '(("1" ["User1"]) ("2" ["User2"])))
   (tabulated-list-print t))
