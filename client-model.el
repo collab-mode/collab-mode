@@ -30,17 +30,17 @@ so it doesn't rebroadcast itself into an infinite loop")
 (defvar collab-mode-cm-other-buffer nil)
 
 (defun collab-mode-cm-init (&optional other-buffer)
- (make-local-variable 'collab-mode-cm-applying-changes)
+ (set (make-local-variable 'collab-mode-cm-applying-changes) nil)
  (set (make-local-variable 'collab-mode-cm-other-buffer)
-  (or other-buffer "*mirror*"))
+  (or other-buffer (get-buffer-create "*mirror*")))
  (unless other-buffer
   (let ((first-buffer (current-buffer))
         (string (buffer-string)))
-   (with-current-buffer (get-buffer-create "*mirror*")
+   (with-current-buffer collab-mode-cm-other-buffer
     (delete-region (point-min) (point-max))
     (insert string)
     (collab-mode-cm-init first-buffer))))
- (add-hook 'after-change-functions #'collab-mode-cm-after-change-hook t))
+ (add-hook 'after-change-functions #'collab-mode-cm-after-change-hook nil t))
 
 ;; STUB FUNCTIONS
 (defun collab-mode-network-post-delete (start end)
