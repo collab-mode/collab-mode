@@ -17,6 +17,6 @@
   (interactive)
   (pop-to-buffer "*Users*" nil)
   (collab-users-mode)
-  (setq tabulated-list-entries '(("1" [("button1" . ())])
+  (setq tabulated-list-entries '(("1" [("button1" . (action (lambda (arg) (message "blah"))))])
 				 ("2" [("button2" . ())])))
   (tabulated-list-print t))
