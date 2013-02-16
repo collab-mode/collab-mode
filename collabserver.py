@@ -121,12 +121,12 @@ def main():
 	serverSocket.bind(( serverip, serverPort))
 	serverSocket.listen(5)
 	print "Server Started at address: ", serverip, " and port # ", serverPort
-	while 1:
+        t = MainSendingThread()
+        t.start()
+        while 1:
 		(tcpCliSock, addr) = serverSocket.accept()
 		print 'Received a connection from:', addr
 		usrlst.append(tcpCliSock)
-		t = MainSendingThread()
-		t.start()
 		t2 = MainListiningThread(tcpCliSock)
 		t2.setDaemon(True)
 		t2.start()
