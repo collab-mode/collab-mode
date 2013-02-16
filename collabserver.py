@@ -1,4 +1,5 @@
-#
+#collabserver.py
+#Author: Josiah Powell
 
 from socket import *
 import sys
@@ -41,10 +42,15 @@ class MainListiningThread(threading.Thread):
 				self.sendAddrList()
 				key = ''
 				mymessage = ''
+			if key == '<list self addr':
+                                messageq.put([str(self.tcplisSoc.getpeername()),self.tcplisSoc])
+                                key = ''
+                                mymessage = ''
 			if key == '<exit':
 				self.userQuit()
 			if key == '<help':
 				message = "type <list addr> to get a list of connected ip's \n"
+                                message = message + "type <list self addr> to show your ip and port \n"
 				message = message + "type <exit> to end session \n"
 				message = message + "type <connect>(index #) to connect to another ip \n"
 				message = message + "type <message>(message to send) to send message to all connect users.\n"
