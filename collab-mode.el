@@ -14,5 +14,5 @@
   (pop-to-buffer "*Users*" nil)
   (collab-users-mode)
   (setq tabulated-list-entries '(("1" [("● user1" . (action (lambda (arg) (message "blah"))))])
-				 ("2" [("○ user2" . ())])))
+				 ("2" [("○ user2" . (face (:foreground "red" :underline t) ))])))
   (tabulated-list-print t))
