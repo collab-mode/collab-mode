@@ -35,8 +35,6 @@ so it doesn't rebroadcast itself into an infinite loop")
 (defun collab-mode-cm-after-change-hook (start end previous-length)
  "handler for hook that the buffer just changed"
  (when (not collab-mode-cm-applying-changes)
-  (message "%S"
-   `(put-text-property ,start ,end font-lock-face ,(font-for-user infinote-user)))
   (put-text-property start end 'font-lock-face (font-for-user infinote-user))
   (let ((collab-mode-cm-updating-infinote t))
    (when (/= previous-length 0)
