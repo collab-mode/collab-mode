@@ -9,34 +9,38 @@
 (defvar collab-mode-cm-applying-changes nil
  "Internal variable used to keep track of which changes collab-mode is making,
 so it doesn't rebroadcast itself into an infinite loop")
+(defvar collab-mode-cm-updating-infinote nil)
 
 (defvar collab-mode-cm-hack-buffer nil "the buffer")
 
 (defun collab-mode-cm-insert (string location)
  "inserts STRING into current buffer at LOCATION"
  (with-current-buffer collab-mode-cm-hack-buffer
-  (let ((collab-mode-cm-applying-changes t))
-   (save-excursion
-    (goto-char location)
-    (insert string)))))
+  (when (not collab-mode-cm-updating-infinote)
+   (let ((collab-mode-cm-applying-changes t))
+    (save-excursion
+     (goto-char location)
+     (insert string))))))
 
 (defun collab-mode-cm-delete (start end)
  "removes text in current buffer from START to END"
  (with-current-buffer collab-mode-cm-hack-buffer
-  (let ((collab-mode-cm-applying-changes t))
-   (delete-region start end))))
+  (when (not collab-mode-cm-updating-infinote)
+   (let ((collab-mode-cm-applying-changes t))
+    (delete-region start end)))))
 
 (defun collab-mode-cm-after-change-hook (start end previous-length)
  "handler for hook that the buffer just changed"
  (when (not collab-mode-cm-applying-changes)
-  (when (/= previous-length 0)
-   (collab-mode-network-post-delete
-    collab-mode-cm-network-connection
-    start (+ start previous-length)))
-  (when (/= start end)
-   (collab-mode-network-post-insert
-    collab-mode-cm-network-connection
-    start (buffer-substring-no-properties start end)))))
+  (let ((collab-mode-cm-updating-infinote t))
+   (when (/= previous-length 0)
+    (collab-mode-network-post-delete
+     collab-mode-cm-network-connection
+     start (+ start previous-length)))
+   (when (/= start end)
+    (collab-mode-network-post-insert
+     collab-mode-cm-network-connection
+     start (buffer-substring-no-properties start end))))))
 
 ;(defvar collab-mode-cm-other-buffer nil)
 (defvar collab-mode-cm-network-connection nil)
