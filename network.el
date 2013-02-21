@@ -1,6 +1,8 @@
 (defun collab-network-connect-to-server ()
-  (setq collab-server-process (open-network-stream "collab-server" "*collab-server*" "ec2.alcobb.com" 10068))
-  (set-process-filter collab-server-process #'collab-network-receive-from-server))
+ (when (boundp 'collab-server-process)
+  (process-kill-without-query collab-server-process))
+ (setq collab-server-process (open-network-stream "collab-server" "*collab-server*" "ec2.alcobb.com" 10068))
+ (set-process-filter collab-server-process #'collab-network-receive-from-server))
 
 (defun collab-network-receive-from-server (process data)
   ; TODO: Handle fragments
