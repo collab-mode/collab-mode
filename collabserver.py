@@ -106,7 +106,7 @@ class MainListiningThread(threading.Thread):
 	def sendMessage(self,mymess):
 		for i in usrlst:
                         if (i != self.tcplisSoc):
-                                messageq.put([mymess,i])
+                                messageq.put([mymess+'\0',i])
 
 
 	def userQuit(self):
