@@ -25,11 +25,12 @@ users, checks which are connected, and returns the appropriate list of entries."
 (defun collab-test-get-entries ()
   "Test building list for collab-get-entries"
   (interactive)
-  (let ((entries '(nil)))
+  (let ()
+    (setq entries)
     (dolist (user (collab-users))
-      (nconc entries (list
-		      (list nil (vector (cons (user-text user) "blah"))))))
-    (print (cdr entries))))
+      (setq entries
+	    (append entries (list (list nil (vector (cons (user-text user) "blah")))))))
+    (print entries)))
 
 (defun user-text (user)
   "Returns user entry label with appropriate face and connection glyph."
