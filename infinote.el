@@ -114,7 +114,7 @@
   "Translate and execute a request"
   ; TODO: everything needed for more than two users. queue, can-executep, etc
   ; Translate the request to the state's vector
-  (let* ((translated-request (infinote-translate request infinote-vector))
+  (let* ((translated-request (condition-case nil (infinote-translate request infinote-vector) (error (progn (message "sync error") request))))
          (operation (infinote-request-operation translated-request))
          (user (infinote-request-user request)))
     (incf (aref infinote-vector user))
@@ -145,6 +145,7 @@
 
 (defun infinote-init ()
   "Set up the buffer local infinote state"
+  (interactive)
   (setq infinote-user 0)
   (setq infinote-state nil)
   (setq infinote-vector (vector 0 0))
