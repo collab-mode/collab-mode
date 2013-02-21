@@ -7,8 +7,7 @@
 (defun collab-mode (user-id)
   "Starts collab-mode and opens users buffer."
   (interactive "P")
-  (collab-mode-cm-init (or user-id 0))
-  (pop-to-buffer (get-buffer-create "users")))
+  (collab-mode-cm-init (or user-id 0)))
 
 (define-derived-mode collab-users-mode tabulated-list-mode "Users Mode"
   "Major mode for managing connections with users"
