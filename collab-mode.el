@@ -25,5 +25,22 @@
 (defun collab-get-entries ()
   "Returns the tabulated-list-entries argument for listing users. It gets the list of
 users, checks which are connected, and returns the appropriate list of entries."
-  (list '("1" [("● user1" . (action (lambda (arg) (message "blah"))))])
-    '("2" [("○ user2" . (face (:foreground "red" :underline t) ))])))
+  (list '(nil [("● user1" . (action (lambda (arg) (message "blah"))))])
+    '(nil [("○ user2" . (face (:foreground "red" :underline t)))])))
+
+(defun collab-test-get-entries ()
+  "Test building list for collab-get-entries"
+  (interactive)
+  (let ((entries '(nil)))
+    (dolist (user (collab-users))
+      (nconc entries (list
+		      (list nil (vector (cons (user-text user) "blah"))))))
+    (print (cdr entries))))
+
+(defun user-text (user)
+  "Returns user entry label with appropriate face and connection glyph."
+  user)
+
+(defun collab-users ()
+  "Returns a list of all available users."
+  (list "Andrew" "Joel" "Jeff"))
