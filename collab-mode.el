@@ -1,6 +1,13 @@
-(defun collab-mode ()
+(let* ((fname (or load-file-name buffer-file-name))
+       (dname (file-name-directory fname)))
+ (load (expand-file-name "infinote.el" dname))
+ (load (expand-file-name "network.el" dname))
+ (load (expand-file-name "client-model.el" dname)))
+
+(defun collab-mode (user-id)
   "Starts collab-mode and opens users buffer."
-  (interactive)
+  (interactive "P")
+  (collab-mode-cm-init (or user-id 0))
   (pop-to-buffer (get-buffer-create "users")))
 
 (define-derived-mode collab-users-mode tabulated-list-mode "Users Mode"
