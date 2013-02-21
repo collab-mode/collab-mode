@@ -1,4 +1,5 @@
 (require 'cl)
+(require 'client-model)
 
 (defstruct infinote-request "An infinote request" user target-vector operation)
 
@@ -6,7 +7,7 @@
   "Get an operation transformed against another operation."
   (pcase operation
     (`(,:noop) '(:noop))
-    (`(,:insert ,position ,text) 
+    (`(,:insert ,position ,text)
      (pcase against-operation
        (`(,:insert ,position2 ,text2) ; TODO: use the cid like py-infinote
         (cond
@@ -18,7 +19,7 @@
           `(:insert ,(- position (length text2)) ,text))
          ((< position position2)
           `(:insert ,position ,text))
-         ((and (>= position position2) (< position (+ position2 (length text2)))) 
+         ((and (>= position position2) (< position (+ position2 (length text2))))
           `(:insert ,position2 ,text))))))
     (`(,:delete ,position ,text)
      (pcase against-op
@@ -51,9 +52,13 @@
 
 (defun infinote-apply (operation)
   "Get a string with the operation applied"
-  (pcase operation
-    (`(,:insert ,position ,text) (infinote-splice position 0 text))
-    (`(,:delete ,position ,text) (infinote-splice position (length text)))))
+  ;; (pcase operation
+  ;;   (`(,:insert ,position ,text) (infinote-splice position 0 text))
+  ;;   (`(,:delete ,position ,text) (infinote-splice position (length text)))))
+ (pcase operation
+  (`(,:insert ,position ,text) (collab-mode-cm-insert text position))
+  (`(,:delete ,position ,text)
+   (collab-mode-cm-delete position (+ position (length text))))))
 
 (defun infinote-previous-vector (user target-vector)
   "Get the vector as it was one request ago"

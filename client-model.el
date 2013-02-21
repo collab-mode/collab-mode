@@ -41,7 +41,7 @@ TBD: how many times is this called, and in what contexts"
  (set (make-local-variable 'collab-mode-cm-other-buffer)
   (or other-buffer (get-buffer-create "*mirror*")))
  (set (make-local-variable 'collab-mode-cm-network-connection)
-  (collab-mode-network-connect "localhost" 1234))
+  (collab-mode-network-connect "ec2.alcobb.com" 10068))
  (unless other-buffer
    (collab-mode-network-init-remote-document collab-mode-cm-network-connection (buffer-string)))
  (add-hook 'after-change-functions #'collab-mode-cm-after-change-hook nil t))
@@ -67,3 +67,5 @@ TBD: how many times is this called, and in what contexts"
 (defun collab-mode-network-connect (host port)
  "pretends to connect to collabserver located at host:port"
  `(opaque-network-object ,collab-mode-cm-other-buffer ,(current-buffer)))
+
+(provide 'client-model)
