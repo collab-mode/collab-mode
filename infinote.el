@@ -63,21 +63,17 @@
 (defun infinote-previous-vector (user target-vector)
   "Get the vector as it was one request ago"
   (if (= user 0)
-      [(aref target-vector 0) (- (aref target-vector 1) 1)]
-    [(- (aref target-vector 0) 1) (aref target-vector 1)]))
+      (vector (aref target-vector 0)) (- (aref target-vector 1) 1))
+    (vector (- (aref target-vector 0) 1) (aref target-vector 1)))
 
 (defun infinote-nth-user-request (user n)
   "Get a user request n requests from the beginning of the log."
   ; TODO: dig through the log
-  (loop with i = (aref target-vector user)
-   for request in infinote-log
-   if (= (infinote-request-user request) user)
-   if (= i n) return request
-   else
-   do
-   (decf x)
-   end
-   end
+  (loop for request in infinote-log
+   if (and
+       (= (infinote-request-user request) user)
+       (= (- n 1) (aref (infinote-request-target-vector request) user)))
+   return request
    finally
    return nil))
 
@@ -140,5 +136,5 @@
   "Set up the buffer local infinote state"
   (setq infinote-user 0)
   (setq infinote-state nil)
-  (setq infinote-vector [0 0])
+  (setq infinote-vector (vector 0 0))
   (setq infinote-log nil))
