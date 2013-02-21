@@ -13,6 +13,9 @@ so it doesn't rebroadcast itself into an infinite loop")
 
 (defvar collab-mode-cm-hack-buffer nil "the buffer")
 
+(defun font-for-user (user)
+ `(:box ,(if (= user 0) "firebrick" "dodger blue")))
+
 (defun collab-mode-cm-insert (string location)
  "inserts STRING into current buffer at LOCATION"
  (with-current-buffer collab-mode-cm-hack-buffer
@@ -20,7 +23,7 @@ so it doesn't rebroadcast itself into an infinite loop")
    (let ((collab-mode-cm-applying-changes t))
     (save-excursion
      (goto-char location)
-     (insert string))))))
+     (insert (propertize string 'font-lock-face (font-for-user (- 1 infinote-user)))))))))
 
 (defun collab-mode-cm-delete (start end)
  "removes text in current buffer from START to END"
@@ -32,6 +35,9 @@ so it doesn't rebroadcast itself into an infinite loop")
 (defun collab-mode-cm-after-change-hook (start end previous-length)
  "handler for hook that the buffer just changed"
  (when (not collab-mode-cm-applying-changes)
+  (message "%S"
+   `(put-text-property ,start ,end font-lock-face ,(font-for-user infinote-user)))
+  (put-text-property start end 'font-lock-face (font-for-user infinote-user))
   (let ((collab-mode-cm-updating-infinote t))
    (when (/= previous-length 0)
     (collab-mode-network-post-delete
