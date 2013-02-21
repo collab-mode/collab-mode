@@ -36,7 +36,7 @@
 (defun infinote-transform-request (request against-request)
   "Rebase a request onto another request"
   (make-infinote-request :user (infinote-request-user request)
-                         :target-vector (let ((new-vector (copy-sequence (infinote-request-vector request))))
+                         :target-vector (let ((new-vector (copy-sequence (infinote-request-target-vector request))))
                                    (infinote-increment-vector new-vector request)
                                    new-vector)
                          :operation (infinote-transform-operation
@@ -73,7 +73,7 @@
 (defun infinote-translate (request target-vector)
   "Get a request modified to be applicable to a state at the target-vector"
   ; If the request is for the target-vector, return it
-  (if (equal (infinote-request-vector request) target-vector)
+  (if (equal (infinote-request-target-vector request) target-vector)
       request
     (let* ((user (infinote-request-user request))
            (previous-vector (infinote-previous-vector user target-vector)))
