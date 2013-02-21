@@ -15,14 +15,10 @@
   (setq tabulated-list-padding 2)
   (tabulated-list-init-header))
 
-(defun print-current-line-id ()
-  (interactive)
-  (message (concat "current line ID is: " (tabulated-list-get-id))))
-
 (defun collab-list-users ()
   (interactive)
   (pop-to-buffer "*Users*" nil)
   (collab-users-mode)
-  (setq tabulated-list-entries '(("1" [("button1" . (action (lambda (arg) (message "blah"))))])
-				 ("2" [("button2" . ())])))
+  (setq tabulated-list-entries '(("1" [("● user1" . (action (lambda (arg) (message "blah"))))])
+				 ("2" [("○ user2" . ())])))
   (tabulated-list-print t))
