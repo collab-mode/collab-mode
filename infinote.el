@@ -56,7 +56,8 @@
   ;;   (`(,:insert ,position ,text) (infinote-splice position 0 text))
   ;;   (`(,:delete ,position ,text) (infinote-splice position (length text)))))
  (pcase operation
-  (`(,:insert ,position ,text) (collab-mode-cm-insert text position))
+  (`(,:insert ,position ,text)
+   (collab-mode-cm-insert text position))
   (`(,:delete ,position ,text)
    (collab-mode-cm-delete position (+ position (length text))))))
 

@@ -9,3 +9,4 @@
 (defun collab-network-send-to-server (text)
   (process-send-string collab-server-process (concat "<message>" text)))
 
+(provide 'network)
