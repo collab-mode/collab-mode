@@ -1,15 +1,19 @@
 (require 'cl)
 (defun test-insert (text pos)
   (goto-char pos)
-  (insert (propertize text 'font-lock-face `(:background ,(if (= user 0) "red" "blue")))))
+  (insert (propertize text 'font-lock-face `(:box ,(if (= user 0) "firebrick" "dodger blue")))))
 (defun test-delete (pos end)
   (goto-char pos)
   (delete-char (- end pos)))
-(defun test-insert-request (user vector pos text)
-  (let ((request (make-infinote-request :user user
-                                        :target-vector vector
-                                        :operation `(:insert ,pos ,text))))
-    (infinote-execute request)))
+(defun insert-request (user vector pos text)
+  (make-infinote-request :user user
+                         :target-vector vector
+                         :operation `(:insert ,pos ,text)))
+
+(defun delete-request (user vector pos text)
+  (make-infinote-request :user user
+                         :target-vector vector
+                         :operation `(:delete ,pos ,text)))
 
 (with-current-buffer "*infinote-tests*"
   (delete-region (point-min) (point-max))
@@ -17,8 +21,13 @@
          (collab-mode-cm-delete (pos end) (test-delete pos end))
          (collab-network-send-to-server (text) (message text)))
     (infinote-init)
-    (test-insert-request 1 [0 0] 1 "I ")
-    (test-insert-request 1 [0 1] 3 "am ")
-    (test-insert-request 1 [0 2] 6 "a ")
-    (test-insert-request 0 [0 1] 1 "hallo ")
-    (test-insert-request 1 [0 3] 8 "test")))
+    (assert (= 1 (infinote-find-translatable-user (insert-request 0 [0 3] 0 "Test") [0 4])))
+
+    (infinote-execute (insert-request 1 [0 0] 1 "I "))
+    (infinote-execute (insert-request 1 [0 1] 3 "am "))
+    (infinote-execute (insert-request 1 [0 2] 6 "a "))
+    (infinote-execute (insert-request 0 [0 1] 1 "hallo "))
+    (infinote-execute (insert-request 1 [0 3] 8 "test"))
+    (assert (equal (buffer-string) "hallo I am a test"))
+    
+    (infinote-execute (delete-request 0 [1 1] 1 "ha"))))

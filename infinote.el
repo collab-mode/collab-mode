@@ -34,14 +34,15 @@
 
 (defun infinote-transform-request (request against-request)
   "Rebase a request onto another request"
-  (let ((operation (infinote-request-operation request))
+  (let ((transformed-request (copy-infinote-request request))
+        (operation (infinote-request-operation request))
         (user (infinote-request-user against-request))
-        (target-vector (infinote-request-target-vector request)))
-    (setf (infinote-request-operation request) 
+        (target-vector (copy-sequence (infinote-request-target-vector request))))
+    (setf (infinote-request-operation transformed-request) 
           (infinote-transform-operation operation
                                         (infinote-request-operation against-request)))
     (incf (aref target-vector user))
-    request))
+    transformed-request))
 
 (defun infinote-splice (start length &optional text)
   "Get a string with <length> characters starting from index <start> replaced with <text>"
@@ -63,9 +64,9 @@
 
 (defun infinote-previous-vector (user target-vector)
   "Get the vector as it was one request ago"
-  (if (= user 0)
-      (vector (aref target-vector 0) (- (aref target-vector 1) 1))
-    (vector (- (aref target-vector 0) 1) (aref target-vector 1))))
+  (let ((previous-vector (copy-sequence target-vector)))
+    (decf (aref previous-vector user))
+    previous-vector))
 
 (defun infinote-nth-user-request (user n)
   "Get a user request n requests from the beginning of the log."
@@ -78,16 +79,25 @@
 (defun infinote-previous-request (user target-vector)
   (infinote-nth-user-request user (aref target-vector user)))
 
+(defun infinote-find-translatable-user (request target-vector)
+  (loop for user-id below (length target-vector)
+        if (and (/= user-id (infinote-request-user request))
+                (> (aref target-vector user-id) (aref (infinote-request-target-vector request) user-id)))
+        return user-id
+        finally return nil))
+
 (defun infinote-translate (request target-vector)
   "Get a request modified to be applicable to a state at the target-vector"
   ; If the request is for the target-vector, return it
+  (assert (loop for user-request-count across target-vector if (< user-request-count 0) return nil end finally return t))
   (if (equal (infinote-request-target-vector request) target-vector)
       request
-    (let* ((user (infinote-request-user request))
-           (previous-vector (infinote-previous-vector user target-vector)))
+    (let* ((translatable-user (infinote-find-translatable-user request target-vector))
+           (previous-vector (infinote-previous-vector translatable-user target-vector)))
+      (assert translatable-user)
       (infinote-transform-request
        (infinote-translate request previous-vector)
-       (infinote-translate (infinote-previous-request (- 1 user) target-vector) previous-vector)))
+       (infinote-translate (infinote-previous-request translatable-user target-vector) previous-vector)))
   ; Find every request in the log that occured after the version we want to apply the request to
   ; Transform the request against each of them, in order  
 
@@ -108,7 +118,7 @@
          (operation (infinote-request-operation translated-request))
          (user (infinote-request-user request)))
     (incf (aref infinote-vector user))
-    (push translated-request infinote-log)
+    (push request infinote-log)
     (infinote-apply operation))
   ; Append the translated request to the log
   ; Execute the request
