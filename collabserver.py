@@ -15,12 +15,28 @@ class MainListiningThread(threading.Thread):
 		threading.Thread.__init__(self)
 		self.tcplisSoc = soc
 		self.connected_users = []
+                self.readButNotParsed = []
+	def recvUntilNull(self):
+                buffer = ''
+                while True:
+                        if self.readButNotParsed:
+                                newInfo = self.readButNotParsed.pop(0)
+                        else:
+                                newInfo = self.tcplisSoc.recv(1024)
+                        spl = newInfo.split('\0', 1)
+                        if len(spl) > 1:
+                                a, b = spl
+                                buffer += a
+                                self.readButNotParsed.append(b)
+                                return buffer
+                        else:
+                                buffer += newInfo
 	def run(self):
 		key = ''
 		mymessage = ''
 		while key != '<exit':
 			try:
-				message = self.tcplisSoc.recv(1024)
+				message = self.recvUntilNull()
 				if not message:
 					key = '<exit'
 					message = ''
@@ -87,8 +103,9 @@ class MainListiningThread(threading.Thread):
 			messageq.put(["invalid index",self.tcplisSoc])
 
 	def sendMessage(self,mymess):
-		for i in self.connected_users:
-			messageq.put([mymess,i])
+		for i in usrlst:
+                        if (i != self.tcplisSoc):
+                                messageq.put([mymess,i])
 
 
 	def userQuit(self):
@@ -117,18 +134,24 @@ def main():
 	socque = Queue.Queue()
 	serverPort = 10068
 	serverSocket = socket(AF_INET, SOCK_STREAM)
-	serverip = gethostbyname(gethostname()) 
+	serverip = gethostbyname(gethostname())
+	serverip = ''
 	serverSocket.bind(( serverip, serverPort))
 	serverSocket.listen(5)
 	print "Server Started at address: ", serverip, " and port # ", serverPort
         t = MainSendingThread()
-        t.start()
+	t3 = MainSendingThread()
+	t4 = MainSendingThread()
+	t5 = MainSendingThread()
+	t.start()
+	t3.start()
+	t4.start()
+	t5.start()
         while 1:
 		(tcpCliSock, addr) = serverSocket.accept()
 		print 'Received a connection from:', addr
 		usrlst.append(tcpCliSock)
 		t2 = MainListiningThread(tcpCliSock)
-		t2.setDaemon(True)
 		t2.start()
 
 
