@@ -2,7 +2,7 @@
 
 (defstruct infinote-request "An infinote request" user target-vector operation)
 
-(defun infinote-transform (operation against-operation &optional cid)
+(defun infinote-transform-operation (operation against-operation &optional cid)
   "Get an operation transformed against another operation."
   (pcase operation
     (`(:noop) '(:noop))
@@ -35,12 +35,13 @@
 (defun infinote-transform-request (request against-request)
   "Rebase a request onto another request"
   (let ((operation (infinote-request-operation request))
-        (user (infinote-request-user request))
+        (user (infinote-request-user against-request))
         (target-vector (infinote-request-target-vector request)))
-    (setf operation (infinote-transform-operation
-                     operation
-                     (infinote-request-operation against-request)))
-    (incf (aref target-vector user))))
+    (setf (infinote-request-operation request) 
+          (infinote-transform-operation operation
+                                        (infinote-request-operation against-request)))
+    (incf (aref target-vector user))
+    request))
 
 (defun infinote-splice (start length &optional text)
   "Get a string with <length> characters starting from index <start> replaced with <text>"
@@ -68,17 +69,14 @@
 
 (defun infinote-nth-user-request (user n)
   "Get a user request n requests from the beginning of the log."
-  ; TODO: dig through the log
   (loop for request in infinote-log
-   if (and
-       (= (infinote-request-user request) user)
-       (= (- n 1) (aref (infinote-request-target-vector request) user)))
-   return request
-   finally
-   return nil))
+        if (and
+            (= (infinote-request-user request) user)
+            (= (- n 1) (aref (infinote-request-target-vector request) user)))
+        return request))
 
 (defun infinote-previous-request (user target-vector)
-  (infinote-nth-user-request user (aref (infinote-previous-vector user target-vector) (- 1 user))))
+  (infinote-nth-user-request user (aref target-vector user)))
 
 (defun infinote-translate (request target-vector)
   "Get a request modified to be applicable to a state at the target-vector"
@@ -89,7 +87,10 @@
            (previous-vector (infinote-previous-vector user target-vector)))
       (infinote-transform-request
        (infinote-translate request previous-vector)
-       (infinote-translate (infinote-previous-request user target-vector) previous-vector)))
+       (infinote-translate (infinote-previous-request (- 1 user) target-vector) previous-vector)))
+  ; Find every request in the log that occured after the version we want to apply the request to
+  ; Transform the request against each of them, in order  
+
   ; Find a user with a target-vector value greater than in the request vector
   ; Get the last-request that caused that user's value to be set to the target-vector value
   ; Get the last-targe-value, the target-value from before the last-request was applied
