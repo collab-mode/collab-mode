@@ -5,14 +5,14 @@
 (defun infinote-transform (operation against-operation &optional cid)
   "Get an operation transformed against another operation."
   (pcase operation
-    (`(,:noop) '(:noop))
-    (`(,:insert ,position ,text)
+    (`(:noop) '(:noop))
+    (`(:insert ,position ,text)
      (pcase against-operation
        (`(,:insert ,position2 ,text2) ; TODO: use the cid like py-infinote
         (cond
          ((< position position2) operation)
          ((>= position position2) `(:insert ,(+ position (length text2)) ,text))))
-       (`(,:delete ,position2 ,text2)
+       (`(:delete ,position2 ,text2)
         (cond
          ((>= position (+ position2 (length text2)))
           `(:insert ,(- position (length text2)) ,text))
@@ -20,7 +20,7 @@
           `(:insert ,position ,text))
          ((and (>= position position2) (< position (+ position2 (length text2))))
           `(:insert ,position2 ,text))))))
-    (`(,:delete ,position ,text)
+    (`(:delete ,position ,text)
      (pcase against-op
        (_ operation)
 ;       (`(,:insert ,position2 ,text2)
@@ -55,9 +55,9 @@
   ;;   (`(,:insert ,position ,text) (infinote-splice position 0 text))
   ;;   (`(,:delete ,position ,text) (infinote-splice position (length text)))))
  (pcase operation
-  (`(,:insert ,position ,text)
+  (`(:insert ,position ,text)
    (collab-mode-cm-insert text position))
-  (`(,:delete ,position ,text)
+  (`(:delete ,position ,text)
    (collab-mode-cm-delete position (+ position (length text))))))
 
 (defun infinote-previous-vector (user target-vector)
