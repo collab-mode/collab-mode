@@ -103,17 +103,19 @@
 
 (defun infinote-insert (pos text)
   "Insert some text"
-  (infinote-execute
-   (make-infinote-request :user infinote-user
-                          :target-vector infinote-vector
-                          :operation `(:insert ,pos ,text))))
+  (let ((request (make-infinote-request :user infinote-user
+                                        :target-vector infinote-vector
+                                        :operation `(:insert ,pos ,text))))
+    (infinote-execute request)
+    (collab-network-send-to-server (let ((print-level nil) (print-length nil)) (prin1-to-string request)))))
 
 (defun infinote-delete (pos text)
   "Delete some text"
-  (infinote-execute
-   (make-infinote-request :user infinote-user
-                          :target-vector infinote-vector
-                          :operation `(:delete ,pos ,text))))
+  (let ((request (make-infinote-request :user infinote-user
+                                        :target-vector infinote-vector
+                                        :operation `(:delete ,pos ,text))))
+    (infinote-execute request)
+    (collab-network-send-to-server (let ((print-level nil) (print-length nil)) (prin1-to-string request)))))
 
 (defun infinote-init ()
   "Set up the buffer local infinote state"
