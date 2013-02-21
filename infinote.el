@@ -79,7 +79,7 @@
 
 (defun infinote-previous-request (user target-vector)
   (infinote-nth-user-request user (aref (infinote-previous-vector user target-vector) (- 1 user))))
-(infinote-init)
+
 (defun infinote-translate (request target-vector)
   "Get a request modified to be applicable to a state at the target-vector"
   ; If the request is for the target-vector, return it
