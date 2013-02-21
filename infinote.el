@@ -82,7 +82,7 @@
    return nil))
 
 (defun infinote-previous-request (user target-vector)
-  (infinote-nth-user-request user (aref (infinote-previous-vector user target-vector) user)))
+  (infinote-nth-user-request user (aref (infinote-previous-vector user target-vector) (- 1 user))))
 
 (defun infinote-translate (request target-vector)
   "Get a request modified to be applicable to a state at the target-vector"
@@ -138,7 +138,7 @@
 
 (defun infinote-init ()
   "Set up the buffer local infinote state"
-  (set (make-local-variable 'infinote-user) 0)
-  (set (make-local-variable 'infinote-state) nil)
-  (set (make-local-variable 'infinote-vector) [0 0])
-  (set (make-local-variable 'infinote-log) nil))
+  (setq infinote-user 0)
+  (setq infinote-state nil)
+  (setq infinote-vector [0 0])
+  (setq infinote-log nil))
