@@ -63,8 +63,8 @@
 (defun infinote-previous-vector (user target-vector)
   "Get the vector as it was one request ago"
   (if (= user 0)
-      (vector (aref target-vector 0)) (- (aref target-vector 1) 1))
-    (vector (- (aref target-vector 0) 1) (aref target-vector 1)))
+      (vector (aref target-vector 0) (- (aref target-vector 1) 1))
+    (vector (- (aref target-vector 0) 1) (aref target-vector 1))))
 
 (defun infinote-nth-user-request (user n)
   "Get a user request n requests from the beginning of the log."
@@ -79,7 +79,7 @@
 
 (defun infinote-previous-request (user target-vector)
   (infinote-nth-user-request user (aref (infinote-previous-vector user target-vector) (- 1 user))))
-
+(infinote-init)
 (defun infinote-translate (request target-vector)
   "Get a request modified to be applicable to a state at the target-vector"
   ; If the request is for the target-vector, return it
@@ -121,16 +121,18 @@
   (let ((request (make-infinote-request :user infinote-user
                                         :target-vector infinote-vector
                                         :operation `(:insert ,pos ,text))))
+    (collab-network-send-to-server (let ((print-level nil) (print-length nil)) (prin1-to-string request)))
     (infinote-execute request)
-    (collab-network-send-to-server (let ((print-level nil) (print-length nil)) (prin1-to-string request)))))
+    ))
 
 (defun infinote-delete (pos text)
   "Delete some text"
   (let ((request (make-infinote-request :user infinote-user
                                         :target-vector infinote-vector
                                         :operation `(:delete ,pos ,text))))
-    (infinote-execute request)
-    (collab-network-send-to-server (let ((print-level nil) (print-length nil)) (prin1-to-string request)))))
+    (collab-network-send-to-server (let ((print-level nil) (print-length nil)) (prin1-to-string request)))
+(infinote-execute request)
+    ))
 
 (defun infinote-init ()
   "Set up the buffer local infinote state"
