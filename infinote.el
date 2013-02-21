@@ -124,7 +124,7 @@
 
 (defun infinote-init ()
   "Set up the buffer local infinote state"
-  (set (make-local-variable infinote-user) 0)
-  (set (make-local-variable infinote-state) nil)
-  (set (make-local-variable infinote-vector) [nil nil])
-  (set (make-local-variable infinote-log) nil))
+  (set (make-local-variable 'infinote-user) 0)
+  (set (make-local-variable 'infinote-state) nil)
+  (set (make-local-variable 'infinote-vector) [nil nil])
+  (set (make-local-variable 'infinote-log) nil))
