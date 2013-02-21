@@ -15,19 +15,20 @@ class MainListiningThread(threading.Thread):
 		threading.Thread.__init__(self)
 		self.tcplisSoc = soc
 		self.connected_users = []
-                self.readButNotParsed = []
+                self.readButNotParsed = ''
 	def recvUntilNull(self):
                 buffer = ''
                 while True:
                         if self.readButNotParsed:
-                                newInfo = self.readButNotParsed.pop(0)
+                                newInfo = self.readButNotParsed
+                                self.readButNotParsed = ''
                         else:
                                 newInfo = self.tcplisSoc.recv(1024)
                         spl = newInfo.split('\0', 1)
                         if len(spl) > 1:
                                 a, b = spl
                                 buffer += a
-                                self.readButNotParsed.append(b)
+                                self.readButNotParsed = b
                                 return buffer
                         else:
                                 buffer += newInfo
@@ -134,6 +135,7 @@ def main():
 	socque = Queue.Queue()
 	serverPort = 10068
 	serverSocket = socket(AF_INET, SOCK_STREAM)
+        serverSocket.setsockopt(SOL_SOCKET, SO_REUSEADDR, 1)
 	serverip = gethostbyname(gethostname())
 	serverip = ''
 	serverSocket.bind(( serverip, serverPort))
