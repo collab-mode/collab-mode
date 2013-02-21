@@ -28,14 +28,15 @@ so it doesn't rebroadcast itself into an infinite loop")
 
 (defun collab-mode-cm-after-change-hook (start end previous-length)
  "handler for hook that the buffer just changed"
- (when (/= previous-length 0)
-  (collab-mode-network-post-delete
-   collab-mode-cm-network-connection
-   start (+ start previous-length)))
- (when (/= start end)
-  (collab-mode-network-post-insert
-   collab-mode-cm-network-connection
-   start (buffer-substring-no-properties start end))))
+ (when (not collab-mode-cm-applying-changes)
+  (when (/= previous-length 0)
+   (collab-mode-network-post-delete
+    collab-mode-cm-network-connection
+    start (+ start previous-length)))
+  (when (/= start end)
+   (collab-mode-network-post-insert
+    collab-mode-cm-network-connection
+    start (buffer-substring-no-properties start end)))))
 
 ;(defvar collab-mode-cm-other-buffer nil)
 (defvar collab-mode-cm-network-connection nil)

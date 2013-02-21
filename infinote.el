@@ -1,5 +1,4 @@
 (require 'cl)
-(require 'client-model)
 
 (defstruct infinote-request "An infinote request" user target-vector operation)
 
