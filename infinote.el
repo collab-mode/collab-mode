@@ -30,18 +30,18 @@
          ))))
 
 (defun infinote-increment-vector (vector request)
-  "Add a request to a vector"
-  (push request (aref vector (infinote-request-user request))))
+  "Increment a user's operation counter in a request"
+  (incf (aref vector (infinote-request-user request))))
 
 (defun infinote-transform-request (request against-request)
   "Rebase a request onto another request"
-  (make-infinote-request :user (infinote-request-user request)
-                         :target-vector (let ((new-vector (copy-sequence (infinote-request-vector request))))
-                                   (infinote-increment-vector new-vector request)
-                                   new-vector)
-                         :operation (infinote-transform-operation
-                                     (infinote-request-operation request)
-                                     (infinote-request-operation against-request))))
+  (let ((operation (infinote-request-operation request))
+        (user (infinote-request-user request))
+        (target-vector (infinote-request-target-vector request)))
+    (setf operation (infinote-transform-operation
+                     operation
+                     (infinote-request-operation against-request)))
+    (incf (aref target-vector user))))
 
 (defun infinote-splice (start length &optional text)
   "Get a string with <length> characters starting from index <start> replaced with <text>"
@@ -63,17 +63,31 @@
 (defun infinote-previous-vector (user target-vector)
   "Get the vector as it was one request ago"
   (if (= user 0)
-      [(aref target-vector 0) (cdr (aref target-vector 1))]
-    [(cdr (aref target-vector 0)) (aref target-vector 1)]))
+      [(aref target-vector 0) (- (aref target-vector 1) 1)]
+    [(- (aref target-vector 0) 1) (aref target-vector 1)]))
+
+(defun infinote-nth-user-request (user n)
+  "Get a user request n requests from the beginning of the log."
+  ; TODO: dig through the log
+  (loop with i = (aref target-vector user)
+   for request in infinote-log
+   if (= (infinote-request-user request) user)
+   if (= i n) return request
+   else
+   do
+   (decf x)
+   end
+   end
+   finally
+   return nil))
 
 (defun infinote-previous-request (user target-vector)
-  "Get the request that brought the vector to its current state"
-  (car (aref target-vector (- 1 user))))
+  (infinote-nth-user-request user (aref (infinote-previous-vector user target-vector) user)))
 
 (defun infinote-translate (request target-vector)
   "Get a request modified to be applicable to a state at the target-vector"
   ; If the request is for the target-vector, return it
-  (if (equal (infinote-request-vector request) target-vector)
+  (if (equal (infinote-request-target-vector request) target-vector)
       request
     (let* ((user (infinote-request-user request))
            (previous-vector (infinote-previous-vector user target-vector)))
@@ -96,7 +110,7 @@
   (let* ((translated-request (infinote-translate request infinote-vector))
          (operation (infinote-request-operation translated-request))
          (user (infinote-request-user request)))
-    (push translated-request (aref infinote-vector user))
+    (incf (aref infinote-vector user))
     (push translated-request infinote-log)
     (infinote-apply operation))
   ; Append the translated request to the log
@@ -126,5 +140,5 @@
   "Set up the buffer local infinote state"
   (set (make-local-variable 'infinote-user) 0)
   (set (make-local-variable 'infinote-state) nil)
-  (set (make-local-variable 'infinote-vector) [nil nil])
+  (set (make-local-variable 'infinote-vector) [0 0])
   (set (make-local-variable 'infinote-log) nil))
