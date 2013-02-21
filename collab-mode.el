@@ -39,7 +39,15 @@ users, checks which are connected, and returns the appropriate list of entries."
 
 (defun user-text (user)
   "Returns user entry label with appropriate face and connection glyph."
-  user)
+  (if (user-connected user)
+      (concat "● " user)
+    (concat "○ " user)))
+
+(defun user-connected (user)
+  "Returns whether USER is connected."
+  (if (string= "Jeff" user)
+      'true
+    nil))
 
 (defun collab-users ()
   "Returns a list of all available users."
