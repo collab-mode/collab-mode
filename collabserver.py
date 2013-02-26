@@ -7,6 +7,7 @@ import threading
 import Queue
 
 usrlst = []
+rooms = [['main',usrlst]]
 lock = threading.Lock()
 messageq = Queue.Queue()
 
@@ -16,6 +17,7 @@ class MainListiningThread(threading.Thread):
 		self.tcplisSoc = soc
 		self.connected_users = []
                 self.readButNotParsed = ''
+                self.myroom = 0
 	def recvUntilNull(self):
                 buffer = ''
                 while True:
@@ -24,6 +26,8 @@ class MainListiningThread(threading.Thread):
                                 self.readButNotParsed = ''
                         else:
                                 newInfo = self.tcplisSoc.recv(1024)
+                                if not newInfo:
+                                        return newInfo
                         spl = newInfo.split('\0', 1)
                         if len(spl) > 1:
                                 a, b = spl
@@ -74,10 +78,22 @@ class MainListiningThread(threading.Thread):
 				messageq.put([message,self.tcplisSoc])
 				key = ''
 				mymessage = ''
+			if key == '<create room':
+                                self.createRoom(mymessage)
+                                key = ''
+                                mymessage = ''
 			if key == '<connect':
 				self.startConnect(mymessage)
 				key = ''
 				mymessage = ''
+			if key == '<list rooms':
+                                self.listRooms()
+                                key = ''
+                                mymessage = ''
+                        if key == '<join room':
+                                self.joinRoom(mymessage)
+                                key = ''
+                                mymessage = ''
 			if key == '<message':
 				self.sendMessage(mymessage)
 				key = ''
@@ -87,11 +103,43 @@ class MainListiningThread(threading.Thread):
 				key = ''
 				mymessage = ''
 
+        def createRoom(self,mymess):
+                validrm = True
+                global rooms
+                for i in rooms:
+                        if i[0] == mymess:
+                                messageq.put(['room name already in use',self.tcplisSoc])
+                                validrm = False
+                if(validrm == True and len(mymess) < 21):
+                        rooms = rooms + [[mymess,[]]]
+        def joinRoom(self,mymess):
+                rmindex = -1
+                j = 0
+                global rooms
+                for i in rooms:
+                        if i[0] == mymess:
+                                rmindex = j
+                        j = j + 1
+                if (rmindex == -1):
+                        messageq.put(['room not found',self.tcplisSoc])
+                else:
+                        rooms[self.myroom][1].remove(self.tcplisSoc)
+                        rooms[rmindex][1].append(self.tcplisSoc)
+                        self.myroom = rmindex
 
+        def listRooms(self):
+                mymess = ''
+                for i in rooms:
+                        mymess = mymess + i[0] + '\n'
+                messageq.put([mymess,self.tcplisSoc])
+                        
+        
 	def sendAddrList(self):
 		sendmsg = ''
-		for i in range(len(usrlst)):
-			sendmsg = sendmsg + "\n" + str(i) + " " + str(usrlst[i].getpeername())
+		for i in range(len(rooms[self.myroom][1])):
+                        sendmsg = sendmsg + '\n' + str(i) + ' ' + str(rooms[self.myroom][1][i].getpeername())
+		#for i in range(len(usrlst)):
+		#	sendmsg = sendmsg + "\n" + str(i) + " " + str(usrlst[i].getpeername())
 		messageq.put([sendmsg,self.tcplisSoc])
 	def startConnect(self,mymess):
 		try:
@@ -104,14 +152,15 @@ class MainListiningThread(threading.Thread):
 			messageq.put(["invalid index",self.tcplisSoc])
 
 	def sendMessage(self,mymess):
-		for i in usrlst:
+		for i in rooms[self.myroom][1]:
                         if (i != self.tcplisSoc):
                                 messageq.put([mymess+'\0',i])
 
 
 	def userQuit(self):
 		try:
-			usrlst.remove(self.tcplisSoc)
+                        rooms[self.myroom][1].remove(self.tcplisSoc)
+                        print str(self.tcplisSoc.getpeername()) + ' quit'
 		except:
 			print 'not able to remove '
 		self.tcplisSoc.close()
