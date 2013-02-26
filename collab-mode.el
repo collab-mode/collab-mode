@@ -14,8 +14,6 @@
   (setq tabulated-list-entries (collab-get-entries))
   (tabulated-list-print t))
 
-
-
 (defun collab-get-entries ()
   "Returns the tabulated-list-entries argument for listing users. It gets the list of
 users, checks which are connected, and returns the appropriate list of entries."
@@ -35,15 +33,18 @@ users, checks which are connected, and returns the appropriate list of entries."
     (concat "○ " user)))
 
 (defun collab-connect-user (user)
+  "Attempts to connect USER."
   (if (string= "Jeff" (tabulated-list-get-id user))
       (if collab-jeff-connected
 	  (setq collab-jeff-connected nil)
 	(setq collab-jeff-connected 'true)))
+  ;; Must re-set TABULATED-LIST-ENTRIES and call TABULATED-LIST-PRINT
+  ;;  to update and re-display the table contents.
   (setq tabulated-list-entries (collab-get-entries))
   (tabulated-list-print)
   (print (tabulated-list-get-id user))) ;; @debug (print)
 
-(setq collab-jeff-connected ())
+(setq collab-jeff-connected ()) ;; @debug
 
 (defun collab-user-connected (user)
   "Returns whether USER is connected.
@@ -52,9 +53,10 @@ This is a temporary function. Actual function will be provided by the client."
       collab-jeff-connected
     nil))
 
+;; @debug
 (defun test-jeff-connected ()
-(interactive)
-(print (collab-user-connected "Jeff")))
+  (interactive)
+  (print (collab-user-connected "Jeff")))
 
 (defun collab-users ()
   "Returns a list of all available users.
