@@ -128,18 +128,20 @@ class MainListiningThread(threading.Thread):
                         self.myroom = rmindex
 
         def listRooms(self):
-                mymess = ''
+                mymess = '(:rooms '
+                indx = 0
                 for i in rooms:
-                        mymess = mymess + i[0] + '\n'
+                        mymess = mymess + '(' + str(indx) + ' "' + i[0] + '")'
+                        indx = indx + 1
+                mymess = mymess + ')'
                 messageq.put([mymess,self.tcplisSoc])
                         
         
 	def sendAddrList(self):
-		sendmsg = ''
+		sendmsg = '(:users '
 		for i in range(len(rooms[self.myroom][1])):
-                        sendmsg = sendmsg + '\n' + str(i) + ' ' + str(rooms[self.myroom][1][i].getpeername())
-		#for i in range(len(usrlst)):
-		#	sendmsg = sendmsg + "\n" + str(i) + " " + str(usrlst[i].getpeername())
+                        sendmsg = sendmsg + '(' + str(i) + ' ' + str(rooms[self.myroom][1][i].getpeername()).replace('(','',1).replace(',',' ',1).replace("'","\"")
+                sendmsg = sendmsg + ')'
 		messageq.put([sendmsg,self.tcplisSoc])
 	def startConnect(self,mymess):
 		try:
