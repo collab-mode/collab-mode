@@ -167,7 +167,7 @@ class MainListiningThread(threading.Thread):
 	def sendMessage(self,mymess):
 		for i in rooms[self.myroom][1]:
                         if (i != self.tcplisSoc):
-                                messageq.put([mymess+'\0',i])
+                                messageq.put([mymess,i])
 
 
 	def userQuit(self):
@@ -185,7 +185,7 @@ class MainSendingThread(threading.Thread):
 		while 1:
 			try:
 				message = messageq.get()
-				message[1].send(message[0])
+				message[1].send(message[0] + '\0')
 			except:
 				print "no data to send"
 
