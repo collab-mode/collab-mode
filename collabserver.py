@@ -71,6 +71,9 @@ class MainListiningThread(threading.Thread):
 				self.userQuit()
 			if key == '<help':
 				message = "type <list addr> to get a list of connected ip's \n"
+				message = message + "type <create room>(room name) to create a new room \n"
+				message = message + "type <join room>(room name) to join an already created room \n"
+				message = message + "type <list rooms> to get a list of the current rooms \n"
                                 message = message + "type <list self addr> to show your ip and port \n"
 				message = message + "type <exit> to end session \n"
 				message = message + "type <connect>(index #) to connect to another ip \n"
@@ -131,7 +134,11 @@ class MainListiningThread(threading.Thread):
                 mymess = '(:rooms '
                 indx = 0
                 for i in rooms:
-                        mymess = mymess + '(' + str(indx) + ' "' + i[0] + '")'
+                        mymess = mymess + '(' + str(indx) + ' "' + i[0] +'"'
+                        if (indx == self.myroom):
+                                mymess = mymess + ' :self-room)'
+                        else:
+                                mymess = mymess +')'
                         indx = indx + 1
                 mymess = mymess + ')'
                 messageq.put([mymess,self.tcplisSoc])
@@ -140,7 +147,11 @@ class MainListiningThread(threading.Thread):
 	def sendAddrList(self):
 		sendmsg = '(:users '
 		for i in range(len(rooms[self.myroom][1])):
-                        sendmsg = sendmsg + '(' + str(i) + ' ' + str(rooms[self.myroom][1][i].getpeername()).replace('(','',1).replace(',',' ',1).replace("'","\"")
+                        sendmsg = sendmsg + '(' + str(i) + ' ' + str(rooms[self.myroom][1][i].getpeername()).replace('(','',1).replace(',',' ',1).replace("'","\"").replace(')','')
+                        if (rooms[self.myroom][1][i] == self.tcplisSoc):
+                                sendmsg = sendmsg + ' :you)'
+                        else:
+                                sendmsg = sendmsg + ')'
                 sendmsg = sendmsg + ')'
 		messageq.put([sendmsg,self.tcplisSoc])
 	def startConnect(self,mymess):
