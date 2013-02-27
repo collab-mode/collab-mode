@@ -1,8 +1,14 @@
-(let* ((fname (or load-file-name buffer-file-name))
-       (dname (file-name-directory fname)))
- (load (expand-file-name "infinote.el" dname))
- (load (expand-file-name "network.el" dname))
- (load (expand-file-name "client-model.el" dname)))
+(when nil
+;; eval the following form to load collab-mode
+ (let* ((fname (or load-file-name buffer-file-name))
+        (dname (file-name-directory fname)))
+  (load (expand-file-name "collab-mode.el" dname))
+  (load (expand-file-name "infinote.el" dname))
+  (load (expand-file-name "network.el" dname))
+  (load (expand-file-name "client-model.el" dname))
+  )
+
+)
 
 (defun collab-mode (user-id)
   "Starts collab-mode and opens users buffer."
@@ -40,15 +46,15 @@ users, checks which are connected, and returns the appropriate list of entries."
       (concat "● " user)
     (concat "○ " user)))
 
-(defun collab-user-connected (user)
-  "Returns whether USER is connected."
-  (if (string= "Jeff" user)
-      'true
-    nil))
+;; (defun collab-user-connected (user)
+;;   "Returns whether USER is connected."
+;;   (if (string= "Jeff" user)
+;;       'true
+;;     nil))
 
-(defun collab-users ()
-  "Returns a list of all available users."
-  (list "Andrew" "Joel" "Jeff"))
+;; (defun collab-users ()
+;;   "Returns a list of all available users."
+;;   (list "Andrew" "Joel" "Jeff"))
 
 (defun collab-user-color (user)
   "Returns USER's color."
