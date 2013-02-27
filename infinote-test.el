@@ -23,11 +23,14 @@
     (infinote-init)
     (assert (= 1 (infinote-find-translatable-user (insert-request 0 [0 3] 0 "Test") [0 4])))
 
-    (infinote-execute (insert-request 1 [0 0] 1 "I "))
-    (infinote-execute (insert-request 1 [0 1] 3 "am "))
-    (infinote-execute (insert-request 1 [0 2] 6 "a "))
-    (infinote-execute (insert-request 0 [0 1] 1 "hallo "))
-    (infinote-execute (insert-request 1 [0 3] 8 "test"))
-    (assert (equal (buffer-string) "hallo I am a test"))
+    (infinote-execute (insert-request 1 [0 0] 1 "This is a test")) ; 14
+    
+    (infinote-execute (insert-request 1 [0 1] 11 "fine "))
+    (infinote-execute (insert-request 0 [0 1] 15 ", no?"))
+    (assert (equal (buffer-string) "This is a fine test, no?"))
+
+    (infinote-execute (insert-request 0 [1 2] 9 "quite "))
+    (infinote-execute (insert-request 1 [1 2] 8 "n't"))
+    (assert (equal (buffer-string) "This isn't quite a fine test, no?"))
     
     (infinote-execute (delete-request 0 [1 1] 1 "ha"))))

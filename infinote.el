@@ -4,29 +4,70 @@
 
 (defun infinote-transform-operation (operation against-operation &optional cid)
   "Get an operation transformed against another operation."
+                                        ; TODO: use the cid like py-infinote
+  (pcase (list operation against-operation)
+    (`((:split ,operation-1 ,operation-2) ,against-operation)
+     `(:split ,(infinote-transform-operation operation-1 against-operation)
+              ,(infinote-transform-operation operation-2 against-operation)))
+    
+    (`(,operation (:split ,operation-1 ,operation-2))
+     (infinote-transform-operation
+      (infinote-transform-operation operation operation-1)
+      (infinote-transform-operation operation-2 operation-1)))
+
+    (`((,op-1 ,position-1 ,text-1) (,op-2 ,position-2 ,text-2))
+     (let* ((length-1 (length text-1))
+            (length-2 (length text-2))
+            (end-1 (+ position-1 length-1))
+            (end-2 (+ position-2 length-2)))
+       (pcase (list op-1 op-2)
+         (`(:insert :insert)
+          (if (< position-1 position-2)
+              `(:insert ,position-1 ,text-1)
+            `(:insert ,(+ position-1 length-2) ,text-1)))
+
+         (`(:insert :delete)
+          (cond
+           ((>= position-1 end-2)
+            `(:insert ,(- position-1 length-2) ,text-1))
+           ((< position-1 position-2)
+            `(:insert ,position-1 ,text-1))
+           (t
+            `(:insert ,position-2 ,text-1))))
+
+         (`(:delete :insert)
+          (cond
+           ((>= position-2 end-1)
+            `(:delete ,position-1 ,text-1))
+           ((<= position-2 position-1)
+            `(:delete ,(+ position-1 length-2) ,text-1))
+           ((and (> position-2 position-1)
+                 (< position-2 end-1))
+            (infinote-split-operation operation (- position-2 position-1) length-2))))
+
+         (`(:delete :delete)
+          (cond
+           ((<= end-1 position-2)
+            `(:delete ,position-1 ,text-1))
+           ((>= position-1 end-2)
+            `(:delete ,(- position-1 length-2) ,text-1))
+           ((>= position-1 position-2)
+            (if (<= end-1 end-2)
+                `(:delete position-2 "")
+              `(:delete ,position-2 (substring text-1 (- end-2 position-1)))))
+           ((< position-1 position-2)
+            (if (<= end-1 end-2)
+                `(:delete ,position-1 (substring text-1 0 (- position-2 position-1)))
+              (let* ((before-inner (substring text-1 0 (- position-2 position-1)))
+                     (after-inner (substring text-1 (- end-2 position-1))))
+                     (text-without-inner (concat before-inner after-inner)))
+                `(:delete ,position-1 text-without-inner)))))))))))
+
+(defun infinote-split-operation (operation at offset)
   (pcase operation
-    (`(:noop) '(:noop))
-    (`(:insert ,position ,text)
-     (pcase against-operation
-       (`(,:insert ,position2 ,text2) ; TODO: use the cid like py-infinote
-        (cond
-         ((< position position2) operation)
-         ((>= position position2) `(:insert ,(+ position (length text2)) ,text))))
-       (`(:delete ,position2 ,text2)
-        (cond
-         ((>= position (+ position2 (length text2)))
-          `(:insert ,(- position (length text2)) ,text))
-         ((< position position2)
-          `(:insert ,position ,text))
-         ((and (>= position position2) (< position (+ position2 (length text2))))
-          `(:insert ,position2 ,text))))))
-    (`(:delete ,position ,text)
-     (pcase against-op
-       (_ operation)
-;       (`(,:insert ,position2 ,text2)
-;        (null))
-                   ; TODO: All the delete transforms
-         ))))
+    (`(,op ,position ,text)
+     `(:split (,op ,position ,(substring text 0 at))
+              (,op ,(+ position at offset) ,(substring text at))))))
 
 (defun infinote-increment-vector (vector request)
   "Increment a user's operation counter in a request"
@@ -114,7 +155,8 @@
   "Translate and execute a request"
   ; TODO: everything needed for more than two users. queue, can-executep, etc
   ; Translate the request to the state's vector
-  (let* ((translated-request (condition-case nil (infinote-translate request infinote-vector) (error (progn (message "sync error") request))))
+  (let* ((translated-request (infinote-translate request infinote-vector);(condition-case nil (infinote-translate request infinote-vector) (error (progn (message "sync error") request)))
+          )
          (operation (infinote-request-operation translated-request))
          (user (infinote-request-user request)))
     (incf (aref infinote-vector user))
