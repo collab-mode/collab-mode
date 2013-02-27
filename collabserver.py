@@ -18,6 +18,7 @@ class MainListiningThread(threading.Thread):
 		self.connected_users = []
                 self.readButNotParsed = ''
                 self.myroom = 0
+                self.sendMessage(self.addrListString())
 	def recvUntilNull(self):
                 buffer = ''
                 while True:
@@ -127,8 +128,10 @@ class MainListiningThread(threading.Thread):
                         messageq.put(['room not found',self.tcplisSoc])
                 else:
                         rooms[self.myroom][1].remove(self.tcplisSoc)
+                        self.sendMessage(self.addrListString())
                         rooms[rmindex][1].append(self.tcplisSoc)
                         self.myroom = rmindex
+                        self.sendMessage(self.addrListString())
 
         def listRooms(self):
                 mymess = '(:rooms '
@@ -154,6 +157,13 @@ class MainListiningThread(threading.Thread):
                                 sendmsg = sendmsg + ')'
                 sendmsg = sendmsg + ')'
 		messageq.put([sendmsg,self.tcplisSoc])
+	def addrListString(self):
+                sendmsg = '(:users '
+		for i in range(len(rooms[self.myroom][1])):
+                        sendmsg = sendmsg + '(' + str(i) + ' ' + str(rooms[self.myroom][1][i].getpeername()).replace('(','',1).replace(',',' ',1).replace("'","\"").replace(')','')
+                        sendmsg = sendmsg + ')'
+                sendmsg = sendmsg + ')'
+                return sendmsg
 	def startConnect(self,mymess):
 		try:
 			indxnum = int(mymess)
@@ -176,6 +186,7 @@ class MainListiningThread(threading.Thread):
                         print str(self.tcplisSoc.getpeername()) + ' quit'
 		except:
 			print 'not able to remove '
+		self.sendMessage(self.addrListString())
 		self.tcplisSoc.close()
 
 class MainSendingThread(threading.Thread):
