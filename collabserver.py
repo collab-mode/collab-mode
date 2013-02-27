@@ -17,11 +17,8 @@ class MainListiningThread(threading.Thread):
 		self.tcplisSoc = soc
 		self.connected_users = []
                 self.readButNotParsed = ''
-<<<<<<< HEAD
-=======
                 self.myroom = 0
                 self.sendMessage(self.addrListString())
->>>>>>> added my test client that I have been using
 	def recvUntilNull(self):
                 buffer = ''
                 while True:
@@ -30,11 +27,8 @@ class MainListiningThread(threading.Thread):
                                 self.readButNotParsed = ''
                         else:
                                 newInfo = self.tcplisSoc.recv(1024)
-<<<<<<< HEAD
-=======
                                 if not newInfo:
                                         return newInfo
->>>>>>> added my test client that I have been using
                         spl = newInfo.split('\0', 1)
                         if len(spl) > 1:
                                 a, b = spl
@@ -181,11 +175,7 @@ class MainListiningThread(threading.Thread):
 			messageq.put(["invalid index",self.tcplisSoc])
 
 	def sendMessage(self,mymess):
-<<<<<<< HEAD
-		for i in usrlst:
-=======
 		for i in rooms[self.myroom][1]:
->>>>>>> added my test client that I have been using
                         if (i != self.tcplisSoc):
                                 messageq.put([mymess,i])
 
@@ -225,17 +215,7 @@ def main():
 	serverSocket.listen(5)
 	print "Server Started at address: ", serverip, " and port # ", serverPort
         t = MainSendingThread()
-<<<<<<< HEAD
-	t3 = MainSendingThread()
-	t4 = MainSendingThread()
-	t5 = MainSendingThread()
 	t.start()
-	t3.start()
-	t4.start()
-	t5.start()
-=======
-	t.start()
->>>>>>> added my test client that I have been using
         while 1:
 		(tcpCliSock, addr) = serverSocket.accept()
 		print 'Received a connection from:', addr
