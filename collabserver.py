@@ -215,13 +215,7 @@ def main():
 	serverSocket.listen(5)
 	print "Server Started at address: ", serverip, " and port # ", serverPort
         t = MainSendingThread()
-	#t3 = MainSendingThread()
-	#t4 = MainSendingThread()
-	#t5 = MainSendingThread()
 	t.start()
-	#t3.start()
-	#t4.start()
-	#t5.start()
         while 1:
 		(tcpCliSock, addr) = serverSocket.accept()
 		print 'Received a connection from:', addr
