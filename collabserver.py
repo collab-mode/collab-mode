@@ -18,6 +18,7 @@ class MainListiningThread(threading.Thread):
 		self.connected_users = []
                 self.readButNotParsed = ''
                 self.myroom = 0
+                self.sendMessage(self.addrListString())
 	def recvUntilNull(self):
                 buffer = ''
                 while True:
@@ -71,6 +72,9 @@ class MainListiningThread(threading.Thread):
 				self.userQuit()
 			if key == '<help':
 				message = "type <list addr> to get a list of connected ip's \n"
+				message = message + "type <create room>(room name) to create a new room \n"
+				message = message + "type <join room>(room name) to join an already created room \n"
+				message = message + "type <list rooms> to get a list of the current rooms \n"
                                 message = message + "type <list self addr> to show your ip and port \n"
 				message = message + "type <exit> to end session \n"
 				message = message + "type <connect>(index #) to connect to another ip \n"
@@ -124,23 +128,42 @@ class MainListiningThread(threading.Thread):
                         messageq.put(['room not found',self.tcplisSoc])
                 else:
                         rooms[self.myroom][1].remove(self.tcplisSoc)
+                        self.sendMessage(self.addrListString())
                         rooms[rmindex][1].append(self.tcplisSoc)
                         self.myroom = rmindex
+                        self.sendMessage(self.addrListString())
 
         def listRooms(self):
-                mymess = ''
+                mymess = '(:rooms '
+                indx = 0
                 for i in rooms:
-                        mymess = mymess + i[0] + '\n'
+                        mymess = mymess + '(' + str(indx) + ' "' + i[0] +'"'
+                        if (indx == self.myroom):
+                                mymess = mymess + ' :self-room)'
+                        else:
+                                mymess = mymess +')'
+                        indx = indx + 1
+                mymess = mymess + ')'
                 messageq.put([mymess,self.tcplisSoc])
                         
         
 	def sendAddrList(self):
-		sendmsg = ''
+		sendmsg = '(:users '
 		for i in range(len(rooms[self.myroom][1])):
-                        sendmsg = sendmsg + '\n' + str(i) + ' ' + str(rooms[self.myroom][1][i].getpeername())
-		#for i in range(len(usrlst)):
-		#	sendmsg = sendmsg + "\n" + str(i) + " " + str(usrlst[i].getpeername())
+                        sendmsg = sendmsg + '(' + str(i) + ' ' + str(rooms[self.myroom][1][i].getpeername()).replace('(','',1).replace(',',' ',1).replace("'","\"").replace(')','')
+                        if (rooms[self.myroom][1][i] == self.tcplisSoc):
+                                sendmsg = sendmsg + ' :you)'
+                        else:
+                                sendmsg = sendmsg + ')'
+                sendmsg = sendmsg + ')'
 		messageq.put([sendmsg,self.tcplisSoc])
+	def addrListString(self):
+                sendmsg = '(:users '
+		for i in range(len(rooms[self.myroom][1])):
+                        sendmsg = sendmsg + '(' + str(i) + ' ' + str(rooms[self.myroom][1][i].getpeername()).replace('(','',1).replace(',',' ',1).replace("'","\"").replace(')','')
+                        sendmsg = sendmsg + ')'
+                sendmsg = sendmsg + ')'
+                return sendmsg
 	def startConnect(self,mymess):
 		try:
 			indxnum = int(mymess)
@@ -154,7 +177,7 @@ class MainListiningThread(threading.Thread):
 	def sendMessage(self,mymess):
 		for i in rooms[self.myroom][1]:
                         if (i != self.tcplisSoc):
-                                messageq.put([mymess+'\0',i])
+                                messageq.put([mymess,i])
 
 
 	def userQuit(self):
@@ -163,6 +186,7 @@ class MainListiningThread(threading.Thread):
                         print str(self.tcplisSoc.getpeername()) + ' quit'
 		except:
 			print 'not able to remove '
+		self.sendMessage(self.addrListString())
 		self.tcplisSoc.close()
 
 class MainSendingThread(threading.Thread):
@@ -172,7 +196,7 @@ class MainSendingThread(threading.Thread):
 		while 1:
 			try:
 				message = messageq.get()
-				message[1].send(message[0])
+				message[1].send(message[0] + '\0')
 			except:
 				print "no data to send"
 
@@ -191,13 +215,13 @@ def main():
 	serverSocket.listen(5)
 	print "Server Started at address: ", serverip, " and port # ", serverPort
         t = MainSendingThread()
-	t3 = MainSendingThread()
-	t4 = MainSendingThread()
-	t5 = MainSendingThread()
+	#t3 = MainSendingThread()
+	#t4 = MainSendingThread()
+	#t5 = MainSendingThread()
 	t.start()
-	t3.start()
-	t4.start()
-	t5.start()
+	#t3.start()
+	#t4.start()
+	#t5.start()
         while 1:
 		(tcpCliSock, addr) = serverSocket.accept()
 		print 'Received a connection from:', addr

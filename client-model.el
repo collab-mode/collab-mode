@@ -13,6 +13,23 @@ so it doesn't rebroadcast itself into an infinite loop")
 
 (defvar collab-mode-cm-hack-buffer nil "the buffer")
 
+(defun collab-mode-cm-update-user-list ()
+ (interactive)
+ (collab-network-send-to-server nil "<list addr>"))
+
+(defun collab-mode-cm-format-user (user)
+ (pcase user
+  (`(,num ,ip ,port . ,_)
+   (format "%d (%s:%d)" num ip port))))
+
+(defun collab-users ()
+ (mapcar #'collab-mode-cm-format-user collab-server-users))
+
+(defun collab-user-connected (user)
+ (loop for user2 in collab-server-users
+  if (equal (cdddr user2) '(:you))
+  return (equal user (collab-mode-cm-format-user user2))))
+
 (defun font-for-user (user)
  `(:box ,(if (= user 0) "firebrick" "dodger blue")))
 
@@ -32,6 +49,11 @@ so it doesn't rebroadcast itself into an infinite loop")
    (let ((collab-mode-cm-applying-changes t))
     (delete-region start end)))))
 
+(defun collab-mode-cm-before-change-hook (start end)
+ "save string for region about to be deleted"
+ (setq collab-mode-cm-text-to-be-changed
+  (buffer-substring-no-properties start end)))
+
 (defun collab-mode-cm-after-change-hook (start end previous-length)
  "handler for hook that the buffer just changed"
  (when (not collab-mode-cm-applying-changes)
@@ -40,11 +62,12 @@ so it doesn't rebroadcast itself into an infinite loop")
    (when (/= previous-length 0)
     (collab-mode-network-post-delete
      collab-mode-cm-network-connection
-     start (+ start previous-length)))
+     start collab-mode-cm-text-to-be-changed))
    (when (/= start end)
     (collab-mode-network-post-insert
      collab-mode-cm-network-connection
-     start (buffer-substring-no-properties start end))))))
+     start (buffer-substring-no-properties start end)))))
+ (setq collab-mode-cm-text-to-be-changed ""))
 
 ;(defvar collab-mode-cm-other-buffer nil)
 (defvar collab-mode-cm-network-connection nil)
@@ -58,6 +81,8 @@ TBD: how many times is this called, and in what contexts"
   ;(or other-buffer (get-buffer-create "*mirror*")))
  (set (make-local-variable 'collab-mode-cm-network-connection)
   (collab-mode-network-connect "ec2.alcobb.com" 10068))
+ (setq collab-mode-cm-text-to-be-changed "")
+ (setq collab-server-users '())
  (setq infinote-user (if (> user-id 0) 1 0))
  ;(unless other-buffer
    ;(collab-mode-network-init-remote-document collab-mode-cm-network-connection (buffer-string)))
@@ -67,9 +92,9 @@ TBD: how many times is this called, and in what contexts"
 (defun dummy-string-of-length (n)
  (apply #'concat (loop repeat n append '("."))))
 
-(defun collab-mode-network-post-delete (network-obj start end)
+(defun collab-mode-network-post-delete (network-obj start old-text)
  "send delete over the network"
- (infinote-delete start (dummy-string-of-length (- end start))))
+ (infinote-delete start old-text))
 
 (defun collab-mode-network-post-insert (network-obj start string)
  "send insert over the network"

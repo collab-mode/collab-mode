@@ -79,7 +79,7 @@
         (operation (infinote-request-operation request))
         (user (infinote-request-user against-request))
         (target-vector (copy-sequence (infinote-request-target-vector request))))
-    (setf (infinote-request-operation transformed-request) 
+    (setf (infinote-request-operation transformed-request)
           (infinote-transform-operation operation
                                         (infinote-request-operation against-request)))
     (incf (aref target-vector user))
@@ -140,7 +140,7 @@
        (infinote-translate request previous-vector)
        (infinote-translate (infinote-previous-request translatable-user target-vector) previous-vector)))
   ; Find every request in the log that occured after the version we want to apply the request to
-  ; Transform the request against each of them, in order  
+  ; Transform the request against each of them, in order
 
   ; Find a user with a target-vector value greater than in the request vector
   ; Get the last-request that caused that user's value to be set to the target-vector value
@@ -174,7 +174,7 @@
   (let ((request (make-infinote-request :user infinote-user
                                         :target-vector (copy-sequence infinote-vector)
                                         :operation `(:insert ,pos ,text))))
-    (collab-network-send-to-server (let ((print-level nil) (print-length nil)) (prin1-to-string request)))
+    (collab-network-send-to-server request)
     (infinote-execute request)))
 
 (defun infinote-delete (pos text)
@@ -182,7 +182,7 @@
   (let ((request (make-infinote-request :user infinote-user
                                         :target-vector (copy-sequence infinote-vector)
                                         :operation `(:delete ,pos ,text))))
-    (collab-network-send-to-server (let ((print-level nil) (print-length nil)) (prin1-to-string request)))
+    (collab-network-send-to-server request)
     (infinote-execute request)))
 
 (defun infinote-init ()
