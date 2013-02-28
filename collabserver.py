@@ -77,8 +77,8 @@ class MainListiningThread(threading.Thread):
 				message = message + "type <list rooms> to get a list of the current rooms \n"
                                 message = message + "type <list self addr> to show your ip and port \n"
 				message = message + "type <exit> to end session \n"
-				message = message + "type <connect>(index #) to connect to another ip \n"
-				message = message + "type <message>(message to send) to send message to all connect users.\n"
+				message = message + "type <message>(message to send) to send message to all users in room.\n"
+                                message = message + "type <broadcast>(message to send) to broadcast a message to all users in all rooms.\n"
 				messageq.put([message,self.tcplisSoc])
 				key = ''
 				mymessage = ''
@@ -102,6 +102,10 @@ class MainListiningThread(threading.Thread):
 				self.sendMessage(mymessage)
 				key = ''
 				mymessage = ''
+			if key == '<broadcast':
+                                self.sendBroadcast(mymessage)
+                                key = ''
+                                mymessage = ''
 			if key == '<invalid format':
 				messageq.put(['recieved invalid format for message',self.tcplisSoc])
 				key = ''
@@ -179,7 +183,10 @@ class MainListiningThread(threading.Thread):
                         if (i != self.tcplisSoc):
                                 messageq.put([mymess,i])
 
-
+        def sendBroadcast(self,mymess):
+                for i in rooms:
+                        for j in i[1]:
+                                messageq.put([mymess,j])
 	def userQuit(self):
 		try:
                         rooms[self.myroom][1].remove(self.tcplisSoc)
