@@ -61,7 +61,7 @@
               (let* ((before-inner (substring text-1 0 (- position-2 position-1)))
                      (after-inner (substring text-1 (- end-2 position-1))))
                      (text-without-inner (concat before-inner after-inner)))
-                `(:delete ,position-1 text-without-inner)))))))))))
+                `(:delete ,position-1 text-without-inner))))))))))
 
 (defun infinote-split-operation (operation at offset)
   (pcase operation
