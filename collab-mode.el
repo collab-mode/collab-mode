@@ -23,7 +23,7 @@ users, checks which are connected, and returns the appropriate list of entries."
     (dolist (user (collab-users))
       (setq entries (append entries (list (list user (vector (cons (collab-user-text user)
 							  `(face (:foreground ,(collab-user-color user) :underline t)
-								 action collab-connect-user button "blah"))))))))
+								 action collab-connect-user))))))))
     (print entries))) ;; @debug (print)
 
 (defun collab-user-text (user)
@@ -52,11 +52,6 @@ This is a temporary function. Actual function will be provided by the client."
   (if (string= "Jeff" user)
       collab-jeff-connected
     nil))
-
-;; @debug
-(defun test-jeff-connected ()
-  (interactive)
-  (print (collab-user-connected "Jeff")))
 
 (defun collab-users ()
   "Returns a list of all available users.
