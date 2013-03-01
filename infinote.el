@@ -9,7 +9,7 @@
     (`((:split ,operation-1 ,operation-2) ,against-operation)
      `(:split ,(infinote-transform-operation operation-1 against-operation)
               ,(infinote-transform-operation operation-2 against-operation)))
-    
+
     (`(,operation (:split ,operation-1 ,operation-2))
      (infinote-transform-operation
       (infinote-transform-operation operation operation-1)
@@ -174,7 +174,7 @@
   (let ((request (make-infinote-request :user infinote-user
                                         :target-vector (copy-sequence infinote-vector)
                                         :operation `(:insert ,pos ,text))))
-    (collab-network-send-to-server request)
+    (collab-network-send-to-server `(:infinote ,request))
     (infinote-execute request)))
 
 (defun infinote-delete (pos text)
@@ -182,7 +182,7 @@
   (let ((request (make-infinote-request :user infinote-user
                                         :target-vector (copy-sequence infinote-vector)
                                         :operation `(:delete ,pos ,text))))
-    (collab-network-send-to-server request)
+    (collab-network-send-to-server `(:infinote ,request))
     (infinote-execute request)))
 
 (defun infinote-init ()

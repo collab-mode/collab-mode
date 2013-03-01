@@ -4,7 +4,7 @@
 ;; client-model.el
 ;;
 
-(require 'network "network.el")
+(require 'cl)
 
 (defvar collab-mode-cm-applying-changes nil
  "Internal variable used to keep track of which changes collab-mode is making,
