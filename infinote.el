@@ -54,14 +54,14 @@
            ((>= position-1 position-2)
             (if (<= end-1 end-2)
                 `(:delete position-2 "")
-              `(:delete ,position-2 (substring text-1 (- end-2 position-1)))))
+              `(:delete ,position-2 ,(substring text-1 (- end-2 position-1)))))
            ((< position-1 position-2)
             (if (<= end-1 end-2)
-                `(:delete ,position-1 (substring text-1 0 (- position-2 position-1)))
+                `(:delete ,position-1 ,(substring text-1 0 (- position-2 position-1)))
               (let* ((before-inner (substring text-1 0 (- position-2 position-1)))
                      (after-inner (substring text-1 (- end-2 position-1))))
                      (text-without-inner (concat before-inner after-inner)))
-                `(:delete ,position-1 text-without-inner))))))))))
+                `(:delete ,position-1 ,text-without-inner))))))))))
 
 (defun infinote-split-operation (operation at offset)
   (pcase operation
@@ -121,15 +121,16 @@
   (infinote-nth-user-request user (aref target-vector user)))
 
 (defun infinote-find-translatable-user (request target-vector)
-  (loop for user-id below (length target-vector)
-        if (and (/= user-id (infinote-request-user request))
-                (> (aref target-vector user-id) (aref (infinote-request-target-vector request) user-id)))
-        return user-id
-        finally return nil))
+  (assert (loop for user-id below (length target-vector)
+                if (and (/= user-id (infinote-request-user request))
+                        (> (aref target-vector user-id) (aref (infinote-request-target-vector request) user-id)))
+                return user-id
+                finally return nil)))
 
 (defun infinote-translate (request target-vector)
   "Get a request modified to be applicable to a state at the target-vector"
   ; If the request is for the target-vector, return it
+  (message "%S --- %S" request target-vector)
   (assert (loop for user-request-count across target-vector if (< user-request-count 0) return nil end finally return t))
   (if (equal (infinote-request-target-vector request) target-vector)
       request
