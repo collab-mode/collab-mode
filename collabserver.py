@@ -5,11 +5,23 @@ from socket import *
 import sys
 import threading
 import Queue
+import xmpp
 
 usrlst = []
 rooms = [['main',usrlst]]
 lock = threading.Lock()
 messageq = Queue.Queue()
+unames = {}
+
+
+
+class xmppWait(threading.Thread):
+	def __init__(self,cl):
+		threading.Thread.__init__(self)
+		self.cli = cl
+	def run(self):
+		while self.cli.Process(1):
+			pass
 
 class MainListiningThread(threading.Thread):
 	def __init__(self, soc):
@@ -19,6 +31,10 @@ class MainListiningThread(threading.Thread):
                 self.readButNotParsed = ''
                 self.myroom = 0
                 self.sendMessage(self.addrListString())
+		self.myJID = ''
+		self.myxmppCl = None
+		self.myxmppCON = None
+		self.xmppIsCon = False
 	def recvUntilNull(self):
                 buffer = ''
                 while True:
@@ -64,6 +80,10 @@ class MainListiningThread(threading.Thread):
 				self.sendAddrList()
 				key = ''
 				mymessage = ''
+			if key == '<xmpp connect':
+				self.xmppConnect(mymessage)
+				key = ''
+				mymessage = ''
 			if key == '<list self addr':
                                 messageq.put([str(self.tcplisSoc.getpeername()),self.tcplisSoc])
                                 key = ''
@@ -106,6 +126,10 @@ class MainListiningThread(threading.Thread):
                                 self.sendBroadcast(mymessage)
                                 key = ''
                                 mymessage = ''
+			if key == '<xmpp friends':
+				self.xmppGetFriends()
+				key = ''
+				mymessage = ''
 			if key == '<invalid format':
 				messageq.put(['recieved invalid format for message',self.tcplisSoc])
 				key = ''
@@ -120,6 +144,71 @@ class MainListiningThread(threading.Thread):
                                 validrm = False
                 if(validrm == True and len(mymess) < 21):
                         rooms = rooms + [[mymess,[]]]
+	def presenceHandler(self,con, presence):
+		#print 'presence: ' + str(presence)
+		if presence:
+			if (presence.getType() != 'unavailable'):
+				who = presence.getFrom()
+				con.send(xmpp.Presence(to=who, typ = 'subscribed'))
+				con.send(xmpp.Presence(to=who, typ = 'subscribe'))
+	def messageHandler(self,con,mess):
+		print str(mess.getFrom()) + ': ' +  str(mess.getBody()) 
+	def xmppConnect(self,mymess):
+		errortype = '';
+		try:
+			(uname, passw) = mymess.split(' ')
+			self.myJID = uname
+			jid = xmpp.protocol.JID(uname,passw,'gmail.com')
+			cl = xmpp.Client('gmail.com',debug=[])
+			con = cl.connect(server=('talk.google.com',5222))
+			if not con:
+				messageq.put(['could not connect',self.tcplisSoc])
+			else:
+				auth = cl.auth(uname,passw,'gmail.com')
+				if not auth:
+					messageq.put(['could not authorize',self.tcplisSoc])
+				else:
+					messageq.put(['connected and authorized',self.tcplisSoc])
+					self.myxmppCl = cl
+					self.myxmppCON = con
+					self.xmppIsCon = True
+					uintname = uname
+					for i in uname:
+						if(not i.isalpha()):
+							uintname = uname.replace(i,'')
+					(r,g,b) = (str(int(uintname,36)*2 % 255).replace('L',''),str(int(uintname,36)*3 % 255).replace('L',''), str(int(uintname,36)*4 % 255).replace('L',''))
+					unames[str(self.tcplisSoc.getpeername())] = (uname,(r,g,b))
+					errortype = 'name'
+					cl.RegisterHandler('presence',self.presenceHandler)
+					cl.RegisterHandler('message',self.messageHandler)
+					errortype = 'handler'
+					cl.sendInitPresence()
+					errortype = 'presence'
+					xt2 = xmppWait(cl)
+					xt2.start()
+
+		except:
+			print "error: " + errortype
+
+	def xmppGetFriends(self):
+		rost = self.myxmppCl.getRoster()
+		rost.Request(force=1)
+		mysend = ''
+		for i in rost.keys():
+			if (str(rost.getName(i)) == 'None'):
+				mysend = mysend + '\n' + 'name =' + str(i).split('@')[0]
+			else:
+				mysend = mysend + '\n' + 'name =' + str(rost.getName(i))
+			if(len(rost.getResources(i)) > 0):
+				if(str(rost.getShow(i)) == 'None'): 
+					mysend = mysend + ' online'
+				if(str(rost.getShow(i)) == 'dnd'):
+					mysend = mysend + ' do not disturb'
+				if(str(rost.getShow(i)) == 'away'):
+					mysend = mysend + ' away'
+			else:
+				mysend = mysend + ' offline'
+		messageq.put([mysend,self.tcplisSoc])
         def joinRoom(self,mymess):
                 rmindex = -1
                 j = 0
@@ -155,6 +244,9 @@ class MainListiningThread(threading.Thread):
 		sendmsg = '(:users '
 		for i in range(len(rooms[self.myroom][1])):
                         sendmsg = sendmsg + '(' + str(i) + ' ' + str(rooms[self.myroom][1][i].getpeername()).replace('(','',1).replace(',',' ',1).replace("'","\"").replace(')','')
+			if (unames[str(rooms[self.myroom][1][i].getpeername())][0] != ''):
+				sendmsg = sendmsg + ' "' + str(unames[str(rooms[self.myroom][1][i].getpeername())][0]) + '"'
+				sendmsg = sendmsg + " " + str(unames[str(rooms[self.myroom][1][i].getpeername())][1]).replace("(",'').replace("'",'').replace(',',' ').replace(')','')
                         if (rooms[self.myroom][1][i] == self.tcplisSoc):
                                 sendmsg = sendmsg + ' :you)'
                         else:
@@ -165,6 +257,9 @@ class MainListiningThread(threading.Thread):
                 sendmsg = '(:users '
 		for i in range(len(rooms[self.myroom][1])):
                         sendmsg = sendmsg + '(' + str(i) + ' ' + str(rooms[self.myroom][1][i].getpeername()).replace('(','',1).replace(',',' ',1).replace("'","\"").replace(')','')
+			if (unames[str(rooms[self.myroom][1][i].getpeername())][0] != ''):
+				sendmsg = sendmsg + ' "' + str(unames[str(rooms[self.myroom][1][i].getpeername())][0]) + '"'
+				sendmsg = sendmsg + " " + str(unames[str(rooms[self.myroom][1][i].getpeername())][1]).replace("(",'').replace("'",'').replace(',',' ').replace(')','')
                         sendmsg = sendmsg + ')'
                 sendmsg = sendmsg + ')'
                 return sendmsg
@@ -193,6 +288,10 @@ class MainListiningThread(threading.Thread):
                         print str(self.tcplisSoc.getpeername()) + ' quit'
 		except:
 			print 'not able to remove '
+		try:
+			self.myxmppCl.disconnect()
+		except:
+			print 'not connected to xmpp'
 		self.sendMessage(self.addrListString())
 		self.tcplisSoc.close()
 
@@ -216,7 +315,7 @@ def main():
 	serverPort = 10068
 	serverSocket = socket(AF_INET, SOCK_STREAM)
         serverSocket.setsockopt(SOL_SOCKET, SO_REUSEADDR, 1)
-	serverip = gethostbyname(gethostname())
+	#serverip = gethostbyname(gethostname())
 	serverip = ''
 	serverSocket.bind(( serverip, serverPort))
 	serverSocket.listen(5)
@@ -227,6 +326,7 @@ def main():
 		(tcpCliSock, addr) = serverSocket.accept()
 		print 'Received a connection from:', addr
 		usrlst.append(tcpCliSock)
+		unames[str(addr)] = ('','')
 		t2 = MainListiningThread(tcpCliSock)
 		t2.start()
 
