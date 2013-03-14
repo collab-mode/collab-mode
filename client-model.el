@@ -10,8 +10,9 @@
  "Internal variable used to keep track of which changes collab-mode is making,
 so it doesn't rebroadcast itself into an infinite loop")
 (defvar collab-mode-cm-updating-infinote nil)
-
-(defvar collab-mode-cm-hack-buffer nil "the buffer")
+(defvar collab-mode-cm-network-connection nil)
+(defvar collab-mode-cm-hack-buffer nil "The buffer")
+(defvar collab-mode-cm-last-cursor-pos nil "Last transmitted cursor position")
 
 (defun collab-mode-cm-update-user-list ()
  (interactive)
@@ -49,6 +50,13 @@ so it doesn't rebroadcast itself into an infinite loop")
    (let ((collab-mode-cm-applying-changes t))
     (delete-region start end)))))
 
+(defun collab-mode-cm-post-change-hook ()
+ "send a cursor update if changed"
+ (let ((cursor-pos (point)))
+  (unless (equal cursor-pos collab-mode-cm-last-cursor-pos)
+   (setq collab-mode-cm-last-cursor-pos cursor-pos)
+   (collab-network-send-to-server `(:cursor ,infinote-user ,cursor-pos)))))
+
 (defun collab-mode-cm-before-change-hook (start end)
  "save string for region about to be deleted"
  (setq collab-mode-cm-text-to-be-changed
@@ -69,9 +77,6 @@ so it doesn't rebroadcast itself into an infinite loop")
      start (buffer-substring-no-properties start end)))))
  (setq collab-mode-cm-text-to-be-changed ""))
 
-;(defvar collab-mode-cm-other-buffer nil)
-(defvar collab-mode-cm-network-connection nil)
-
 (defun collab-mode-cm-init (user-id)
  "Initialization for the client model
 TBD: how many times is this called, and in what contexts"
@@ -86,11 +91,9 @@ TBD: how many times is this called, and in what contexts"
  (setq infinote-user (if (> user-id 0) 1 0))
  ;(unless other-buffer
    ;(collab-mode-network-init-remote-document collab-mode-cm-network-connection (buffer-string)))
+ (add-hook 'post-command-hook #'collab-mode-cm-post-change-hook nil t)
+ (add-hook 'before-change-functions #'collab-mode-cm-before-change-hook nil t)
  (add-hook 'after-change-functions #'collab-mode-cm-after-change-hook nil t))
-
-;; STUB FUNCTIONS
-(defun dummy-string-of-length (n)
- (apply #'concat (loop repeat n append '("."))))
 
 (defun collab-mode-network-post-delete (network-obj start old-text)
  "send delete over the network"

@@ -6,6 +6,7 @@
   (load (expand-file-name "infinote.el" dname))
   (load (expand-file-name "network.el" dname))
   (load (expand-file-name "client-model.el" dname))
+  (load (expand-file-name "collab-cursor.el" dname))
   )
 
 )

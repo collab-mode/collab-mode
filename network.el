@@ -19,6 +19,8 @@
        (with-demoted-errors (infinote-execute infinote-message)))
       (`(:chat ,chat-message)
        (error "to be implemented..."))
+      (`(:cursor ,user ,cursor-loc)
+       (collab-cursor-move-to-char cursor-loc))
       (`(:users . ,users)
        (setq collab-server-users users))
       (message (error "unknown server message: %S" message)))
