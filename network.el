@@ -2,34 +2,6 @@
 
 (require 'xmlgen)
 
-(defmacro lax-case (expr &rest clauses)
-  "Eval EXPR and choose among clauses on that value.
-Works like `case' except key values are compared by `equal'."
-  (let* ((temp (if (cl-simple-expr-p expr 3) expr (make-symbol "--cl-var--")))
-	 (head-list nil)
-	 (body (cons
-		'cond
-		(mapcar
-		 (function
-		  (lambda (c)
-		    (cons (cond ((memq (car c) '(t otherwise)) t)
-				((eq (car c) 'ecase-error-flag)
-				 (list 'error "ecase failed: %s, %s"
-				       temp (list 'quote (reverse head-list))))
-				((listp (car c))
-				 (setq head-list (append (car c) head-list))
-				 (list 'member* temp (list 'quote (car c))))
-				(t
-				 (if (memq (car c) head-list)
-				     (error "Duplicate key in case: %s"
-					    (car c)))
-				 (push (car c) head-list)
-				 (list 'equal temp (list 'quote (car c)))))
-			  (or (cdr c) '(nil)))))
-		 clauses))))
-    (if (eq temp expr) body
-      (list 'let (list (list temp expr)) body))))
-
 ;; globals
 (defvar infinoted-connections nil "Active connections to infinote servers")
 
@@ -114,7 +86,7 @@ Works like `case' except key values are compared by `equal'."
   (let ((tag (car xml-data))
         (attributes (cadr xml-data))
         (contents (cddr xml-data)))
-    (lax-case tag
+    (case tag
               (stream:stream) ; assume the stream is fine and do nothing
               (stream:features
                (when (cddr xml-data)
@@ -214,7 +186,7 @@ Works like `case' except key values are compared by `equal'."
   (let ((command (car command-xml-data))
         (attributes (cadr command-xml-data))
         (contents (cddr command-xml-data)))
-    (lax-case command
+    (case command
               (welcome
                (collab-infinoted-send-explore 0))
               (explore-begin) ; not really needed
