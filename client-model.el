@@ -56,7 +56,7 @@ so it doesn't rebroadcast itself into an infinite loop")
  (let ((buffer (get-buffer "*Users*")))
   (when buffer
    (with-current-buffer buffer
-    (revert-buffer t t t)))
+    (revert-buffer t t t)))))
 
 (defun collab-user-connected (user)
  t)
