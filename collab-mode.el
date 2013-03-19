@@ -11,6 +11,26 @@
 
 )
 
+(setq collab-users-list)
+
+(defun collab-cursor (user position)
+  "Places a cursor for USER at POSITION with COLOR.
+If POSITION is <= 1 then the overlay is deleted."
+  (interactive)
+  (setq color (collab-user-color user))
+  (if (< position 1)
+      (when (assoc user collab-users-list)
+	(progn
+	  (delete-overlay (cdr (assoc user collab-users-list)))
+	  (assq-delete-all user collab-users-list)))
+    (if (not (assoc user collab-users-list))
+	(progn
+	  (setq collab-users-list (append collab-users-list `(,(cons user (make-overlay position (+ position 1) (current-buffer) t)))))
+	  (overlay-put (cdr (assoc user collab-users-list)) 'face `((foreground-color . "white") (background-color . ,color))))
+      (move-overlay (cdr (assoc user collab-users-list)) position (+ position 1))
+      (overlay-put (cdr (assoc user collab-users-list)) 'face `((foreground-color . "white") (background-color . ,color))))))
+
+
 (defun collab-mode (user-id)
   "Starts collab-mode and opens users buffer."
   (interactive "P")
