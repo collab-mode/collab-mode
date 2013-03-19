@@ -26,7 +26,7 @@ so it doesn't rebroadcast itself into an infinite loop")
  (pcase user
   (`(,num ,ip ,port ,username ,r ,g ,b . ,_)
    (list
-    (equal (last user) '(:you))
+    (equal username (collab-username-from-user (collab-self-user)))
     username
     (collab-mode-cm-rgb-to-color r g b)))))
 
