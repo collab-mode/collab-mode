@@ -18,10 +18,16 @@ so it doesn't rebroadcast itself into an infinite loop")
  (interactive)
  (collab-network-send-to-server nil "<list addr>"))
 
+(defun collab-mode-cm-rgb-to-color (r g b)
+ (format "#%02x%02x%02x" r g b))
+
 (defun collab-mode-cm-format-user (user)
  (pcase user
-  (`(,num ,ip ,port . ,_)
-   (format "%d (%s:%d)" num ip port))))
+  (`(,num ,ip ,port ,username ,r ,g ,b . ,_)
+   (list
+    (equal (last user) :you)
+    username
+    (collab-mode-cm-rgb-to-color r g b)))))
 
 (defun collab-users ()
  (mapcar #'collab-mode-cm-format-user collab-server-users))
@@ -32,9 +38,10 @@ so it doesn't rebroadcast itself into an infinite loop")
   (revert-buffer t t t)))
 
 (defun collab-user-connected (user)
- (loop for user2 in collab-server-users
-  if (equal (last user2) :you)
-  return (equal user (collab-mode-cm-format-user user2))))
+ t)
+ ;; (loop for user2 in collab-server-users
+ ;;  if (equal (last user2) :you)
+ ;;  return (equal user (collab-mode-cm-format-user user2))))
 
 (defun font-for-user (user)
  `(:box ,(if (= user 0) "firebrick" "dodger blue")))
