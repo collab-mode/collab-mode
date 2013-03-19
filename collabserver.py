@@ -186,6 +186,7 @@ class MainListiningThread(threading.Thread):
 					errortype = 'presence'
 					xt2 = xmppWait(cl)
 					xt2.start()
+					self.sendMessage(self.addrListString())
 
 		except:
 			print "error: " + errortype
@@ -244,9 +245,9 @@ class MainListiningThread(threading.Thread):
 		sendmsg = '(:users '
 		for i in range(len(rooms[self.myroom][1])):
                         sendmsg = sendmsg + '(' + str(i) + ' ' + str(rooms[self.myroom][1][i].getpeername()).replace('(','',1).replace(',',' ',1).replace("'","\"").replace(')','')
-			if (unames[str(rooms[self.myroom][1][i].getpeername())][0] != ''):
-				sendmsg = sendmsg + ' "' + str(unames[str(rooms[self.myroom][1][i].getpeername())][0]) + '"'
-				sendmsg = sendmsg + " " + str(unames[str(rooms[self.myroom][1][i].getpeername())][1]).replace("(",'').replace("'",'').replace(',',' ').replace(')','')
+			#if (unames[str(rooms[self.myroom][1][i].getpeername())][0] != ''):
+			sendmsg = sendmsg + ' "' + str(unames[str(rooms[self.myroom][1][i].getpeername())][0]) + '"'
+			sendmsg = sendmsg + " " + str(unames[str(rooms[self.myroom][1][i].getpeername())][1]).replace("(",'').replace("'",'').replace(',',' ').replace(')','')
                         if (rooms[self.myroom][1][i] == self.tcplisSoc):
                                 sendmsg = sendmsg + ' :you)'
                         else:
@@ -257,9 +258,9 @@ class MainListiningThread(threading.Thread):
                 sendmsg = '(:users '
 		for i in range(len(rooms[self.myroom][1])):
                         sendmsg = sendmsg + '(' + str(i) + ' ' + str(rooms[self.myroom][1][i].getpeername()).replace('(','',1).replace(',',' ',1).replace("'","\"").replace(')','')
-			if (unames[str(rooms[self.myroom][1][i].getpeername())][0] != ''):
-				sendmsg = sendmsg + ' "' + str(unames[str(rooms[self.myroom][1][i].getpeername())][0]) + '"'
-				sendmsg = sendmsg + " " + str(unames[str(rooms[self.myroom][1][i].getpeername())][1]).replace("(",'').replace("'",'').replace(',',' ').replace(')','')
+			#if (unames[str(rooms[self.myroom][1][i].getpeername())][0] != ''):
+			sendmsg = sendmsg + ' "' + str(unames[str(rooms[self.myroom][1][i].getpeername())][0]) + '"'
+			sendmsg = sendmsg + " " + str(unames[str(rooms[self.myroom][1][i].getpeername())][1]).replace("(",'').replace("'",'').replace(',',' ').replace(')','')
                         sendmsg = sendmsg + ')'
                 sendmsg = sendmsg + ')'
                 return sendmsg
@@ -284,6 +285,10 @@ class MainListiningThread(threading.Thread):
                                 messageq.put([mymess,j])
 	def userQuit(self):
 		try:
+			del unames[str(rooms[self.myroom][1][i].getpeername())]
+		except:
+			pass
+		try:
                         rooms[self.myroom][1].remove(self.tcplisSoc)
                         print str(self.tcplisSoc.getpeername()) + ' quit'
 		except:
@@ -291,7 +296,7 @@ class MainListiningThread(threading.Thread):
 		try:
 			self.myxmppCl.disconnect()
 		except:
-			print 'not connected to xmpp'
+			pass
 		self.sendMessage(self.addrListString())
 		self.tcplisSoc.close()
 
@@ -326,7 +331,19 @@ def main():
 		(tcpCliSock, addr) = serverSocket.accept()
 		print 'Received a connection from:', addr
 		usrlst.append(tcpCliSock)
-		unames[str(addr)] = ('','')
+		uintname = str(addr)
+		for i in str(addr):
+			if(not i.isdigit()):
+				uintname = uintname.replace(i,'')
+		(r,g,b) = (str(int(uintname,36)*2 % 255).replace('L',''),str(int(uintname,36)*3 % 255).replace('L',''), str(int(uintname,36)*4 % 255).replace('L',''))
+		myun = str(addr)
+		myun = myun.replace('(','<')
+		myun = myun.replace("'",'')
+		myun = myun.replace(",",":")
+		myun = myun.replace(")",">")
+		myun = myun.replace(" ","")
+		unames[str(addr)] = (myun,(r,g,b))
+		#unames[str(addr)] = ('','')
 		t2 = MainListiningThread(tcpCliSock)
 		t2.start()
 
