@@ -11,8 +11,9 @@
 so it doesn't rebroadcast itself into an infinite loop")
 (defvar collab-mode-cm-updating-infinote nil)
 (defvar collab-mode-cm-network-connection nil)
-(defvar collab-mode-cm-hack-buffer nil "The buffer")
+(defvar collab-mode-cm-buffer nil "The buffer")
 (defvar collab-mode-cm-last-cursor-pos nil "Last transmitted cursor position")
+(defvar collab-mode-cached-self-user nil)
 
 (defun collab-mode-cm-update-user-list ()
  (interactive)
@@ -25,14 +26,32 @@ so it doesn't rebroadcast itself into an infinite loop")
  (pcase user
   (`(,num ,ip ,port ,username ,r ,g ,b . ,_)
    (list
-    (equal (last user) :you)
+    (equal (last user) '(:you))
     username
     (collab-mode-cm-rgb-to-color r g b)))))
+
 
 (defun collab-users ()
  (mapcar #'collab-mode-cm-format-user collab-server-users))
 
+(defun collab-user-from-username (username)
+ (loop for user in collab-server-users
+  if (equal (collab-username-from-user user) username)
+  return user))
+
+(defun collab-username-from-user (user)
+ (cadddr user))
+
+(defun collab-self-user ()
+ (let ((current-you (loop for user in collab-server-users
+                     if (equal (last user) '(:you))
+                     return user)))
+  (when current-you
+   (setq collab-mode-cached-self-user current-you))
+  collab-mode-cached-self-user))
+
 (defun collab-mode-cm-new-users-received (users)
+ (collab-self-user)
  (setq collab-server-users users)
  (with-current-buffer "*Users*"
   (revert-buffer t t t)))
@@ -48,7 +67,7 @@ so it doesn't rebroadcast itself into an infinite loop")
 
 (defun collab-mode-cm-insert (string location)
  "inserts STRING into current buffer at LOCATION"
- (with-current-buffer collab-mode-cm-hack-buffer
+ (with-current-buffer collab-mode-cm-buffer
   (when (not collab-mode-cm-updating-infinote)
    (let ((collab-mode-cm-applying-changes t))
     (save-excursion
@@ -57,7 +76,7 @@ so it doesn't rebroadcast itself into an infinite loop")
 
 (defun collab-mode-cm-delete (start end)
  "removes text in current buffer from START to END"
- (with-current-buffer collab-mode-cm-hack-buffer
+ (with-current-buffer collab-mode-cm-buffer
   (when (not collab-mode-cm-updating-infinote)
    (let ((collab-mode-cm-applying-changes t))
     (delete-region start end)))))
@@ -67,7 +86,8 @@ so it doesn't rebroadcast itself into an infinite loop")
  (let ((cursor-pos (point)))
   (unless (equal cursor-pos collab-mode-cm-last-cursor-pos)
    (setq collab-mode-cm-last-cursor-pos cursor-pos)
-   (collab-network-send-to-server `(:cursor ,infinote-user ,cursor-pos)))))
+   (collab-network-send-to-server
+    `(:cursor ,(collab-username-from-user (collab-self-user)) ,cursor-pos)))))
 
 (defun collab-mode-cm-before-change-hook (start end)
  "save string for region about to be deleted"
@@ -92,7 +112,7 @@ so it doesn't rebroadcast itself into an infinite loop")
 (defun collab-mode-cm-init (user-id)
  "Initialization for the client model
 TBD: how many times is this called, and in what contexts"
- (setq collab-mode-cm-hack-buffer (current-buffer))
+ (setq collab-mode-cm-buffer (current-buffer))
  (set (make-local-variable 'collab-mode-cm-applying-changes) nil)
  ;(set (make-local-variable 'collab-mode-cm-other-buffer)
   ;(or other-buffer (get-buffer-create "*mirror*")))

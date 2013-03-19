@@ -6,7 +6,6 @@
   (load (expand-file-name "infinote.el" dname))
   (load (expand-file-name "network.el" dname))
   (load (expand-file-name "client-model.el" dname))
-  (load (expand-file-name "collab-cursor.el" dname))
   )
 
 )
@@ -16,6 +15,7 @@
 (defun collab-cursor (user position)
   "Places a cursor for USER at POSITION with COLOR.
 If POSITION is <= 1 then the overlay is deleted."
+ (message "%s" user)
   (interactive)
   (setq color (collab-user-color user))
   (if (< position 1)

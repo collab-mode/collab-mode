@@ -2,7 +2,7 @@
 
 (defun collab-network-connect-to-server ()
  (when (boundp 'collab-server-process)
-  (process-kill-without-query collab-server-process))
+  (delete-process collab-server-process))
  (setq collab-server-process (open-network-stream "collab-server" "*collab-server*" "cobbal.com" 10068))
  (set-process-filter collab-server-process #'collab-network-receive-from-server))
 
@@ -20,7 +20,10 @@
       (`(:chat ,chat-message)
        (error "to be implemented..."))
       (`(:cursor ,user ,cursor-loc)
-       (collab-cursor-move-to-char cursor-loc))
+       (with-current-buffer collab-mode-cm-buffer
+        (collab-cursor
+         (collab-mode-cm-format-user (collab-user-from-username user))
+         cursor-loc)))
       (`(:users . ,users)
        (collab-mode-cm-new-users-received users))
       (`(:rooms . ,rooms)
