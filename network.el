@@ -18,8 +18,8 @@
 (make-variable-buffer-local 'infinoted-node-id)
 (defvar infinoted-node-type nil "Node type of this document")
 (make-variable-buffer-local 'infinoted-node-type)
-(defvar infinoted-user-vectors nil "Each user's last seen state vector")
-(make-variable-buffer-local 'infinoted-user-vectors)
+(defvar infinoted-users nil "plist of (user-id <user-state-plist> ...)")
+(make-variable-buffer-local 'infinoted-users)
 (defvar infinoted-user-id nil "Local user's id for this document")
 (make-variable-buffer-local 'infinoted-user-id)
 (defvar infinoted-connection nil "Infinoted connection associated with this document")
@@ -38,7 +38,7 @@
       (setq infinoted-group-name "InfDirectory")
       (setq infinoted-node-id 0)
       (setq infinoted-node-type "InfDirectory")
-      (setq infinoted-sessions `("InfDirectory" . ,(current-buffer)))
+      (setq infinoted-sessions (list "InfDirectory" (current-buffer)))
       (setq infinoted-connection network-process)
       (collab-infinoted-send-stream-header "localhost"))))
 
@@ -54,7 +54,7 @@
 
       (while (> (point-max) (point-min))
         (display-buffer (current-buffer))
-        (sit-for 0.25)
+        (sit-for 0.1)
         
         ;; delete anything that isn't a tag opening. mainly worried about whitespace
         (delete-region (point) (progn (skip-chars-forward "^<") (point)))
@@ -75,7 +75,8 @@
           (return (collab-infinoted-close-stream SOMETHING)))
 
         (let ((beg (point))
-              (xml-data (xml-parse-tag)))
+              (xml-data))
+          (ignore-errors (setq xml-data (xml-parse-tag))) ; an error means we don't have enough data yet, no biggie
           (if (not xml-data)
               (return)
             (delete-region beg (point)) ; remove the tag we just parsed
@@ -163,9 +164,9 @@
    group))
 
 (defun collab-infinoted-find-file (filename)
-  (let ((existing-file (assoc-default filename infinoted-nodes)))
+  (let ((existing-file (lax-plist-get infinoted-nodes filename)))
     (if existing-file
-        (collab-infinoted-send-subscribe-session (assoc-default 'id existing-file))
+        (collab-infinoted-send-subscribe-session (plist-get existing-file 'id))
       (collab-infinoted-send-add-node filename))))
 
 (defun collab-infinoted-create-session (name id group-name)
@@ -177,7 +178,72 @@
       (setq infinoted-node-type "InfText")
       (setq infinoted-connection network-process)
       (display-buffer (current-buffer)))
-    (setq infinoted-sessions (cons `(group-name . new-buffer) infinoted-sessions))))
+    (setq infinoted-sessions (plist-put infinoted-sessions group-name new-buffer))))
+
+(defun collab-infinoted-user-join (name id vector hue caret selection status)
+  (when (equal name "emacs-joel")
+    (setq infinoted-user-id id))
+  (setq infinoted-users (plist-put
+                         infinoted-users
+                         id
+                         (list 'name name
+                               'id id
+                               'vector vector
+                               'hue hue
+                               'caret caret
+                               'selection selection
+                               'status status))))
+
+(defun collab-infinoted-read-vector (vector-string)
+  (mapcar #'string-to-number (split-string vector-string "[:;]" t)))
+
+(defun collab-infinoted-xml-to-operation (operation-xml)
+  (let* ((operation (car operation-xml))
+         (attributes (cadr operation-xml))
+         (contents (cddr operation-xml))
+         (pos-string (assoc-default 'pos attributes))
+         (len-string (assoc-default 'len attributes))
+         (caret-string (assoc-default 'caret attributes))
+         (selection-string (assoc-default 'selection attributes))
+         (pos (and pos-string (string-to-number pos-string)))
+         (len (and len-string (string-to-number len-string)))
+         (caret (and caret-string (string-to-number caret-string)))
+         (selection (and selection-string (string-to-number selection-string))))
+    (case operation
+      ((insert insert-caret) (let ((text (car contents)))
+                               (list operation pos text)))
+      ((delete delete-caret) (if len
+                                 (list operation pos len)
+                               (let ((text (collab-infinoted-segment-xml-to-text contents)))
+                                 (list operation pos (length text) text))))
+      ((no-op undo undo-caret redo redo-caret) (list operation))
+      (move (list operation caret selection)))))
+
+(defun collab-infinoted-segment-xml-to-text (segment-xml)
+  ;; TODO: mark this with author ids
+  (concat (mapcar #'(lambda (segment) (if (listp segment) (caddr segment) segment)) segment-xml)))
+
+(defun collab-infinoted-increment-vector (vector diff)
+  (loop
+   with new-vector = (copy-sequence vector)
+   for prop on diff by #'cddr
+   do
+   (let ((user-id (car prop))
+         (op-count (cadr prop)))
+     (plist-put new-vector user-id (+ op-count
+                                      (or (plist-get new-vector user-id)
+                                          0))))
+   finally return new-vector))
+
+(defun collab-infinoted-increment-user-vector (user-id vector-diff)
+  )
+
+(defun collab-infinoted-handle-request (user-id operation)
+  (pcase operation
+    (`(insert-caret ,pos ,text)
+     (progn
+       (goto-char (+ 1 pos))
+       (insert text)))))
 
 (defun collab-infinoted-handle-group-commands (group-name commands)
   (mapcar #'collab-infinoted-handle-group-command commands))
@@ -185,7 +251,9 @@
 (defun collab-infinoted-handle-group-command (command-xml-data)
   (let ((command (car command-xml-data))
         (attributes (cadr command-xml-data))
-        (contents (cddr command-xml-data)))
+        (contents (cddr command-xml-data))
+        (session-buffer (lax-plist-get infinoted-sessions group-name)))
+    (message (format "Got group %S command %S" group-name command-xml-data))
     (case command
               (welcome
                (collab-infinoted-send-explore 0))
@@ -196,9 +264,9 @@
                (let ((id (assoc-default 'id attributes))
                      (name (assoc-default 'name attributes)))
                  (setq infinoted-nodes
-                       (cons `(,name
-                               ,(assq-delete-all 'seq attributes))
-                             infinoted-nodes))
+                       (plist-put infinoted-nodes
+                                  name
+                                  (assq-delete-all 'seq attributes)))
                  (let ((first-content-tag (car contents)))
                    (when (equal 'subscribe (car first-content-tag))
                      (let ((group (xml-get-attribute first-content-tag 'group)))
@@ -233,7 +301,16 @@
                )
               (user-join
                ;; store user data
-               )
+               (let ((name (assoc-default 'name attributes))
+                     (id (assoc-default 'id attributes))
+                     (vector (collab-infinoted-read-vector (assoc-default 'time attributes)))
+                     (hue (string-to-number (assoc-default 'hue attributes)))
+                     (caret (string-to-number (assoc-default 'caret attributes)))
+                     (selection (string-to-number (assoc-default 'selection attributes)))
+                     (status (assoc-default 'status attributes)))
+                 (when session-buffer
+                   (with-current-buffer session-buffer
+                     (collab-infinoted-user-join name id vector hue caret selection status)))))
               (user-rejoin
                ;; store user data
                )
@@ -242,8 +319,14 @@
               (sync-message) ; not supported
               (message) ; not supported
               (request
-               ;; pass request to handler
-               ))))
+               (let ((user-id (string-to-number (assoc-default 'user attributes)))
+                     (vector-diff (collab-infinoted-read-vector (assoc-default 'time attributes)))
+                     (operation-xml (car contents)))
+                 ;; pass request to handler
+                 (when session-buffer
+                   (with-current-buffer session-buffer
+                     (collab-infinoted-increment-user-vector user-id vector-diff)
+                     (collab-infinoted-handle-request user-id (collab-infinoted-xml-to-operation operation-xml)))))))))
 
 (defun collab-network-connect-to-server ()
  (when (boundp 'collab-server-process)
