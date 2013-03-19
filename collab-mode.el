@@ -20,7 +20,9 @@
   "Major mode for managing connections with users"
   (setq tabulated-list-format [("Users" 18 t)])
   (setq tabulated-list-padding 2)
-  (tabulated-list-init-header))
+  (tabulated-list-init-header)
+  (add-hook 'tabulated-list-revert-hook (lambda () (setq tabulated-list-entries (collab-get-entries))
+					  (tabulated-list-print))))
 
 (defun collab-list-users ()
   (interactive)
