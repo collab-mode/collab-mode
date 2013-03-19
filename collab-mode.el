@@ -65,9 +65,9 @@ users, checks which are connected, and returns the appropriate list of entries."
 
 (defun collab-user-text (user)
   "Returns user entry label with appropriate face and connection glyph."
-  (if (collab-user-connected user)
-      (concat "● " user)
-    (concat "○ " user)))
+ (concat
+  (if (car user) "● " "○ ")
+  (cadr user)))
 
 ;; (defun collab-user-connected (user)
 ;;   "Returns whether USER is connected."
@@ -81,6 +81,4 @@ users, checks which are connected, and returns the appropriate list of entries."
 
 (defun collab-user-color (user)
   "Returns USER's color."
-  (if (string= "Jeff" user)
-      "red"
-    "blue"))
+  (caddr user))
