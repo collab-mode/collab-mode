@@ -53,8 +53,10 @@ so it doesn't rebroadcast itself into an infinite loop")
 (defun collab-mode-cm-new-users-received (users)
  (collab-self-user)
  (setq collab-server-users users)
- (with-current-buffer "*Users*"
-  (revert-buffer t t t)))
+ (let ((buffer (get-buffer "*Users*")))
+  (when buffer
+   (with-current-buffer buffer
+    (revert-buffer t t t)))
 
 (defun collab-user-connected (user)
  t)
