@@ -26,9 +26,14 @@ so it doesn't rebroadcast itself into an infinite loop")
 (defun collab-users ()
  (mapcar #'collab-mode-cm-format-user collab-server-users))
 
+(defun collab-mode-cm-new-users-received (users)
+ (setq collab-server-users users)
+ (with-current-buffer "*Users*"
+  (revert-buffer t t t)))
+
 (defun collab-user-connected (user)
  (loop for user2 in collab-server-users
-  if (equal (cdddr user2) '(:you))
+  if (equal (last user2) :you)
   return (equal user (collab-mode-cm-format-user user2))))
 
 (defun font-for-user (user)
@@ -88,6 +93,7 @@ TBD: how many times is this called, and in what contexts"
   (collab-mode-network-connect "ec2.alcobb.com" 10068))
  (setq collab-mode-cm-text-to-be-changed "")
  (setq collab-server-users '())
+ (setq collab-server-rooms '())
  (setq infinote-user (if (> user-id 0) 1 0))
  ;(unless other-buffer
    ;(collab-mode-network-init-remote-document collab-mode-cm-network-connection (buffer-string)))
@@ -114,6 +120,7 @@ TBD: how many times is this called, and in what contexts"
  "connect to collabserver located at host:port"
  (infinote-init)
  (collab-network-connect-to-server)
+ (collab-mode-cm-update-user-list)
  `(opaque-network-object ,(current-buffer)))
 
 (provide 'client-model)
