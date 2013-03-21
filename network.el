@@ -1,5 +1,7 @@
 (require 'cl)
 
+(defvar collab-network-verbose nil "Set to t to see all messages")
+
 (defun collab-network-connect-to-server ()
  (when (boundp 'collab-server-process)
   (delete-process collab-server-process))
@@ -14,7 +16,7 @@
   (let ((messages (split-string collab-server-input-buffer "[\000]")))
     (while (> (length messages) 1)
      (let ((msg (read (car messages))))
-      (message "%S" msg)
+      (when collab-network-verbose (message "%S" msg))
       (setq messages (cdr messages))
       (setq collab-server-input-buffer
        (mapconcat 'identity messages "\000"))
@@ -30,13 +32,21 @@
           cursor-loc)))
        (`(:users . ,users)
         (collab-mode-cm-new-users-received users))
+       (`(:xmppfriends . ,friends)
+        (collab-mode-cm-new-friends-received friends))
        (`(:rooms . ,rooms)
         (setq collab-server-rooms rooms))
        (`(:chat ,from-username ,msg)
         (collab-chat-buffer-receive msg from-username))
+
        ;; TODO: change server messages for these
-       (`connected (message "Login successful"))
-       (`could (message "Login failed"))
+       (`connected
+        (message "Login successful")
+        (collab-mode-cm-login-status-changed t))
+       (`could
+        (message "Login failed")
+        (collab-mode-cm-login-status-changed nil))
+
        (msg (error "unknown server message: %S" msg)))))))
 
 (defun collab-network-send-to-server (request &optional command)
@@ -47,8 +57,8 @@
 
 
 (defun collab-network-send-string-to-server (request &optional command)
- (let ((message (concat (or command "<message>") request "\000")))
-  (message "%s" message)
-  (process-send-string collab-server-process message)))
+ (let ((msg (concat (or command "<message>") request "\000")))
+  (when collab-network-verbose (message "%s" msg))
+  (process-send-string collab-server-process msg)))
 
 (provide 'network)

@@ -39,7 +39,7 @@ If POSITION is <= 1 then the overlay is deleted."
 
 (define-derived-mode collab-users-mode tabulated-list-mode "Users Mode"
   "Major mode for managing connections with users"
-  (setq tabulated-list-format [("" 10 t) ("Users" 18 t)])
+  (setq tabulated-list-format [("" 11 t) ("Users" 18 t)])
   (setq tabulated-list-padding 2)
   (tabulated-list-init-header)
   (add-hook 'tabulated-list-revert-hook
@@ -68,7 +68,7 @@ users, checks which are connected, and returns the appropriate list of entries."
          (cons (collab-user-text user)
           `(face (:foreground ,(collab-user-color user) :underline t)
             action collab-user-action))))))
-    (print entries)))
+    entries))
 
 (defun collab-user-action (mark)
  (collab-invite-user (tabulated-list-get-id mark)))
@@ -84,19 +84,6 @@ users, checks which are connected, and returns the appropriate list of entries."
 (defun collab-user-text (user)
   "Returns user entry label with appropriate face and connection glyph."
  (cadr user))
- ;; (concat
- ;;  (if (car user) "● " "○ ")
- ;;  (cadr user)))
-
-;; (defun collab-user-connected (user)
-;;   "Returns whether USER is connected."
-;;   (if (string= "Jeff" user)
-;;       'true
-;;     nil))
-
-;; (defun collab-users ()
-;;   "Returns a list of all available users."
-;;   (list "Andrew" "Joel" "Jeff"))
 
 (defun collab-user-color (user)
   "Returns USER's color."

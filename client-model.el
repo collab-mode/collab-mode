@@ -14,13 +14,22 @@ so it doesn't rebroadcast itself into an infinite loop")
 (defvar collab-mode-cm-buffer nil "The buffer")
 (defvar collab-mode-cm-last-cursor-pos nil "Last transmitted cursor position")
 (defvar collab-mode-cached-self-user nil)
+(defvar collab-mode-cm-XMPP-username nil "XMPP username we're logged in as or nil")
+(defvar collab-mode-cm-last-attempted-login nil "Last XMPP username we tried to log in as")
+(defvar collab-server-friends '())
+(defvar collab-server-users '())
 
 (defun collab-mode-cm-update-user-list ()
  (interactive)
  (collab-network-send-to-server nil "<list addr>"))
 
+(defun collab-mode-cm-update-friend-list ()
+ (interactive)
+ (collab-network-send-to-server nil "<xmpp friends>"))
+
 (defun collab-mode-cm-xmpp-login (username password)
  "Perform XMPP login with provided username and password"
+ (setq collab-mode-cm-last-attempted-login username)
  (collab-network-send-string-to-server nil
   (concat "<xmpp connect>" username " " password))
  (collab-mode-cm-update-user-list))
@@ -35,16 +44,31 @@ so it doesn't rebroadcast itself into an infinite loop")
 
 (defun collab-mode-cm-format-user (user)
  (pcase user
+  ;; Server user
   (`(,num ,ip ,port ,username ,r ,g ,b . ,_)
    (list
     (cond
      ((equal username (collab-self-username)) 'you)
      (t 'collaborating))
     username
-    (collab-mode-cm-rgb-to-color r g b)))))
+    (collab-mode-cm-rgb-to-color r g b)))
+  ;; Friend list user
+  (`(,num ,username ,status)
+   (list
+    (if (equal status "offline")
+     'offline
+     'available)
+    username
+    "black"))))
+
+(defun collab-server-friends-minus-server-users ()
+ (loop for friend in collab-server-friends
+  if (not (collab-user-from-username (cadr friend)))
+  collect friend))
 
 (defun collab-users ()
- (mapcar #'collab-mode-cm-format-user collab-server-users))
+ (mapcar #'collab-mode-cm-format-user
+  (append collab-server-users (collab-server-friends-minus-server-users))))
 
 (defun collab-user-from-username (username)
  (loop for user in collab-server-users
@@ -85,6 +109,21 @@ so it doesn't rebroadcast itself into an infinite loop")
   (when buffer
    (with-current-buffer buffer
     (revert-buffer t t t)))))
+
+(defun collab-mode-cm-new-friends-received (friends)
+ (setq collab-server-friends friends)
+ (let ((buffer (get-buffer "*Users*")))
+  (when buffer
+   (with-current-buffer buffer
+    (revert-buffer t t t)))))
+
+(defun collab-mode-cm-login-status-changed (logged-in)
+ (if logged-in
+  (progn
+   (setq collab-mode-cm-XMPP-username collab-mode-cm-last-attempted-login)
+   (run-at-time 3 nil #'collab-mode-cm-update-friend-list)
+   (run-at-time t 5 #'collab-mode-cm-update-friend-list))
+  (setq collab-mode-cm-XMPP-username nil)))
 
 (defun font-for-user (user)
  `(:box ,(if (= user 0) "firebrick" "dodger blue")))
@@ -147,6 +186,7 @@ TBD: how many times is this called, and in what contexts"
   (collab-mode-network-connect "ec2.alcobb.com" 10068))
  (setq collab-mode-cm-text-to-be-changed "")
  (setq collab-server-users '())
+ (setq collab-server-friends '())
  (setq collab-server-rooms '())
  (setq infinote-user (if (> user-id 0) 1 0))
  ;(unless other-buffer
