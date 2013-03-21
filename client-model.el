@@ -122,7 +122,9 @@ so it doesn't rebroadcast itself into an infinite loop")
   (progn
    (setq collab-mode-cm-XMPP-username collab-mode-cm-last-attempted-login)
    (run-at-time 3 nil #'collab-mode-cm-update-friend-list)
-   (run-at-time t 5 #'collab-mode-cm-update-friend-list))
+   (run-at-time t 5 #'collab-mode-cm-update-friend-list)
+   (setq infinote-user-name collab-mode-cm-XMPP-username)
+   (infinote-connect-to-server))
   (setq collab-mode-cm-XMPP-username nil)))
 
 (defun font-for-user (user)
@@ -188,12 +190,13 @@ TBD: how many times is this called, and in what contexts"
  (setq collab-server-users '())
  (setq collab-server-friends '())
  (setq collab-server-rooms '())
- (setq infinote-user (if (> user-id 0) 1 0))
+ ;(setq infinote-user (if (> user-id 0) 1 0))
  ;(unless other-buffer
    ;(collab-mode-network-init-remote-document collab-mode-cm-network-connection (buffer-string)))
- (add-hook 'post-command-hook #'collab-mode-cm-post-change-hook nil t)
- (add-hook 'before-change-functions #'collab-mode-cm-before-change-hook nil t)
- (add-hook 'after-change-functions #'collab-mode-cm-after-change-hook nil t))
+ ;(add-hook 'post-command-hook #'collab-mode-cm-post-change-hook nil t)
+ ;(add-hook 'before-change-functions #'collab-mode-cm-before-change-hook nil t)
+ ;(add-hook 'after-change-functions #'collab-mode-cm-after-change-hook nil t)
+ )
 
 (defun collab-mode-network-post-delete (network-obj start old-text)
  "send delete over the network"
@@ -212,7 +215,7 @@ TBD: how many times is this called, and in what contexts"
 
 (defun collab-mode-network-connect (host port)
  "connect to collabserver located at host:port"
- (infinote-init)
+ ;(infinote-init)
  (collab-network-connect-to-server)
  (collab-mode-cm-update-user-list)
  `(opaque-network-object ,(current-buffer)))
