@@ -1,7 +1,7 @@
 (require 'ewoc)
 
 (defun collab-pp (data)
-  "Prints messages."
+  "Prints messages for ewoc."
   (insert data))
 
 (defvar collab-point-insert nil
@@ -13,12 +13,13 @@
 (defvar collab-chat-keymap 
   (let ((map (make-sparse-keymap)))
     (define-key map "\r" 'collab-chat-buffer-send)
-    map))
+    map)
+  "The keymap for collab-chat-mode.")
 
-(defun collab-test ()
-  "test"
+(defun collab-chat-mode ()
+  "Creates collab-chat-mode window."
   (interactive)
-  (with-current-buffer (get-buffer-create "test")
+  (pop-to-buffer (get-buffer-create "chat"))
     (unless collab-chat-ewoc
       (setq collab-chat-ewoc
 	    (ewoc-create 'collab-pp nil "---"))
@@ -30,13 +31,9 @@
       (setq collab-point-insert (point-marker)))
     (setq major-mode 'collab-chat-mode
 	  mode-name "collab-chat")
-    (use-local-map collab-chat-keymap)))
+    (use-local-map collab-chat-keymap))
 
 (defun collab-chat-buffer-send ()
   (interactive)
   (let ((body (delete-and-extract-region collab-point-insert (point-max))))
     (ewoc-enter-last collab-chat-ewoc body)))
-
-;;(collab-test)
-
-;;(ewoc-enter-last collab-chat-ewoc "some stuff 2")
