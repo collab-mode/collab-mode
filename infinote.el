@@ -162,7 +162,8 @@
 (defun infinote-wait-for-connection ()
   (while (and infinote-connection
               (not infinote-connection-ready))
-    (accept-process-output infinote-connection)))
+    (sit-for 1.0)))
+                                        ;(accept-process-output infinote-connection)))
 
 (defun infinote-filter (network-process string)
   ;; a lot of the xml parsing trickiness is straight from jabber.el's xmpp filter
