@@ -2,8 +2,10 @@
 
 (let* ((fname (or load-file-name buffer-file-name))
         (dname (file-name-directory fname)))
+  (load (expand-file-name "xml.el" dname))
   (load (expand-file-name "xmlgen.el" dname)))
 
+(require 'xml)
 (require 'xmlgen)
 
 (defgroup infinote nil
