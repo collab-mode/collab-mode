@@ -224,7 +224,7 @@
 
 (defun collab-infinoted-segment-xml-to-text (segment-xml)
   ;; TODO: mark this with author ids
-  (concat (mapcar #'(lambda (segment) (if (listp segment) (caddr segment) segment)) segment-xml)))
+  (apply #'concat (mapcar #'(lambda (segment) (if (listp segment) (caddr segment) segment)) segment-xml)))
 
 (defun collab-infinoted-vector-includes (vector-1 vector-2)
   (loop
