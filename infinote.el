@@ -160,9 +160,10 @@
         (infinote-wait-for-connection)))))
 
 (defun infinote-wait-for-connection ()
-  (while (and infinote-connection
+  (loop for i from 0 to 10
+        do (and infinote-connection
               (not infinote-connection-ready))
-    (sit-for 1.0)))
+        (sit-for 1.0)))
                                         ;(accept-process-output infinote-connection)))
 
 (defun infinote-filter (network-process string)
