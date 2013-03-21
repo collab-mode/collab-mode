@@ -130,7 +130,7 @@
 (defun infinote-translate (request target-vector)
   "Get a request modified to be applicable to a state at the target-vector"
   ; If the request is for the target-vector, return it
-  (message "%S --- %S" request target-vector)
+  ;;(message "%S --- %S" request target-vector)
   (assert (loop for user-request-count across target-vector if (< user-request-count 0) return nil end finally return t))
   (if (equal (infinote-request-target-vector request) target-vector)
       request
