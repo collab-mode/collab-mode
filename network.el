@@ -542,7 +542,6 @@
                  (when session-buffer
                    (with-current-buffer session-buffer
                      (unless syncing (collab-infinoted-diff-user-vector user-id vector-diff))
-                     
                      (let ((request-vector (if syncing vector-diff (collab-infinoted-user-vector user-id))))
                        (collab-infinoted-handle-request user-id request-vector (collab-infinoted-xml-to-operation operation-xml))))))))))
 
