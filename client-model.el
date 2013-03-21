@@ -18,6 +18,11 @@ so it doesn't rebroadcast itself into an infinite loop")
 (defvar collab-mode-cm-last-attempted-login nil "Last XMPP username we tried to log in as")
 (defvar collab-server-friends '())
 (defvar collab-server-users '())
+(defvar collab-server-rooms '())
+
+(defun collab-mode-cm-update-room-list ()
+ (interactive)
+ (collab-network-send-to-server nil "<list rooms>"))
 
 (defun collab-mode-cm-update-user-list ()
  (interactive)
@@ -118,6 +123,14 @@ so it doesn't rebroadcast itself into an infinite loop")
    (with-current-buffer buffer
     (revert-buffer t t t)))))
 
+(defun collab-mode-cm-new-rooms-received (rooms)
+ (setq collab-server-rooms rooms))
+
+(defun collab-mode-cm-current-room ()
+ (loop for room in collab-server-rooms
+  if (equal (last room) '(:self-room))
+  return (cadr room)))
+
 (defun collab-mode-cm-login-status-changed (logged-in)
  (if logged-in
   (progn
@@ -174,7 +187,18 @@ so it doesn't rebroadcast itself into an infinite loop")
  (setq collab-mode-cm-text-to-be-changed ""))
 
 (defun collab-invite-user (user)
- (message "{%s}" user))
+ (let ((room (collab-mode-cm-current-room)))
+  (if (equal room "main")
+   (setq room (format "%x" (random))))
+  (collab-network-send-string-to-server room "<create room>")
+  (collab-network-send-string-to-server room "<join room>")
+  (collab-mode-cm-update-room-list)
+  (collab-network-send-string-to-server user "<invite>")))
+
+(defun collab-mode-cm-invite-received (room)
+ (collab-network-send-string-to-server room "<join room>")
+ (collab-mode-cm-update-room-list)
+ (collab-mode-cm-update-user-list))
 
 (defun collab-mode-cm-init (user-id)
  "Initialization for the client model

@@ -23,8 +23,6 @@
       (pcase msg
        (`(:infinote ,infinote-message)
         (with-demoted-errors (infinote-execute infinote-message)))
-       (`(:chat ,chat-message)
-        (error "to be implemented..."))
        (`(:cursor ,user ,cursor-loc)
         (with-current-buffer collab-mode-cm-buffer
          (collab-cursor
@@ -34,8 +32,10 @@
         (collab-mode-cm-new-users-received users))
        (`(:xmppfriends . ,friends)
         (collab-mode-cm-new-friends-received friends))
+       (`(:invite ,room)
+        (collab-mode-cm-invite-received room))
        (`(:rooms . ,rooms)
-        (setq collab-server-rooms rooms))
+        (collab-mode-cm-new-rooms-received rooms))
        (`(:chat ,from-username ,msg)
         (collab-chat-buffer-receive msg from-username))
 
@@ -46,6 +46,8 @@
        (`could
         (message "Login failed")
         (collab-mode-cm-login-status-changed nil))
+
+       (`room nil) ;; ignore
 
        (`(:error . ,_) nil)
 
