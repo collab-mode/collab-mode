@@ -130,11 +130,24 @@ class MainListiningThread(threading.Thread):
 				self.xmppGetFriends()
 				key = ''
 				mymessage = ''
+			if key == '<invite':
+				self.sendInvite(mymessage)
+				key = ''
+				mymessage = ''
 			if key == '<invalid format':
 				messageq.put(['recieved invalid format for message',self.tcplisSoc])
 				key = ''
 				mymessage = ''
-
+	def sendInvite(self,mymess):
+		myaddr = ''
+		for sock,uname in unames.iteritems():
+			if uname[0] == mymess:
+				myaddr = sock
+		for i in rooms:
+                        for j in i[1]:
+				if(str(j.getpeername()) == myaddr):
+					mess = '(:invite ' + '"' + str(rooms[self.myroom][0]) + '")'
+					messageq.put([mess,j])
         def createRoom(self,mymess):
                 validrm = True
                 global rooms
@@ -192,24 +205,30 @@ class MainListiningThread(threading.Thread):
 			print "error: " + errortype
 
 	def xmppGetFriends(self):
-		rost = self.myxmppCl.getRoster()
-		rost.Request(force=1)
-		mysend = ''
-		for i in rost.keys():
-			if (str(rost.getName(i)) == 'None'):
-				mysend = mysend + '\n' + 'name =' + str(i).split('@')[0]
-			else:
-				mysend = mysend + '\n' + 'name =' + str(rost.getName(i))
-			if(len(rost.getResources(i)) > 0):
-				if(str(rost.getShow(i)) == 'None'): 
-					mysend = mysend + ' online'
-				if(str(rost.getShow(i)) == 'dnd'):
-					mysend = mysend + ' do not disturb'
-				if(str(rost.getShow(i)) == 'away'):
-					mysend = mysend + ' away'
-			else:
-				mysend = mysend + ' offline'
-		messageq.put([mysend,self.tcplisSoc])
+		if(self.xmppIsCon):
+			rost = self.myxmppCl.getRoster()
+			rost.Request(force=1)
+			mysend = '(:xmppfriends '
+			index = 0;
+			for i in rost.keys():
+				if (str(rost.getName(i)) == 'None'):
+					mysend = mysend + '(' + str(index) + ' "' + str(i).split('@')[0] + '"'
+				else:
+					mysend = mysend + '('+ str(index) + ' "' + str(rost.getName(i)) + '"'
+				if(len(rost.getResources(i)) > 0):
+					if(str(rost.getShow(i)) == 'None'): 
+						mysend = mysend + ' "online")'
+					if(str(rost.getShow(i)) == 'dnd'):
+						mysend = mysend + ' "dnd")'
+					if(str(rost.getShow(i)) == 'away'):
+						mysend = mysend + ' "away")'
+				else:
+					mysend = mysend + ' "offline")'
+				index = index + 1;
+			mysend = mysend + ')';
+			messageq.put([mysend,self.tcplisSoc])
+		else:
+			messageq.put(['(:error (0 "Not Loged In"))',self.tcplisSoc])
         def joinRoom(self,mymess):
                 rmindex = -1
                 j = 0
