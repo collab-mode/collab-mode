@@ -8,6 +8,7 @@
   (load (expand-file-name "client-model.el" dname))
   (load (expand-file-name "collab-auth-prompt.el" dname))
   (load (expand-file-name "chat-buffer.el" dname))
+  (load (expand-file-name "xmlgen.el" dname))
   )
 
 )

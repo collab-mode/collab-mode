@@ -1,5 +1,9 @@
 (eval-when-compile (require 'cl))
 
+(let* ((fname (or load-file-name buffer-file-name))
+        (dname (file-name-directory fname)))
+  (load (expand-file-name "xmlgen.el" dname)))
+
 (require 'xmlgen)
 
 (defgroup infinote nil
@@ -305,7 +309,18 @@
    `(delete-caret :pos ,pos
                   :len ,len)))
 
+(defun infinote-collab-text-properties (username)
+  (append
+   (if (equal username (collab-self-username))
+       '(:weight bold)
+     '())
+   `(:background
+     ,(collab-mode-cm-color-for-user
+       (collab-user-from-username username)))))
+
 (defun infinote-local-insert (pos text)
+  (message (format "%S - %S" pos text))
+  (add-text-properties pos (+ pos (length text)) `(face ,(infinote-collab-text-properties infinote-user-name)))
   (let ((pos (- pos 1)))
     (infinote-send-insert pos text)
     (push (list infinote-user-id
@@ -642,11 +657,11 @@
       (`(insert ,pos ,text)
        (save-excursion
          (goto-char (+ 1 pos))
-         (insert text)))
+         (insert (propertize text `(faces (infinote-collab-text-properties (infinote-get-user-data user-id 'name)))))))
       (`(insert-caret ,pos ,text)
        (save-excursion
          (goto-char (+ 1 pos))
-         (insert text)))
+         (insert (propertize text `(faces (infinote-collab-text-properties (infinote-get-user-data user-id 'name)))))))
       (`(delete ,pos ,len)
        (save-excursion
          (delete-region (+ 1 pos) (+ 1 pos len))))
