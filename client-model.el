@@ -21,12 +21,12 @@ so it doesn't rebroadcast itself into an infinite loop")
 
 (defun collab-mode-cm-update-user-list ()
  (interactive)
- (when collab-mode-cm-XMPP-username
-  (collab-network-send-to-server nil "<list addr>")))
+ (collab-network-send-to-server nil "<list addr>"))
 
 (defun collab-mode-cm-update-friend-list ()
  (interactive)
- (collab-network-send-to-server nil "<xmpp friends>"))
+ (when collab-mode-cm-XMPP-username
+  (collab-network-send-to-server nil "<xmpp friends>")))
 
 (defun collab-mode-cm-xmpp-login (username password)
  "Perform XMPP login with provided username and password"
