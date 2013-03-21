@@ -9,4 +9,5 @@ password as cdr to COLLAB-MODE-CM-XMPP-LOGIN."
 	 (password-read "Password: "))))
 
 (defun collab-mode-cm-xmpp-login (info)
-  (message  "username: %s, password: %s" (car info) (cdr info)))
+  "Usage example."
+  (message "username: %s, password: %s" (car info) (cdr info)))
