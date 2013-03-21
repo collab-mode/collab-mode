@@ -6,7 +6,7 @@
   "infinote"
   :group 'communication)
 
-(defcustom infinote-server "localhost"
+(defcustom infinote-server "irc.joelhough.com"
   "infinote server"
   :group 'infinote
   :type 'string)
@@ -21,8 +21,16 @@
   :group 'infinote
   :type 'string)
 
+(defcustom infinote-hue (random* 1.0)
+  "Your hue [0.0-1.0]"
+  :group 'infinote
+  :type 'float)
+
 ;; globals
 (defvar infinote-connection nil "Active connection to infinote server")
+(defvar infinote-connection-buffer nil "Process buffer for connection to server")
+(defvar infinote-connection-ready nil "non-nil when the connection auth'd and handshook")
+(defvar infinote-verbose nil "Print debug messages")
 
 ;; connection (process-buffer) locals
 (defvar infinote-nodes nil "Nodes (documents and subdirectories) on a server")
@@ -51,6 +59,8 @@
 (make-variable-buffer-local 'infinote-inhibit-change-hooks)
 (defvar infinote-before-change-text nil "Text about to be changed by a local edit")
 (make-variable-buffer-local 'infinote-text-before-change)
+(defvar infinote-syncing nil "In the process of syncing this document")
+(make-variable-buffer-local 'infinote-syncing)
 
 (define-minor-mode infinote-mode
   "infinote"
@@ -58,24 +68,30 @@
   (if infinote-mode
       (progn
         (unless infinote-connection (infinote-connect-to-server))
-        ;; (unless infinote-node-id (sync-in))
+        (unless infinote-node-id
+          (let ((name (buffer-name)))
+          (with-current-buffer (process-buffer infinote-connection)
+            (infinote-send-add-node name))))
         ;; (unless infinote-chat-buffer (infinote-join-chat))
         ;; (unless infinote-users-buffer (infinote-create-users-buffer))
         
         (add-hook 'before-change-functions #'infinote-before-change nil t)
-        (add-hook 'after-change-functions #'infinote-after-change t t)
-        (add-hook 'post-command-hook #'infinote-post-command nil t))
+        (add-hook 'after-change-functions #'infinote-after-change nil t)
+        (add-hook 'post-command-hook #'infinote-post-command nil t)
+        (add-hook 'kill-buffer-hook #'infinote-close-session nil t))
     (remove-hook 'before-change-functions #'infinote-before-change t)
     (remove-hook 'after-change-functions #'infinote-after-change t)
-    (remove-hook 'post-command-hook #'infinote-post-command t)))
+    (remove-hook 'post-command-hook #'infinote-post-command t)
+    (remove-hook 'kill-buffer-hook #'infinote-close-session nil t)
+    (infinote-close-session)))
 
 (defun infinote-find-file (filename)
-  (interactive "sInfinoted file: ")
+  (interactive "sInfinote file: ")
   (unless infinote-connection (infinote-connect-to-server))
   (with-current-buffer (process-buffer infinote-connection)
     (let ((existing-file (lax-plist-get infinote-nodes filename)))
       (if existing-file
-          (infinote-send-subscribe-session (plist-get existing-file 'id))
+          (infinote-send-subscribe-session (lax-plist-get existing-file 'id))
         (infinote-send-add-node filename)))))
 
 (defun infinote-before-change (start end)
@@ -84,22 +100,44 @@
 
 (defun infinote-after-change (start end previous-length)
   (unless infinote-inhibit-change-hooks
-    (let ((text (buffer-substring-no-properties start end))
-          (changed? (zerop previous-length))
-          (inserted? (> end start))
-          (start (- start 1))
-          (end (- end 1)))
+    (let ((insert-text (buffer-substring-no-properties start end))
+          (changed? (> previous-length 0))
+          (inserted? (> end start)))
       (assert (>= end start))
       (when changed?
-        (let ((length (- end start)))
-          (infinote-record-delete start length text)
-          (infinote-send-delete start length))
+        (infinote-local-delete start infinote-before-change-text))
       (when inserted?
-        (infinote-record-insert start)
-        (infinote-send-insert start text-2))))))
+        (infinote-local-insert start insert-text)))))
 
 (defun infinote-post-command ()
   )
+
+(defun infinote-close-session ()
+  (when (buffer-live-p infinote-connection-buffer)
+    (when infinote-connection
+      (infinote-send-session-unsubscribe))
+    (let ((group-name infinote-group-name))
+      (with-current-buffer infinote-connection-buffer
+        (setq infinote-sessions (lax-plist-put infinote-sessions group-name nil)))))
+  (setq infinote-group-name nil)
+  (setq infinote-node-id nil)
+  (setq infinote-node-type nil)
+  (setq infinote-users nil)
+  (setq infinote-user-id nil)
+  (setq infinote-request-log nil)
+  (setq infinote-request-queue nil)
+  (setq infinote-my-last-sent-vector nil)
+  (setq infinote-inhibit-change-hooks nil)
+  (setq infinote-before-change-text nil)
+  (setq infinote-syncing nil))
+
+(defun infinote-server-buffer-killed ()
+  (when (eq (current-buffer)
+            infinote-connection-buffer)
+    (setq infinote-connection nil)
+    (setq infinote-connection-ready nil)
+    ;; un-infinote any open session buffers
+    ))
 
 (defun infinote-connect-to-server ()
   (unless infinote-connection
@@ -108,11 +146,19 @@
       (setq infinote-connection network-process)
       (set-process-filter network-process #'infinote-filter)
       (with-current-buffer (process-buffer network-process)
+        (add-hook 'kill-buffer-hook #'infinote-server-buffer-killed nil t)
+        (setq infinote-connection-buffer (current-buffer))
         (setq infinote-group-name "InfDirectory")
         (setq infinote-node-id 0)
         (setq infinote-node-type "InfDirectory")
         (setq infinote-sessions (list "InfDirectory" (current-buffer)))
-        (infinote-send-stream-header infinote-server)))))
+        (infinote-send-stream-header infinote-server)
+        (infinote-wait-for-connection)))))
+
+(defun infinote-wait-for-connection ()
+  (while (and infinote-connection
+              (not infinote-connection-ready))
+    (accept-process-output infinote-connection)))
 
 (defun infinote-filter (network-process string)
   ;; a lot of the xml parsing trickiness is straight from jabber.el's xmpp filter
@@ -126,9 +172,6 @@
 
       (block message-loop
         (while (> (point-max) (point-min))
-          (display-buffer (current-buffer))
-          (sit-for 0.1)
-          
           ;; delete anything that isn't a tag opening. mainly worried about whitespace
           (delete-region (point) (progn (skip-chars-forward "^<") (point)))
 
@@ -145,7 +188,8 @@
 
           ;; stream close
           (when (looking-at "</stream:stream>")
-            (return (infinote-close-stream SOMETHING)))
+            (kill-buffer)
+            (return-from message-loop))
 
           (let ((beg (point))
                 (xml-data))
@@ -173,6 +217,7 @@
                (infinote-handle-group-commands (assoc-default 'name attributes) contents)))))
 
 (defun infinote-send-string (string)
+  (assert infinote-connection)
   (process-send-string infinote-connection string))
 
 (defun infinote-send-xml (xml-data)
@@ -220,6 +265,10 @@
    `(subscribe-session :seq "0"
                        :id ,node-id)))
 
+(defun infinote-send-session-unsubscribe ()
+  (infinote-send-group-command
+   '(session-unsubscribe)))
+
 (defun infinote-send-add-node (filename)
   (infinote-send-group-command
    `(add-node :seq "0"
@@ -232,34 +281,52 @@
   (infinote-send-group-command
    `(subscribe-ack :id ,node-id)))
 
+(defun infinote-send-sync-ack ()
+  (infinote-send-group-command
+   `(sync-ack)))
+
 (defun infinote-send-user-join (name group)
   (infinote-send-group-command
    `(user-join :seq "0"
                :name ,name
                :status "active"
-               :time ""
+               :time ,(infinote-vector-to-string (infinote-my-vector))
                :caret "0"
-               :hue "0.56")
+               :hue ,infinote-hue)
    group))
 
 (defun infinote-send-insert (pos text)
-  (infinote-send-group-command
-   `(insert-caret :pos ,(- pos 1)
+  (infinote-send-request
+   `(insert-caret :pos ,pos
                   ,text)))
-
-(defun infinote-local-insert (pos text)
-  (infinote-send-insert pos text)
-  (infinote-record-insert pos text)
-  (infinote-increment-my-vector infinote-user-id)
-  (setq infinote-my-last-sent-vector (infinote-my-vector)))
 
 (defun infinote-send-delete (pos len)
   (infinote-send-request
-   `(delete-caret :pos ,(- pos 1)
-                  ,len)))
+   `(delete-caret :pos ,pos
+                  :len ,len)))
+
+(defun infinote-local-insert (pos text)
+  (let ((pos (- pos 1)))
+    (infinote-send-insert pos text)
+    (push (list infinote-user-id
+                (infinote-my-vector)
+                (list 'insert-caret pos text))
+          infinote-request-log)
+    (infinote-increment-my-vector infinote-user-id)
+    (setq infinote-my-last-sent-vector (infinote-my-vector))))
+
+(defun infinote-local-delete (pos text)
+  (let ((pos (- pos 1)))
+    (infinote-send-delete pos (length text))
+    (push (list infinote-user-id
+                (infinote-my-vector)
+                (list 'delete-caret pos text))
+          infinote-request-log) 
+    (infinote-increment-my-vector infinote-user-id)
+    (setq infinote-my-last-sent-vector (infinote-my-vector))))
 
 (defun infinote-diff-since-last-sent-vector ()
-  (infinote-diffed-vector (infinote-my-vector) infinote-my-last-sent-vector))
+  (infinote-vector-subtract (infinote-my-vector) infinote-my-last-sent-vector))
 
 (defun infinote-vector-to-string (vector)
   (mapconcat
@@ -276,30 +343,36 @@
    ";"))
 
 (defun infinote-create-session (name id group-name)
-  (new-buffer (generate-new-buffer name))
-  (with-current-buffer new-buffer
-    (setq infinote-group-name group-name)
-    (setq infinote-node-id id)
-    (setq infinote-node-type "InfText")
-    (infinote-mode)
-    (display-buffer (current-buffer)))
-  (setq infinote-sessions (plist-put infinote-sessions group-name new-buffer)))
+  (let ((new-buffer (get-buffer name)))
+    (when (or (not new-buffer)
+              (not (buffer-local-value 'infinote-mode new-buffer))
+              (buffer-local-value 'infinote-node-id new-buffer))
+      (setq new-buffer (generate-new-buffer name)))
+    (with-current-buffer new-buffer
+      (setq infinote-group-name group-name)
+      (setq infinote-node-id id)
+      (setq infinote-node-type "InfText")
+      (unless infinote-mode (infinote-mode))
+      (display-buffer (current-buffer)))
+    (setq infinote-sessions (lax-plist-put infinote-sessions group-name new-buffer))))
 
 (defun infinote-user-join (name id vector hue caret selection status)
-  (setq infinote-users (plist-put
+  (setq infinote-users (lax-plist-put
                          infinote-users
                          id
                          (list 'name name
                                'id id
-                               'vector vector
+                               'vector (if (and syncing (equal name infinote-user-name)) nil vector)
                                'hue hue
                                'caret caret
                                'selection selection
                                'status status)))
   (when (equal name infinote-user-name)
     (setq infinote-user-id id)
-    (unless (= (point-min) (point-max))
-      (infinote-send-insert 0 (buffer-substring-no-properties (point-min) (point-max))))))
+    (unless (or infinote-syncing
+                (= (point-min) (point-max)))
+      (infinote-local-insert 1 (buffer-substring-no-properties (point-min) (point-max))))
+    (setq infinote-syncing nil)))
 
 (defun infinote-read-vector (vector-string)
   (mapcar #'string-to-number (split-string vector-string "[:;]" t)))
@@ -344,6 +417,19 @@
   (and (infinote-vector-includes vector-1 vector-2)
        (infinote-vector-includes vector-2 vector-1)))
 
+(defun infinote-vector-subtract (vector-1 vector-2)
+  (loop
+   with new-vector = (copy-sequence vector-1)
+   for prop on vector-2 by #'cddr
+   do
+   (let ((user-id (car prop))
+         (op-count (cadr prop)))
+     (setq new-vector (lax-plist-put new-vector
+                                 user-id
+                                 (- (infinote-operation-count user-id new-vector)
+                                    op-count))))
+   finally return new-vector))
+
 (defun infinote-diffed-vector (vector diff)
   (loop
    with new-vector = (copy-sequence vector)
@@ -351,19 +437,19 @@
    do
    (let ((user-id (car prop))
          (op-count (cadr prop)))
-     (setq new-vector (plist-put new-vector
+     (setq new-vector (lax-plist-put new-vector
                                  user-id
                                  (+ op-count
                                     (infinote-operation-count user-id new-vector)))))
    finally return new-vector))
 
 (defun infinote-diff-user-vector (user-id diff)
-  (let* ((user-data (plist-get infinote-users user-id))
-         (vector (plist-get user-data 'vector)))
+  (let* ((user-data (lax-plist-get infinote-users user-id))
+         (vector (lax-plist-get user-data 'vector)))
     (setq infinote-users
-          (plist-put infinote-users
+          (lax-plist-put infinote-users
                      user-id
-                     (plist-put user-data
+                     (lax-plist-put user-data
                                 'vector
                                 (infinote-diffed-vector vector diff))))))
 
@@ -371,17 +457,17 @@
   (infinote-diff-user-vector infinote-user-id (list user-id 1)))
 
 (defun infinote-user-vector (user-id)
-  (plist-get (plist-get infinote-users user-id) 'vector))
+  (lax-plist-get (lax-plist-get infinote-users user-id) 'vector))
 
 (defun infinote-get-user-data (user-id field)
-  (plist-get (plist-get infinote-users user-id) field))
+  (lax-plist-get (lax-plist-get infinote-users user-id) field))
 
 (defun infinote-set-user-data (user-id field value)
-  (let ((user-data (plist-get infinote-users user-id)))
+  (let ((user-data (lax-plist-get infinote-users user-id)))
     (setq infinote-users
-          (plist-put infinote-users
+          (lax-plist-put infinote-users
                      user-id
-                     (plist-put user-data field value)))))
+                     (lax-plist-put user-data field value)))))
 
 (defun infinote-insert-segment (author-id text)
   (let ((infinote-inhibit-change-hooks t))
@@ -389,7 +475,7 @@
     (insert text)))
 
 (defun infinote-operation-count (user-id vector)
-  (or (plist-get vector user-id) 0))
+  (or (lax-plist-get vector user-id) 0))
 
 (defun infinote-nth-user-request-from-log (user-id n)
   (loop for request in infinote-request-log
@@ -401,10 +487,10 @@
 (defun infinote-translatable-user (request-user-id request-vector target-vector)
   (loop for target-operation on target-vector by #'cddr
         if (let ((target-user-id (car target-operation))
-                 (target-operation-count (cdr target-operation)))
+                 (target-operation-count (cadr target-operation)))
              (and (/= target-user-id request-user-id)
                   (> target-operation-count (infinote-operation-count target-user-id request-vector))))
-        return target-user-id
+        return (car target-operation)
         finally return nil))
 
 (defun infinote-closer-target-request (request-user-id request-vector target-vector)
@@ -500,7 +586,7 @@
         closer-target-operation)))))
 
 (defun infinote-my-vector ()
-  (plist-get (plist-get infinote-users infinote-user-id) 'vector))
+  (lax-plist-get (lax-plist-get infinote-users infinote-user-id) 'vector))
 
 (defun infinote-can-apply (vector onto-vector)
   (loop for user-operations on vector by #'cddr
@@ -528,13 +614,14 @@
 
 (defun infinote-contextualize-delete (operation currently-applicable-operation)
   (destructuring-bind (op pos len) operation
-    (list op pos len (infinote-affected-text currently-applicable-operation))))
+    (list op pos (infinote-affected-text currently-applicable-operation))))
 
 (defun infinote-handle-request (user-id vector operation)
   (let ((request (list user-id vector operation)))
     (if syncing
-        (progn (push request infinote-request-log)
-               (infinote-increment-my-vector user-id))
+        (progn
+          (push request infinote-request-log)
+          (infinote-increment-my-vector user-id))
       (let ((op-type (infinote-op-type (car operation))))
         (when (member op-type '(insert delete))
           (let ((my-vector (infinote-my-vector)))
@@ -570,7 +657,7 @@
 (defun infinote-node-from-id (id)
   (loop for node on infinote-nodes by #'cddr
         if (equal id
-                  (plist-get (cadr node) 'id))
+                  (lax-plist-get (cadr node) 'id))
         return (cadr node)
         finally return nil))
 
@@ -582,12 +669,13 @@
         (attributes (cadr command-xml-data))
         (contents (cddr command-xml-data))
         (session-buffer (lax-plist-get infinote-sessions group-name)))
-    (message (format "Got group %S command %S" group-name command-xml-data))
+    (when infinote-verbose (message (format "Got group %S command %S" group-name command-xml-data)))
     (case command
               (welcome
                (infinote-send-explore 0))
               (explore-begin) ; not really needed
-              (explore-end) ; not really needed
+              (explore-end ; not really needed
+               (setq infinote-connection-ready t))
               (add-node
                ;; add node to file list
                (let ((id (string-to-number (assoc-default 'id attributes)))
@@ -595,7 +683,7 @@
                      (parent (string-to-number (assoc-default 'id attributes)))
                      (type (assoc-default 'type attributes)))
                  (setq infinote-nodes
-                       (plist-put infinote-nodes
+                       (lax-plist-put infinote-nodes
                                   name
                                   (list 'id id
                                         'parent parent
@@ -606,7 +694,8 @@
                      (let ((group (xml-get-attribute first-content-tag 'group)))
                        (infinote-create-session name id group)
                        (infinote-send-subscribe-ack id)
-                       (infinote-send-user-join infinote-user-name group))))))
+                       (infinote-send-user-join infinote-user-name group)
+                       (setq infinote-my-last-sent-vector (infinote-my-vector)))))))
               (sync-in
                ;; send document sync
                )
@@ -614,18 +703,26 @@
               (subscribe-session
                ;; add session and ack
                (let* ((id (string-to-number (assoc-default 'id attributes)))
-                      (name (plist-get (infinote-node-from-id id) 'name))
+                      (name (lax-plist-get (infinote-node-from-id id) 'name))
                       (group (assoc-default 'group attributes)))
                  (infinote-create-session name id group)
-                 (infinote-send-subscribe-ack id)
-                 (infinote-send-user-join infinote-user-name group)))
+                 (infinote-send-subscribe-ack id)))
               (subscribe-chat
                ;; add chat and ack
                )
-              (sync-begin) ; not really needed
-              (sync-end) ; not really needed
+              (sync-begin
+               (when session-buffer
+                 (with-current-buffer session-buffer
+                   (setq infinote-syncing t)))) ; not really needed
+              (sync-end
+               (when infinote-verbose (message (format "Session buffer %S" session-buffer)))
+               (when session-buffer
+                 (with-current-buffer session-buffer
+                   (infinote-send-sync-ack)
+                   (infinote-send-user-join infinote-user-name group-name)
+                   (setq infinote-my-last-sent-vector (infinote-my-vector))))) 
               (sync-segment
-               ;; fill in buffer data
+                  ;; fill in buffer data
                (when session-buffer
                  (with-current-buffer session-buffer
                    (infinote-insert-segment (assoc-default 'author attributes) (car contents)))))
