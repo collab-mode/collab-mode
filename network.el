@@ -47,6 +47,8 @@
         (message "Login failed")
         (collab-mode-cm-login-status-changed nil))
 
+       (`(:error . ,_) nil)
+
        (msg (error "unknown server message: %S" msg)))))))
 
 (defun collab-network-send-to-server (request &optional command)

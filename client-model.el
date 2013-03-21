@@ -21,7 +21,8 @@ so it doesn't rebroadcast itself into an infinite loop")
 
 (defun collab-mode-cm-update-user-list ()
  (interactive)
- (collab-network-send-to-server nil "<list addr>"))
+ (when collab-mode-cm-XMPP-username
+  (collab-network-send-to-server nil "<list addr>")))
 
 (defun collab-mode-cm-update-friend-list ()
  (interactive)
