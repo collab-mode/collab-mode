@@ -19,6 +19,12 @@ so it doesn't rebroadcast itself into an infinite loop")
  (interactive)
  (collab-network-send-to-server nil "<list addr>"))
 
+(defun collab-mode-cm-xmpp-login (username password)
+ "Perform XMPP login with provided username and password"
+ (collab-network-send-string-to-server nil
+  (concat "<xmpp connect>" username " " password))
+ (collab-mode-cm-update-user-list))
+
 (defun collab-mode-cm-rgb-to-color (r g b)
  (format "#%02x%02x%02x" r g b))
 
@@ -26,7 +32,9 @@ so it doesn't rebroadcast itself into an infinite loop")
  (pcase user
   (`(,num ,ip ,port ,username ,r ,g ,b . ,_)
    (list
-    (equal username (collab-username-from-user (collab-self-user)))
+    (cond
+     ((equal username (collab-username-from-user (collab-self-user))) 'you)
+     (t 'collaborating))
     username
     (collab-mode-cm-rgb-to-color r g b)))))
 
@@ -51,18 +59,12 @@ so it doesn't rebroadcast itself into an infinite loop")
   collab-mode-cached-self-user))
 
 (defun collab-mode-cm-new-users-received (users)
- (collab-self-user)
+ (collab-self-user) ;; call this so that it can be re-cached if needed
  (setq collab-server-users users)
  (let ((buffer (get-buffer "*Users*")))
   (when buffer
    (with-current-buffer buffer
     (revert-buffer t t t)))))
-
-(defun collab-user-connected (user)
- t)
- ;; (loop for user2 in collab-server-users
- ;;  if (equal (last user2) :you)
- ;;  return (equal user (collab-mode-cm-format-user user2))))
 
 (defun font-for-user (user)
  `(:box ,(if (= user 0) "firebrick" "dodger blue")))
@@ -110,6 +112,9 @@ so it doesn't rebroadcast itself into an infinite loop")
      collab-mode-cm-network-connection
      start (buffer-substring-no-properties start end)))))
  (setq collab-mode-cm-text-to-be-changed ""))
+
+(defun collab-invite-user (user)
+ (message "{%s}" user))
 
 (defun collab-mode-cm-init (user-id)
  "Initialization for the client model

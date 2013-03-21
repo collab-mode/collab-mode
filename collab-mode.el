@@ -6,16 +6,16 @@
   (load (expand-file-name "infinote.el" dname))
   (load (expand-file-name "network.el" dname))
   (load (expand-file-name "client-model.el" dname))
+  (load (expand-file-name "collab-auth-prompt.el" dname))
   )
 
 )
 
-(setq collab-users-list)
+(defvar collab-users-list nil)
 
 (defun collab-cursor (user position)
   "Places a cursor for USER at POSITION with COLOR.
 If POSITION is <= 1 then the overlay is deleted."
- (message "%s" user)
   (interactive)
   (setq color (collab-user-color user))
   (if (< position 1)
@@ -38,11 +38,13 @@ If POSITION is <= 1 then the overlay is deleted."
 
 (define-derived-mode collab-users-mode tabulated-list-mode "Users Mode"
   "Major mode for managing connections with users"
-  (setq tabulated-list-format [("Users" 18 t)])
+  (setq tabulated-list-format [("" 10 t) ("Users" 18 t)])
   (setq tabulated-list-padding 2)
   (tabulated-list-init-header)
-  (add-hook 'tabulated-list-revert-hook (lambda () (setq tabulated-list-entries (collab-get-entries))
-					  (tabulated-list-print))))
+  (add-hook 'tabulated-list-revert-hook
+   (lambda ()
+    (setq tabulated-list-entries (collab-get-entries))
+    (tabulated-list-print))))
 
 (defun collab-list-users ()
   (interactive)
@@ -55,19 +57,35 @@ If POSITION is <= 1 then the overlay is deleted."
   "Returns the tabulated-list-entries argument for listing users. It gets the list of
 users, checks which are connected, and returns the appropriate list of entries."
   (interactive)
-  (let ()
-    (setq entries)
+  (let ((entries '()))
     (dolist (user (collab-users))
-      (setq entries
-	    (append entries (list (list nil (vector (cons (collab-user-text user)
-							  `(face (:foreground ,(collab-user-color user) :underline t)))))))))
+      (add-to-list 'entries
+       (list
+        (cadr user) ;; tablulated ID
+        (vector
+         (collab-user-status user)
+         (cons (collab-user-text user)
+          `(face (:foreground ,(collab-user-color user) :underline t)
+            action collab-user-action))))))
     (print entries)))
+
+(defun collab-user-action (mark)
+ (collab-invite-user (tabulated-list-get-id mark)))
+
+(defun collab-user-status (user)
+ (cond
+  ((equal (car user) 'you) "(you)")
+  ((equal (car user) 'collaborating) "(connected)")
+  ((equal (car user) 'available) "●")
+  ((equal (car user) 'offline) "○")
+  (t "")))
 
 (defun collab-user-text (user)
   "Returns user entry label with appropriate face and connection glyph."
- (concat
-  (if (car user) "● " "○ ")
-  (cadr user)))
+ (cadr user))
+ ;; (concat
+ ;;  (if (car user) "● " "○ ")
+ ;;  (cadr user)))
 
 ;; (defun collab-user-connected (user)
 ;;   "Returns whether USER is connected."
