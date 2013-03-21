@@ -16,7 +16,7 @@
     map)
   "The keymap for collab-chat-mode.")
 
-(defun collab-chat-mode ()
+(defun collab-chat ()
   "Creates collab-chat-mode window."
   (interactive)
   ;;(setq collab-point-insert nil)
@@ -36,7 +36,6 @@
     (use-local-map collab-chat-keymap))
 
 (defun collab-chat-buffer-send ()
-  (interactive)
   (let ((body (delete-and-extract-region collab-point-insert (point-max))))
     (collab-chat-buffer-receive body (collab-self-username))
     (collab-mode-cm-send-chat body)))
