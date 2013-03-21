@@ -10,7 +10,7 @@
 (defvar collab-chat-ewoc nil
   "The ewoc showing the messages of this chat buffer.")
 
-(defvar collab-chat-keymap 
+(defvar collab-chat-keymap
   (let ((map (make-sparse-keymap)))
     (define-key map "\r" 'collab-chat-buffer-send)
     map)
@@ -19,6 +19,8 @@
 (defun collab-chat-mode ()
   "Creates collab-chat-mode window."
   (interactive)
+  ;;(setq collab-point-insert nil)
+  ;;(setq collab-chat-ewoc nil)
   (pop-to-buffer (get-buffer-create "chat"))
     (unless collab-chat-ewoc
       (setq collab-chat-ewoc
@@ -36,4 +38,12 @@
 (defun collab-chat-buffer-send ()
   (interactive)
   (let ((body (delete-and-extract-region collab-point-insert (point-max))))
-    (ewoc-enter-last collab-chat-ewoc body)))
+    (collab-chat-buffer-receive body (collab-self-username))
+    (collab-mode-cm-send-chat body)))
+
+(defun collab-chat-buffer-receive (msg username)
+ (let* ((face (collab-mode-cm-chat-font-for-username username))
+        (user-text (propertize username 'face `(:underline t . ,face)))
+        (message-text (propertize msg 'face face)))
+  (ewoc-enter-last collab-chat-ewoc
+    (concat user-text ": " message-text))))

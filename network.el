@@ -31,7 +31,9 @@
        (`(:users . ,users)
         (collab-mode-cm-new-users-received users))
        (`(:rooms . ,rooms)
-        (serq collab-server-rooms rooms))
+        (setq collab-server-rooms rooms))
+       (`(:chat ,from-username ,msg)
+        (collab-chat-buffer-receive msg from-username))
        ;; TODO: change server messages for these
        (`connected (message "Login successful"))
        (`could (message "Login failed"))

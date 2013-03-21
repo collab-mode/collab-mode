@@ -28,16 +28,20 @@ so it doesn't rebroadcast itself into an infinite loop")
 (defun collab-mode-cm-rgb-to-color (r g b)
  (format "#%02x%02x%02x" r g b))
 
+(defun collab-mode-cm-color-for-user (user)
+ (pcase user
+  (`(,num ,ip ,port ,username ,r ,g ,b . ,_)
+   (collab-mode-cm-rgb-to-color r g b))))
+
 (defun collab-mode-cm-format-user (user)
  (pcase user
   (`(,num ,ip ,port ,username ,r ,g ,b . ,_)
    (list
     (cond
-     ((equal username (collab-username-from-user (collab-self-user))) 'you)
+     ((equal username (collab-self-username)) 'you)
      (t 'collaborating))
     username
     (collab-mode-cm-rgb-to-color r g b)))))
-
 
 (defun collab-users ()
  (mapcar #'collab-mode-cm-format-user collab-server-users))
@@ -57,6 +61,22 @@ so it doesn't rebroadcast itself into an infinite loop")
   (when current-you
    (setq collab-mode-cached-self-user current-you))
   collab-mode-cached-self-user))
+
+(defun collab-self-username ()
+ (collab-username-from-user (collab-self-user)))
+
+(defun collab-mode-cm-chat-font-for-username (username)
+ (append
+  (if (equal username (collab-self-username))
+   '(:weight bold)
+   '())
+  `(:foreground
+    ,(collab-mode-cm-color-for-user
+      (collab-user-from-username username)))))
+
+(defun collab-mode-cm-send-chat (msg)
+ (collab-network-send-to-server
+  `(:chat ,(collab-self-username) ,msg)))
 
 (defun collab-mode-cm-new-users-received (users)
  (collab-self-user) ;; call this so that it can be re-cached if needed
