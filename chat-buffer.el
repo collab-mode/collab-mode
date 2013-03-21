@@ -16,7 +16,7 @@
     map)
   "The keymap for collab-chat-mode.")
 
-(defun collab-chat-mode ()
+(defun collab-chat ()
   "Creates collab-chat-mode window."
   (interactive)
   ;;(setq collab-point-insert nil)
