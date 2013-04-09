@@ -3,7 +3,9 @@
 (defun collab-network-connect-to-server ()
  (when (boundp 'collab-server-process)
   (delete-process collab-server-process))
- (setq collab-server-process (open-network-stream "collab-server" "*collab-server*" "cobbal.com" 10068))
+ (setq collab-server-process (open-network-stream "collab-server"
+                              (get-buffer-create "*collab-server*")
+                              "cobbal.com" 10069 :type 'ssl))
  (set-process-filter collab-server-process #'collab-network-receive-from-server))
 
 (setq collab-server-input-buffer "")
