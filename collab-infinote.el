@@ -776,3 +776,5 @@
                      (unless syncing (infinote-diff-user-vector user-id vector-diff))
                      (let ((request-vector (if syncing vector-diff (infinote-user-vector user-id))))
                        (infinote-handle-request user-id request-vector (infinote-xml-to-operation operation-xml))))))))))
+
+(provide 'collab-infinote)

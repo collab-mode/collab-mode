@@ -63,4 +63,4 @@
   (when collab-network-verbose (message "%s" msg))
   (process-send-string collab-server-process msg)))
 
-(provide 'network)
+(provide 'collab-network)

@@ -245,4 +245,4 @@ TBD: how many times is this called, and in what contexts"
  (collab-mode-cm-update-user-list)
  `(opaque-network-object ,(current-buffer)))
 
-(provide 'client-model)
+(provide 'collab-client-model)

@@ -1,17 +1,8 @@
-(when nil
-;; eval the following form to load collab-mode
- (let* ((fname (or load-file-name buffer-file-name))
-        (dname (file-name-directory fname)))
-  (load (expand-file-name "collab-mode.el" dname))
-  (load (expand-file-name "infinote.el" dname))
-  (load (expand-file-name "network.el" dname))
-  (load (expand-file-name "client-model.el" dname))
-  (load (expand-file-name "collab-auth-prompt.el" dname))
-  (load (expand-file-name "chat-buffer.el" dname))
-  (load (expand-file-name "xmlgen.el" dname))
-  )
-
-)
+(require 'ewoc)
+(require 'password-cache)
+(require 'xmlgen)
+(require 'collab-infinote)
+(require 'collab-client-model)
 
 (defvar collab-users-list nil)
 
@@ -44,9 +35,9 @@ If POSITION is <= 1 then the overlay is deleted."
   (setq tabulated-list-padding 2)
   (tabulated-list-init-header)
   (add-hook 'tabulated-list-revert-hook
-   (lambda ()
-    (setq tabulated-list-entries (collab-get-entries))
-    (tabulated-list-print))))
+	    (lambda ()
+	      (setq tabulated-list-entries (collab-get-entries))
+	      (tabulated-list-print))))
 
 (defun collab-list-users ()
   (interactive)
@@ -62,30 +53,90 @@ users, checks which are connected, and returns the appropriate list of entries."
   (let ((entries '()))
     (dolist (user (collab-users))
       (add-to-list 'entries
-       (list
-        (cadr user) ;; tablulated ID
-        (vector
-         (collab-user-status user)
-         (cons (collab-user-text user)
-          `(face (:foreground ,(collab-user-color user) :underline t)
-            action collab-user-action))))))
+		   (list
+		    (cadr user) ;; tablulated ID
+		    (vector
+		     (collab-user-status user)
+		     (cons (collab-user-text user)
+			   `(face (:foreground ,(collab-user-color user) :underline t)
+				  action collab-user-action))))))
     entries))
 
 (defun collab-user-action (mark)
- (collab-invite-user (tabulated-list-get-id mark)))
+  (collab-invite-user (tabulated-list-get-id mark)))
 
 (defun collab-user-status (user)
- (cond
-  ((equal (car user) 'you) "(you)")
-  ((equal (car user) 'collaborating) "(connected)")
-  ((equal (car user) 'available) "●")
-  ((equal (car user) 'offline) "○")
-  (t "")))
+  (cond
+   ((equal (car user) 'you) "(you)")
+   ((equal (car user) 'collaborating) "(connected)")
+   ((equal (car user) 'available) "●")
+   ((equal (car user) 'offline) "○")
+   (t "")))
 
 (defun collab-user-text (user)
   "Returns user entry label with appropriate face and connection glyph."
- (cadr user))
+  (cadr user))
 
 (defun collab-user-color (user)
   "Returns USER's color."
   (caddr user))
+
+
+
+(defun collab-pp (data)
+  "Prints messages for ewoc."
+  (insert data))
+
+(defvar collab-point-insert nil
+  "Position where the message being composed starts")
+
+(defvar collab-chat-ewoc nil
+  "The ewoc showing the messages of this chat buffer.")
+
+(defvar collab-chat-keymap
+  (let ((map (make-sparse-keymap)))
+    (define-key map "\r" 'collab-chat-buffer-send)
+    map)
+  "The keymap for collab-chat-mode.")
+
+(defun collab-chat ()
+  "Creates collab-chat-mode window."
+  (interactive)
+  ;;(setq collab-point-insert nil)
+  ;;(setq collab-chat-ewoc nil)
+  (pop-to-buffer (get-buffer-create "chat"))
+  (unless collab-chat-ewoc
+    (setq collab-chat-ewoc
+	  (ewoc-create 'collab-pp nil "---"))
+    (goto-char (point-max))
+    (put-text-property (point-min) (point) 'read-only t)
+    (let ((inhibit-read-only t))
+      (put-text-property (point-min) (point) 'front-sticky t)
+      (put-text-property (point-min) (point) 'rear-nonsticky t))
+    (setq collab-point-insert (point-marker)))
+  (setq major-mode 'collab-chat-mode
+	mode-name "collab-chat")
+  (use-local-map collab-chat-keymap))
+
+(defun collab-chat-buffer-send ()
+  (interactive)
+  (let ((body (delete-and-extract-region collab-point-insert (point-max))))
+    (collab-chat-buffer-receive body (collab-self-username))
+    (collab-mode-cm-send-chat body)))
+
+(defun collab-chat-buffer-receive (msg username)
+  (let* ((face (collab-mode-cm-chat-font-for-username username))
+	 (user-text (propertize username 'face `(:underline t . ,face)))
+	 (message-text (propertize msg 'face face)))
+    (ewoc-enter-last collab-chat-ewoc
+		     (concat user-text ": " message-text))))
+
+(defun collab-login ()
+  "Prompts for a username and password. Passes username and
+password to COLLAB-MODE-CM-XMPP-LOGIN."
+  (interactive)
+  (collab-mode-cm-xmpp-login
+   (read-from-minibuffer "Username: ")
+   (password-read "Password: ")))
+
+(provide 'collab-mode)
