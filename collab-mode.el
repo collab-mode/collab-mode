@@ -2,6 +2,7 @@
 (require 'password-cache)
 (require 'xmlgen)
 (require 'collab-infinote)
+(require 'collab-network)
 (require 'collab-client-model)
 
 (defvar collab-users-list nil)
