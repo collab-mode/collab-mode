@@ -2,6 +2,7 @@
 #Author: Josiah Powell
 
 from socket import *
+import ssl
 import sys
 import threading
 import Queue
@@ -42,7 +43,8 @@ class MainListiningThread(threading.Thread):
                                 newInfo = self.readButNotParsed
                                 self.readButNotParsed = ''
                         else:
-                                newInfo = self.tcplisSoc.recv(1024)
+                                #newInfo = self.tcplisSoc.recv(1024)
+				newInfo = self.tcplisSoc.read()
                                 if not newInfo:
                                         return newInfo
                         spl = newInfo.split('\0', 1)
@@ -134,10 +136,19 @@ class MainListiningThread(threading.Thread):
 				self.sendInvite(mymessage)
 				key = ''
 				mymessage = ''
+			if key == '<xmpp chat':
+				self.xmppChat(mymessage)
+				key = ''
+				mymessage = ''
 			if key == '<invalid format':
 				messageq.put(['recieved invalid format for message',self.tcplisSoc])
 				key = ''
 				mymessage = ''
+	def xmppChat(self,mymess):
+		if(self.xmppIsCon):
+			(mid,sendmess) = mymess.split(' ',1)
+			myjid = xmpp.protocol.JID(mid)
+			self.myxmppCl.send(xmpp.protocol.Message(myjid,sendmess))
 	def sendInvite(self,mymess):
 		myaddr = ''
 		for sock,uname in unames.iteritems():
@@ -165,7 +176,9 @@ class MainListiningThread(threading.Thread):
 				con.send(xmpp.Presence(to=who, typ = 'subscribed'))
 				con.send(xmpp.Presence(to=who, typ = 'subscribe'))
 	def messageHandler(self,con,mess):
-		print str(mess.getFrom()) + ': ' +  str(mess.getBody()) 
+		if (mess.getBody() != None):
+			mymess = '(:whisper "' +str(mess.getFrom()).split("/",1)[0] + '"  "' +  str(mess.getBody()) + '")' 
+			messageq.put([mymess,self.tcplisSoc])
 	def xmppConnect(self,mymess):
 		errortype = '';
 		try:
@@ -211,19 +224,22 @@ class MainListiningThread(threading.Thread):
 			mysend = '(:xmppfriends '
 			index = 0;
 			for i in rost.keys():
-				if (str(rost.getName(i)) == 'None'):
-					mysend = mysend + '(' + str(index) + ' "' + str(i).split('@')[0] + '"'
-				else:
-					mysend = mysend + '('+ str(index) + ' "' + str(rost.getName(i)) + '"'
+				#if (str(rost.getName(i)) == 'None'):
+				mysend = mysend + '(' + str(index) + ' "' + str(i) + '"' #.split('@')[0] + '"'
+				#else:
+				#	mysend = mysend + '('+ str(index) + ' "' + str(rost.getName(i)) + '"'
 				if(len(rost.getResources(i)) > 0):
 					if(str(rost.getShow(i)) == 'None'): 
-						mysend = mysend + ' "online")'
-					if(str(rost.getShow(i)) == 'dnd'):
-						mysend = mysend + ' "dnd")'
-					if(str(rost.getShow(i)) == 'away'):
-						mysend = mysend + ' "away")'
+						mysend = mysend + ' "online"'
+					elif(str(rost.getShow(i)) == 'dnd'):
+						mysend = mysend + ' "dnd"'
+					elif(str(rost.getShow(i)) == 'away'):
+						mysend = mysend + ' "away"'
+					else:
+						mysend = mysend + ' "online"'
 				else:
-					mysend = mysend + ' "offline")'
+					mysend = mysend + ' "offline"'
+				mysend = mysend + ')'
 				index = index + 1;
 			mysend = mysend + ')';
 			messageq.put([mysend,self.tcplisSoc])
@@ -336,7 +352,7 @@ class MainSendingThread(threading.Thread):
 
 def main():
 	socque = Queue.Queue()
-	serverPort = 10068
+	serverPort = 10069
 	serverSocket = socket(AF_INET, SOCK_STREAM)
         serverSocket.setsockopt(SOL_SOCKET, SO_REUSEADDR, 1)
 	#serverip = gethostbyname(gethostname())
@@ -348,8 +364,12 @@ def main():
 	t.start()
         while 1:
 		(tcpCliSock, addr) = serverSocket.accept()
+		connstream = ssl.wrap_socket(tcpCliSock,server_side=True,
+					     certfile="server.crt",
+					     keyfile="server.key",
+					     ssl_version=ssl.PROTOCOL_TLSv1)
 		print 'Received a connection from:', addr
-		usrlst.append(tcpCliSock)
+		usrlst.append(connstream)
 		uintname = str(addr)
 		for i in str(addr):
 			if(not i.isdigit()):
@@ -363,8 +383,11 @@ def main():
 		myun = myun.replace(" ","")
 		unames[str(addr)] = (myun,(r,g,b))
 		#unames[str(addr)] = ('','')
-		t2 = MainListiningThread(tcpCliSock)
-		t2.start()
+		try:
+			t2 = MainListiningThread(connstream)
+			t2.start()
+		except:
+			connstream.close()
 
 
 if __name__ == "__main__":
