@@ -97,7 +97,7 @@ elements content.")
                              (concat ">" (mapconcat
                                           (lambda (s) (xmlgen s el (1+ level)))
                                           (if xmlgen-escape-elm-vals
-                                              (mapcar 'xmlgen-string-escape (cdr xml))
+                                              (mapcar #'xmlgen-string-escape (cdr xml))
                                             (cdr xml))
                                           "")
                                      "</" el ">")

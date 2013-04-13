@@ -80,7 +80,7 @@
             (infinote-send-add-node name))))
         ;; (unless infinote-chat-buffer (infinote-join-chat))
         ;; (unless infinote-users-buffer (infinote-create-users-buffer))
-        
+
         (add-hook 'before-change-functions #'infinote-before-change nil t)
         (add-hook 'after-change-functions #'infinote-after-change nil t)
         (add-hook 'post-command-hook #'infinote-post-command nil t)
@@ -231,7 +231,7 @@
 (defun infinote-send-xml (xml-data)
   (infinote-send-string (xmlgen xml-data)))
 
-(defun infinote-send-group-command (xml-data &optional group-name) 
+(defun infinote-send-group-command (xml-data &optional group-name)
   (let ((group (or group-name infinote-group-name)))
     (infinote-send-xml
      `(group :name ,group
@@ -248,7 +248,7 @@
   (infinote-send-xml
    '(auth :xmlns "urn:ietf:params:xml:ns:xmpp-sasl"
           :mechanism "ANONYMOUS")))
-  
+
 (defun infinote-send-sasl-response (username)
   (infinote-send-xml
    `(response :xmlns "urn:ietf:params:xml:ns:xmpp-sasl"
@@ -340,7 +340,7 @@
     (push (list infinote-user-id
                 (infinote-my-vector)
                 (list 'delete-caret pos text))
-          infinote-request-log) 
+          infinote-request-log)
     (infinote-increment-my-vector infinote-user-id)
     (setq infinote-my-last-sent-vector (infinote-my-vector))))
 
@@ -591,8 +591,8 @@
                 (list op-1 position-1 (substring text-1 0 (- position-2 position-1)))
               (let* ((before-inner (substring text-1 0 (- position-2 position-1)))
                      (after-inner (substring text-1 (- end-2 position-1))))
-                     (text-without-inner (concat before-inner after-inner)))
-                (list op-1 position-1 text-without-inner))))))))))
+                     (text-without-inner (concat before-inner after-inner))
+                (list op-1 position-1 text-without-inner)))))))))))
 
 (defun infinote-translate-operation (user-id request-vector target-vector operation)
   (if (infinote-vector-equal request-vector
@@ -739,7 +739,7 @@
                  (with-current-buffer session-buffer
                    (infinote-send-sync-ack)
                    (infinote-send-user-join infinote-user-name group-name)
-                   (setq infinote-my-last-sent-vector (infinote-my-vector))))) 
+                   (setq infinote-my-last-sent-vector (infinote-my-vector)))))
               (sync-segment
                   ;; fill in buffer data
                (when session-buffer
