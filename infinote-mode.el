@@ -142,7 +142,7 @@
 
 (defun infinote-connect-to-server ()
   (unless infinote-connection
-    (let* ((connection-name (format "*infinote-server-%s:%d*" infinote-server infinote-port))
+    (let* ((connection-name (format " *infinote-server-%s:%d*" infinote-server infinote-port))
            (network-process (open-network-stream connection-name connection-name infinote-server infinote-port)))
       (setq infinote-connection network-process)
       (set-process-filter network-process #'infinote-filter)
@@ -444,6 +444,9 @@
                                     (infinote-operation-count user-id new-vector)))))
    finally return new-vector))
 
+(defun infinote-vector-set-op-count (vector user-id op-count)
+  (lax-plist-put (copy-sequence vector) user-id op-count))
+
 (defun infinote-vector-least-common-successor (vector-1 vector-2)
   (loop
    with new-vector = (copy-sequence vector-1)
@@ -595,17 +598,61 @@
         (length (caddr operation)))
     (list 'split (list 'delete pos split-at) (list 'delete (+ split-at space) (- length split-at)))))
 
+(defun infinote-associated-request (user-id vector operation)
+  (when (member (infinote-op-type (car operation)) '(undo redo))
+    (let ((skip-counter 1))
+      (loop for request in infinote-request-log
+            if (and (equal (car request) user-id)
+                    (<= (infinote-operation-count user-id (cadr request))
+                        (infinote-operation-count user-id vector)))
+            if (equal (infinote-op-type (caddr operation)) (infinote-op-type (caaddr request)))
+            do (incf skip-counter)
+            else
+            do (decf skip-counter)
+            if (= skip-counter 0)
+            return request
+            finally return nil))))
+
+(defun infinote-unredo-operation (user-id request-vector target-vector operation) 
+  (when (member (infinote-op-type (car operation)) '(undo redo))
+    (assert "reload here")
+    (let ((associated-request (infinote-associated-request user-id request-vector operation)))
+      (destructuring-bind (associated-user-id associated-vector associated-operation) associated-request
+        (let ((mirror-at (infinote-vector-set-op-count
+                          target-vector
+                          user-id
+                          (infinote-operation-count
+                           user-id
+                           associated-vector))))
+          (when (infinote-can-apply mirror-at my-vector)
+            (let* ((translated-operation (infinote-translate-operation
+                                          associated-user-id
+                                          associated-vector
+                                          mirror-at
+                                          associated-operation))
+                   (op (infinote-op-type (car translated-operation)))
+                   (mirror-by (- (infinote-operation-count user-id target-vector)
+                                 (infinote-operation-count user-id mirror-at))))
+              (cond
+               ((equal op 'insert) (list 'delete (cadr translated-operation) (length (caddr translated-operation))))
+               ((equal op 'delete) (cons 'insert (cdr translated-operation)))
+               ((equal op 'split) (list 'split (error "not implemented")))))))))))
+
 (defun infinote-translate-operation (user-id request-vector target-vector operation)
-  (if (infinote-vector-equal request-vector
-                                     target-vector)
+  (if (and (not (member (infinote-op-type (car operation)) '(undo redo)))
+           (infinote-vector-equal request-vector
+                                  target-vector))
       operation
-    (let ((closer-target-request (infinote-closer-target-request user-id request-vector target-vector)))
-     (destructuring-bind (closer-target-user closer-target-vector closer-target-operation) closer-target-request
-       (let ((translated-operation (infinote-translate-operation user-id request-vector closer-target-vector operation)))
-       (infinote-transform-operation
-        translated-operation
-        closer-target-operation
-        (infinote-cid-is-op user-id request-vector translated-operation closer-target-user closer-target-vector closer-target-operation)))))))
+    (let ((mirrored-operation (infinote-unredo-operation user-id request-vector target-vector operation)))
+      (if mirrored-operation
+          mirrored-operation
+        (let ((closer-target-request (infinote-closer-target-request user-id request-vector target-vector)))
+          (destructuring-bind (closer-target-user closer-target-vector closer-target-operation) closer-target-request
+            (let ((translated-operation (infinote-translate-operation user-id request-vector closer-target-vector operation)))
+              (infinote-transform-operation
+               translated-operation
+               closer-target-operation
+               (infinote-cid-is-op user-id request-vector translated-operation closer-target-user closer-target-vector closer-target-operation)))))))))
 
 (defun infinote-cid-is-op (user vector operation against-user against-vector against-operation)
   (let ((op-1 (infinote-op-type (car operation)))
@@ -634,17 +681,20 @@
   (let ((my-vector (infinote-my-vector)))
     (loop for request in infinote-request-queue
           if (destructuring-bind (user-id vector operation) request
-               (infinote-can-apply vector my-vector))
+               (or (infinote-associated-request user-id vector operation)
+                   (infinote-can-apply vector my-vector)))
           do
           (setq infinote-request-queue (remove request infinote-request-queue))
           (apply #'infinote-handle-request request)
           and return nil)))
 
 (defun infinote-affected-text (operation)
-  (destructuring-bind (op pos len) operation
-    (let ((start (+ pos 1))
-          (end (+ pos 1 len)))
-      (buffer-substring-no-properties start end))))
+  (if (equal (car operation) 'split)
+      (mapconcat #'infinote-affected-text (cdr operation) "")
+    (destructuring-bind (op pos len) operation
+      (let ((start (+ pos 1))
+            (end (+ pos 1 len)))
+        (buffer-substring-no-properties start end)))))
 
 (defun infinote-contextualize-delete (operation currently-applicable-operation)
   (destructuring-bind (op pos len) operation
@@ -657,14 +707,24 @@
           (push request infinote-request-log)
           (infinote-increment-my-vector user-id))
       (let ((op-type (infinote-op-type (car operation))))
-        (when (member op-type '(insert delete))
+        (when (member op-type '(insert delete undo redo))
           (let ((my-vector (infinote-my-vector)))
             (if (infinote-can-apply vector my-vector)
-                (let ((translated-operation (infinote-translate-operation user-id vector my-vector operation)))
-                  ;(when (equal op-type 'delete)
-                  ;  (setq request (list user-id vector (infinote-contextualize-delete operation translated-operation))))
+                (let* ((vector (if (not (member op-type '(undo redo)))
+                                   vector
+                                 (infinote-vector-set-op-count
+                                  (cadr (infinote-associated-request
+                                         user-id
+                                         vector
+                                         operation))
+                                  user-id
+                                  (infinote-operation-count user-id vector))))
+                       (translated-operation (infinote-translate-operation user-id vector my-vector operation))) 
+                  (let ((push-request (if (equal op-type 'delete)
+                                            (list user-id vector (infinote-contextualize-delete operation translated-operation))
+                                          request)))
+                    (push push-request infinote-request-log))
                   (infinote-apply-operation user-id translated-operation)
-                  (push request infinote-request-log)
                   (infinote-increment-my-vector user-id)
                   (infinote-diff-user-vector user-id (list user-id 1))
                   (infinote-process-request-queue))
