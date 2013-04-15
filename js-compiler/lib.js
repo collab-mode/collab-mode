@@ -22,33 +22,41 @@ function cons_t(car, cdr) {
 }
 
 function make_cADr_functions(prefix, levels) {
-    var function_body = "return x";
     var i;
+    var function_body = "x";
     for (i = prefix.length - 1; i >= 0; i--) {
-        function_body += ".c" + prefix[i] + "r";
+        function_body = "FN_c" + prefix[i] + "r(" + function_body + ")";
     }
-    function_body += ";"
+    function_body = "return " + function_body + ";";
 
-    this["FN_c" + prefix + "r"] = new Function("x", function_body);
+    function_name = "FN_c" + prefix + "r";
+    if (!(function_name in this)) {
+        this[function_name] = new Function("x", function_body);
+    }
 
     if (levels > 0) {
         make_cADr_functions(prefix + "a", levels - 1);
         make_cADr_functions(prefix + "d", levels - 1);
     }
 }
+
 make_cADr_functions("a", 3);
 make_cADr_functions("d", 3);
 
-function FN_cdr(x) {
-    return x.cdr;
-}
-
 function FN_car(x) {
-    return x.car;
+    return (x !== false) && x.car;
 }
 
-function FN_cadr(x) {
-    return x.cdr.car;
+function FN_cdr(x) {
+    return (x !== false) && x.cdr;
+}
+
+function FN_car_safe(x) {
+    return FN_consp(x) && x.car;
+}
+
+function FN_cdr_safe(x) {
+    return FN_consp(x) && x.cdr;
 }
 
 function FN_cons(car, cdr) {
@@ -242,7 +250,7 @@ function FN_lax_plist_get(l, k) {
     var x = l;
     while (x) {
         if (x.car === k) {
-            return x.cdr;
+            return x.cdr.car;
         }
         x = x.cdr.cdr;
     }
@@ -291,7 +299,7 @@ function FN_mapconcat(f, l, sep) {
 }
 
 function FN_numberp(n) {
-    return 0 === (0 + n);
+    return n === (0 + n);
 }
 
 function FN_stringp(s) {
@@ -312,15 +320,6 @@ function FN_replace_regexp_in_string(regexp, rep, str, fixedcase, literal, subex
 
 }
 */
-
-$match_data = false;
-function FN_match_data() {
-    return $match_data;
-}
-
-function FN_set_match_data(list, reseat) {
-    $match_data = list;
-}
 
 function FN_nreverse(list) {
     if (list === false) {
@@ -359,43 +358,70 @@ function FN_string_match(regexp, string, start) {
     }
 }
 
+function FN_error(msg) {
+    throw msg;
+}
+
+function FN_intern(x) {
+    return x;
+}
+
+function FN_assoc(key, list) {
+    var x = list;
+    while (x !== false) {
+        if (x.car === key) {
+            return x;
+        }
+        x = x.cdr;
+    }
+    return false;
+}
+
+function FN_assoc_default(key, list, test, $default) {
+    if (typeof(test) === 'undefined' || test === false) {
+        test = FN_equal;
+    }
+    if (typeof($default) === 'undefined') {
+        $default = false;
+    }
+
+    var x = list;
+    while (x !== false) {
+        if (FN_consp(x.car)) {
+            if (test(x.car.car, key) !== false) {
+                return x.car.cdr;
+            }
+        } else {
+            if (test(x.car, key) !== false) {
+                return $default;
+            }
+        }
+        x = x.cdr;
+    }
+    return false;
+}
+
+function FN_base64_encode_string(str) {
+    return btoa(str);
+}
+
+function FN_string_to_number(str, base) {
+    base = base || 10;
+    if (base === 10) {
+        return parseFloat(str);
+    } else {
+        return parseInt(str, base);
+    }
+}
+
+function FN_memql(elt, list) {
+    return FN_member(elt, list);
+}
+
 // Horrible hacks
 function init() {
-/*
-infinote_user_name='acobb';
-infinote_user_id = 0;
-infinote_users = FN_list("acobb", 0, 0, 0, 0, 0);
-infinote_group_name = "foo";
-infinote_my_last_sent_vector = false;
-infinote_connection = false;
-infinote_request_log = false;
-*/
     FN_infinote_collab_text_properties =
         FN_add_text_properties =
         function(){};
 }
 init();
-
-function FN_infinote_send_string(str) {
-    console.log("pretending to send ", str);
-}
-
-//function FN_collab_self_username() {return 'acobb';}
-
-/*
-old_gen = FN_xmlgen;
-FN_xmlgen = function() {
-    var args = Array.prototype.slice.call(arguments, 0);
-    print("xmlgen called with " + args.toString());
-    return old_gen.apply(this, arguments);
-};
-
-old_extract = FN_xmlgen_extract_plist;
-FN_xmlgen_extract_plist = function() {
-    var args = Array.prototype.slice.call(arguments, 0);
-    print("xmlgen_extract_plist(" + args.toString() + ")");
-    var ret = old_extract.apply(this, arguments);
-    print(" -> " + ret.toString());
-    return ret;
-}
-*/

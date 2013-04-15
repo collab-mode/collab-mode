@@ -1,18 +1,22 @@
 ;;; -*- lexical-binding: t -*-
 
 (defun js-sym-trans (sym)
- (mapconcat
-  (lambda (c)
-   (pcase c
-    (`?- "_")
-    (`?_ "$_")
-    (`?> "$GT_")
-    (`?< "$LT_")
-    (`?= "$EQ_")
-    (`?+ "$PLUS_")
-    (`?? "$HUH_")
-    (_ (string c))))
-  (string-to-list (symbol-name sym)) ""))
+ (cond
+  ;; keywords ruin everything...
+  ((eq sym 'default) "_$default")
+  (t
+   (mapconcat
+    (lambda (c)
+     (pcase c
+      (`?- "_")
+      (`?_ "$_")
+      (`?> "$GT_")
+      (`?< "$LT_")
+      (`?= "$EQ_")
+      (`?+ "$PLUS_")
+      (`?? "$HUH_")
+      (_ (string c))))
+    (string-to-list (symbol-name sym)) ""))))
 
 (defun js-arg-trans (sym)
  (concat "arg$" (js-sym-trans sym)))
@@ -21,8 +25,12 @@
  (concat "old$" (js-sym-trans sym)))
 
 (defun string-it (it)
- (let ((print-escape-newlines t))
-  (prin1-to-string it)))
+ (replace-regexp-in-string "\r" "\\\\r"
+  (replace-regexp-in-string "\t" "\\\\t"
+   (let ((print-escape-newlines t)
+         (print-escape-non-ascii nil)
+         (print-escape-multibyte nil))
+    (prin1-to-string it)))))
 
 (defun js-fn-trans (fn-sym)
  (concat "FN_" (js-sym-trans fn-sym)))
@@ -156,6 +164,10 @@
       ,(make-js alternate)
       ")"))
 
+   (`(if ,condition ,consequent . ,alternates)
+    (list (make-js `(if ,condition ,consequent
+                     (progn . ,alternates)))))
+
    (`(cond) (list "false"))
 
    (`(cond (,conditional ,consequent) . ,clauses)
@@ -238,6 +250,9 @@
       ,(mapconcat #'make-js protect-forms ";\n")
       "}})()"))
 
+   (`(save-current-buffer . ,body)
+    (list (make-js `(save-current-buffer-fn (lambda () . ,body)))))
+
    (`(,(pred
         (lambda (x)
          (member x
@@ -275,6 +290,7 @@
 
 (let* ((interesting-functions
         '(
+          infinote-find-file
           infinote-before-change
           infinote-after-change
           infinote-post-command
@@ -300,6 +316,7 @@
           infinote-local-delete
           infinote-diff-since-last-sent-vector
           infinote-vector-to-string
+          infinote-create-session
           infinote-user-join
           infinote-read-vector
           infinote-xml-to-operation
@@ -328,40 +345,74 @@
           infinote-contextualize-delete
           infinote-handle-request
           infinote-node-from-id
-
+          infinote-handle-group-commands
+          infinote-handle-group-command
 
           xmlgen
           xmlgen-extract-plist
           xmlgen-attr-to-string
           xmlgen-string-escape
+
+          xml-parse-tag-1
+          xml-parse-attlist
+          xml-maybe-do-ns
+          xml-substitute-special
+          xml-parse-string
           ))
        (interesting-vars
         '(
-infinote-server
-infinote-port
-infinote-user-name
-infinote-hue
-infinote-connection
-infinote-connection-buffer
-infinote-connection-ready
-infinote-verbose
-infinote-nodes
-infinote-sessions
-infinote-group-name
-infinote-node-id
-infinote-node-type
-infinote-users
-infinote-user-id
-infinote-request-log
-infinote-request-queue
-infinote-my-last-sent-vector
-infinote-inhibit-change-hooks
-infinote-before-change-text
-infinote-syncing
+          infinote-server
+          infinote-port
+          infinote-user-name
+          infinote-hue
+          infinote-connection
+          infinote-connection-buffer
+          infinote-connection-ready
+          infinote-verbose
+          infinote-nodes
+          infinote-sessions
+          infinote-group-name
+          infinote-node-id
+          infinote-node-type
+          infinote-users
+          infinote-user-id
+          infinote-request-log
+          infinote-request-queue
+          infinote-my-last-sent-vector
+          infinote-inhibit-change-hooks
+          infinote-before-change-text
+          infinote-syncing
 
           xmlgen-escape-attribute-vals
           xmlgen-escape-elm-vals
-          xmlgen-escapees))
+          xmlgen-escapees
+
+          xml-validating-parser
+          xml-sub-parser
+
+          xml-undefined-entity
+          xml-default-ns
+          xml-name-start-char-re
+          xml-name-char-re
+          xml-name-re
+          xml-names-re
+          xml-nmtoken-re
+          xml-nmtokens-re
+          xml-char-ref-re
+          xml-entity-ref
+          xml-entity-or-char-ref-re
+          xml-pe-reference-re
+          xml-reference-re
+          xml-att-value-re
+          xml-tokenized-type-re
+          xml-notation-type-re
+          xml-enumeration-re
+          xml-enumerated-type-re
+          xml-att-type-re
+          xml-default-decl-re
+          xml-att-def-re
+          xml-entity-value-re
+          ))
        (result (apply #'concat
                 `(,@(loop for sym in interesting-functions
                      collect

@@ -523,10 +523,10 @@ Return one of:
 	    (when (and (consp (car attr))
 		       (equal "http://www.w3.org/2000/xmlns/"
 			      (caar attr)))
-	      (push (cons (cdar attr) (cdr attr))
-		    (if (symbolp (car xml-ns))
-			(cdr xml-ns)
-		      xml-ns)))))
+
+             (if (symbolp (car xml-ns))
+	      (push (cons (cdar attr) (cdr attr)) (cdr xml-ns))
+	      (push (cons (cdar attr) (cdr attr)) xml-ns)))))
 	(setq children (list attrs (xml-maybe-do-ns node-name "" xml-ns)))
 	(cond
 	 ;; is this an empty element ?
@@ -977,7 +977,7 @@ STRING is assumed to occur in an XML attribute value."
 	       (> (length string) (+ strlen xml-entity-expansion-limit))
 	       (error "XML: Passed `xml-entity-expansion-limit' while expanding `&%s;'"
 		      ref)))))
-    (mapconcat 'identity (nreverse (cons string children)) "")))
+    (mapconcat #'identity (nreverse (cons string children)) "")))
 
 (defun xml-substitute-numeric-entities (string)
   "Substitute SGML numeric entities by their respective utf characters.

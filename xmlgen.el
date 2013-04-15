@@ -107,7 +107,7 @@ elements content.")
   "Escape STRING for inclusion in some XML."
   (when (stringp string)
     (mapc
-     '(lambda (e)
+     #'(lambda (e)
        (setq string
         (replace-regexp-in-string (car e) (cdr e) string)))
      xmlgen-escapees))
@@ -139,7 +139,7 @@ the plist and the plist."
         (plist '())
         (last-keyword nil))
     (mapc
-     '(lambda (item)
+     #'(lambda (item)
        (let ((item (pop list)))
          (cond
            (last-keyword

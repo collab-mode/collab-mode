@@ -1,6 +1,25 @@
 <html>
+ <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
  <script src="lib.js"></script>
+ <script src="buffer.js"></script>
  <script src="tmp"></script>
+ <script src="infinote.js"></script>
  <!--<script>console.log(FN_xmlgen(FN_list("p", ":class", "big")));</script>-->
- <script>init()</script>
+ <script>
+  init()
+  function foo() {
+  FN_infinote_connect_to_server();
+  }
+ </script>
+
+ <body>
+  <button onclick="foo()">
+   connect
+  </button>
+  <button onclick="FN_infinote_find_file('bar')">
+   open bar
+  </button>
+  <div id="log">
+  </div>
+ </body>
 </html>
