@@ -1,6 +1,6 @@
 (eval-when-compile (require 'cl))
 
-(require 'xmlgen)
+;(require 'xmlgen)
 
 (defgroup infinote nil
   "infinote"
@@ -757,3 +757,64 @@
                      (unless syncing (infinote-diff-user-vector user-id vector-diff))
                      (let ((request-vector (if syncing vector-diff (infinote-user-vector user-id))))
                        (infinote-handle-request user-id request-vector (infinote-xml-to-operation operation-xml))))))))))
+
+(defun infinote-test-session ()
+  (with-current-buffer (get-buffer-create " *test-results*")
+    (show-buffer nil (current-buffer))
+    (let ((test-files (directory-files "test" nil "\.xml$"))
+          (results-buffer (current-buffer))
+          (actual "")
+          (expected ""))
+      (loop for test-file in test-files
+            do (insert (format "%s %s\n" test-file (if (infinote-test-session-from-file (concat "test/" test-file))
+                   "passed!"
+                 (format "failed! expected: %s\ngot: %s" expected actual))))))))
+
+(defun infinote-test-xml-from-file (filename)
+  (remove-if #'stringp (car (xml-parse-file filename))))
+
+(defun infinote-test-run-command-from-xml-data (xml-data)  
+  (let ((tag (car xml-data))
+        (attributes (cadr xml-data))
+        (contents (remove-if #'stringp (cddr xml-data))))
+    (message (format "%s %s %s" tag attributes contents))
+    (cond
+     ((equal 'user tag)
+      (infinote-test-add-user (string-to-number (assoc-default 'id attributes))))
+     ((equal 'initial-buffer tag)
+      (infinote-test-initial-buffer contents))
+     ((equal 'request tag)
+      (infinote-test-request (infinote-read-vector (assoc-default 'time attributes))
+                             (string-to-number (assoc-default 'user attributes))
+                             (infinote-xml-to-operation (car contents))))
+     ((equal 'final-buffer tag)
+      (infinote-test-final-buffer contents)))))
+
+(defun infinote-test-run-commands-from-xml-data (xml-data)
+  (car (last (mapcar #'infinote-test-run-command-from-xml-data (cddr xml-data)))))
+
+(defun infinote-test-session-from-file (filename)
+  (let ((xml-data (infinote-test-xml-from-file filename)))
+    (with-temp-buffer
+      (setq syncing nil)
+      (infinote-test-run-commands-from-xml-data xml-data))))
+
+(defun infinote-test-segments-to-string (segments)
+  (message (format "%s" segments))
+  (mapconcat #'caddr (remove-if #'stringp segments) ""))
+
+(defun infinote-test-add-user (id)
+  (infinote-user-join (format "user-%d" id) id (infinote-read-vector "") (random* 1.0) 0 0 "test"))
+
+(defun infinote-test-initial-buffer (segments)
+  (insert (infinote-test-segments-to-string segments)))
+
+(defun infinote-test-request (time user operation)
+  (infinote-diff-user-vector user time)
+  (infinote-handle-request user (infinote-user-vector user) operation))
+
+(defun infinote-test-final-buffer (segments)
+  (setq expected (infinote-test-segments-to-string segments))
+  (setq actual (buffer-string))
+  (equal expected actual))
+
