@@ -1,6 +1,7 @@
 (eval-when-compile (require 'cl))
 
-(require 'xmlgen)
+(load-file "xml.el")
+(load-file "xmlgen.el")
 
 (defgroup infinote nil
   "infinote"
