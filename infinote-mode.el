@@ -194,7 +194,7 @@
 
           (let ((beg (point))
                 (xml-data))
-            (ignore-errors (setq xml-data (xml-parse-tag-1))) ; an error means we don't have enough data yet, no biggie
+            (ignore-errors (setq xml-data (xml-parse-tag))) ; an error means we don't have enough data yet, no biggie
             (if (not xml-data)
                 (return-from message-loop)
               (delete-region beg (point)) ; remove the tag we just parsed
