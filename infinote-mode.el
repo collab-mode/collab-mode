@@ -83,7 +83,7 @@
     (remove-hook 'before-change-functions #'infinote-before-change t)
     (remove-hook 'after-change-functions #'infinote-after-change t)
     (remove-hook 'post-command-hook #'infinote-post-command t)
-    (remove-hook 'kill-buffer-hook #'infinote-close-session nil t)
+    (remove-hook 'kill-buffer-hook #'infinote-close-session t)
     (infinote-close-session)))
 
 (defun infinote-find-file (filename)
@@ -116,7 +116,7 @@
 (defun infinote-close-session ()
   (when (buffer-live-p infinote-connection-buffer)
     (when infinote-connection
-      (infinote-send-session-unsubscribe))
+      (ignore-errors (infinote-send-session-unsubscribe)))
     (let ((group-name infinote-group-name))
       (with-current-buffer infinote-connection-buffer
         (setq infinote-sessions (lax-plist-put infinote-sessions group-name nil)))))
@@ -154,21 +154,21 @@
         (setq infinote-node-type "InfDirectory")
         (setq infinote-sessions (list "InfDirectory" (current-buffer)))
         (infinote-send-stream-header infinote-server)
-        (infinote-wait-for-connection)))))
+        (infinote-wait-for-connection)
+        ))))
 
 (defun infinote-wait-for-connection ()
   (while (and infinote-connection
               (not infinote-connection-ready))
-    (accept-process-output infinote-connection)))
+    (accept-process-output infinote-connection 1.0)))
 
 (defun infinote-filter (network-process string)
   ;; a lot of the xml parsing trickiness is straight from jabber.el's xmpp filter
   (when (buffer-live-p (process-buffer network-process))
     (with-current-buffer (process-buffer network-process)
       ;; append new data to the buffer and set up for parsing
-      (goto-char (process-mark network-process))
+      (goto-char (point-max))
       (insert string)
-      (set-marker (process-mark network-process) (point))
       (goto-char (point-min))
 
       (block message-loop
@@ -193,8 +193,8 @@
             (return-from message-loop))
 
           (let ((beg (point))
-                (xml-data))
-            (ignore-errors (setq xml-data (xml-parse-tag))) ; an error means we don't have enough data yet, no biggie
+                xml-data)
+            (ignore-errors (setq xml-data (xml-parse-tag-1))) ; an error means we don't have enough data yet, no biggie
             (if (not xml-data)
                 (return-from message-loop)
               (delete-region beg (point)) ; remove the tag we just parsed
@@ -207,6 +207,9 @@
         (contents (cddr xml-data)))
     (case tag
               (stream:stream) ; assume the stream is fine and do nothing
+              (stream:error
+               (kill-buffer infinote-connection-buffer)
+               (error (format "stream error: %s" contents)))
               (stream:features
                (when (cddr xml-data)
                  (infinote-send-auth)))
@@ -751,7 +754,7 @@
               (sync-begin
                (when session-buffer
                  (with-current-buffer session-buffer
-                   (setq infinote-syncing t)))) ; not really needed
+                   (setq infinote-syncing t))))
               (sync-end
                (when infinote-verbose (message (format "Session buffer %S" session-buffer)))
                (when session-buffer
@@ -760,7 +763,7 @@
                    (infinote-send-user-join infinote-user-name group-name)
                    (setq infinote-my-last-sent-vector (infinote-my-vector))))) 
               (sync-segment
-                  ;; fill in buffer data
+               ;; fill in buffer data
                (when session-buffer
                  (with-current-buffer session-buffer
                    (infinote-insert-segment (assoc-default 'author attributes) (car contents)))))
