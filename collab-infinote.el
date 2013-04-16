@@ -1,12 +1,7 @@
 (eval-when-compile (require 'cl))
 
-(let* ((fname (or load-file-name buffer-file-name))
-        (dname (file-name-directory fname)))
-  (load (expand-file-name "xml.el" dname))
-  (load (expand-file-name "xmlgen.el" dname)))
-
-(require 'xml)
-(require 'xmlgen)
+(load-file "xml.el")
+(load-file "xmlgen.el")
 
 (defgroup infinote nil
   "infinote"
@@ -162,11 +157,9 @@
         (infinote-wait-for-connection)))))
 
 (defun infinote-wait-for-connection ()
-  (loop for i from 0 to 10
-        do (and infinote-connection
+  (while (and infinote-connection
               (not infinote-connection-ready))
-        (sit-for 1.0)))
-                                        ;(accept-process-output infinote-connection)))
+    (accept-process-output infinote-connection)))
 
 (defun infinote-filter (network-process string)
   ;; a lot of the xml parsing trickiness is straight from jabber.el's xmpp filter
@@ -313,18 +306,7 @@
    `(delete-caret :pos ,pos
                   :len ,len)))
 
-(defun infinote-collab-text-properties (username)
-  (append
-   (if (equal username (collab-self-username))
-       '(:weight bold)
-     '())
-   `(:background
-     ,(collab-mode-cm-color-for-user
-       (collab-user-from-username username)))))
-
 (defun infinote-local-insert (pos text)
-  (message (format "%S - %S" pos text))
-  (add-text-properties pos (+ pos (length text)) `(face ,(infinote-collab-text-properties infinote-user-name)))
   (let ((pos (- pos 1)))
     (infinote-send-insert pos text)
     (push (list infinote-user-id
@@ -462,6 +444,19 @@
                                     (infinote-operation-count user-id new-vector)))))
    finally return new-vector))
 
+(defun infinote-vector-least-common-successor (vector-1 vector-2)
+  (loop
+   with new-vector = (copy-sequence vector-1)
+   for prop on vector-2 by #'cddr
+   do
+   (let ((user-id (car prop))
+         (op-count (cadr prop)))
+     (setq new-vector (lax-plist-put new-vector
+                                 user-id
+                                 (max (infinote-operation-count user-id new-vector)
+                                      op-count))))
+   finally return new-vector))
+
 (defun infinote-diff-user-vector (user-id diff)
   (let* ((user-data (lax-plist-get infinote-users user-id))
          (vector (lax-plist-get user-data 'vector)))
@@ -528,32 +523,35 @@
 
 (defun infinote-op-type (op)
   (cond
+   ((member op '(split)) 'split)
    ((member op '(delete delete-caret)) 'delete)
    ((member op '(insert insert-caret)) 'insert)
    ((member op '(undo undo-caret)) 'undo)
    ((member op '(redo redo-caret)) 'redo)))
 
-(defun infinote-transform-operation (operation against-operation)
+(defun infinote-transform-operation (operation against-operation cid-is-op)
  "Get an operation transformed against another operation."
-                                        ; TODO use the cid like py-infinote
   (pcase (list operation against-operation)
     (`((split ,operation-1 ,operation-2) ,against-operation)
-     `(split ,(infinote-transform-operation operation-1 against-operation)
-              ,(infinote-transform-operation operation-2 against-operation)))
+     `(split ,(infinote-transform-operation operation-1 against-operation cid-is-op)
+              ,(infinote-transform-operation operation-2 against-operation cid-is-op)))
 
     (`(,operation (split ,operation-1 ,operation-2))
      (infinote-transform-operation
-      (infinote-transform-operation operation operation-1)
-      (infinote-transform-operation operation-2 operation-1)))
+      (infinote-transform-operation operation operation-1 cid-is-op)
+      (infinote-transform-operation operation-2 operation-1 cid-is-op)
+      cid-is-op))
 
-    (`((,op-1 ,position-1 ,text-1) (,op-2 ,position-2 ,text-2))
-     (let* ((length-1 (length text-1))
-            (length-2 (length text-2))
+    (`((,op-1 ,position-1 ,text-or-length-1) (,op-2 ,position-2 ,text-or-length-2))
+     (let* ((text-1 (and (stringp text-or-length-1) text-or-length-1))
+            (text-2 (and (stringp text-or-length-2) text-or-length-2))
+            (length-1 (or (and text-1 (length text-1)) text-or-length-1))
+            (length-2 (or (and text-2 (length text-2)) text-or-length-2))
             (end-1 (+ position-1 length-1))
             (end-2 (+ position-2 length-2)))
        (pcase (list (infinote-op-type op-1) (infinote-op-type op-2))
          (`(insert insert)
-          (if (< position-1 position-2)
+          (if (or (< position-1 position-2) (and (= position-1 position-2) (not cid-is-op)))
               (list op-1 position-1 text-1)
             (list op-1 (+ position-1 length-2) text-1)))
 
@@ -569,9 +567,9 @@
          (`(delete insert)
           (cond
            ((>= position-2 end-1)
-            (list op-1 position-1 text-1))
+            (list op-1 position-1 length-1))
            ((<= position-2 position-1)
-            (list op-1 (+ position-1 length-2) text-1))
+            (list op-1 (+ position-1 length-2) length-1))
            ((and (> position-2 position-1)
                  (< position-2 end-1))
             (infinote-split-operation operation (- position-2 position-1) length-2))))
@@ -579,20 +577,23 @@
          (`(delete delete)
           (cond
            ((<= end-1 position-2)
-            (list op-1 position-1 text-1))
+            (list op-1 position-1 length-1))
            ((>= position-1 end-2)
-            (list op-1 (- position-1 length-2) text-1))
+            (list op-1 (- position-1 length-2) length-1))
            ((>= position-1 position-2)
             (if (<= end-1 end-2)
-                (list op-1 position-2 "")
-              (list op-1 position-2 (substring text-1 (- end-2 position-1)))))
+                (list op-1 position-2 0)
+              (list op-1 position-2 (- end-1 end-2))))
            ((< position-1 position-2)
             (if (<= end-1 end-2)
-                (list op-1 position-1 (substring text-1 0 (- position-2 position-1)))
-              (let* ((before-inner (substring text-1 0 (- position-2 position-1)))
-                     (after-inner (substring text-1 (- end-2 position-1))))
-                     (text-without-inner (concat before-inner after-inner)))
-                (list op-1 position-1 text-without-inner))))))))))
+                (list op-1 position-1 (- position-2 position-1))
+              (list op-1 position-1 (- length-1 length-2)))))))))))
+
+(defun infinote-split-operation (operation split-at space)
+  (let ((op (car operation))
+        (pos (cadr operation))
+        (length (caddr operation)))
+    (list 'split (list 'delete pos split-at) (list 'delete (+ split-at space) (- length split-at)))))
 
 (defun infinote-translate-operation (user-id request-vector target-vector operation)
   (if (infinote-vector-equal request-vector
@@ -600,9 +601,23 @@
       operation
     (let ((closer-target-request (infinote-closer-target-request user-id request-vector target-vector)))
      (destructuring-bind (closer-target-user closer-target-vector closer-target-operation) closer-target-request
+       (let ((translated-operation (infinote-translate-operation user-id request-vector closer-target-vector operation)))
        (infinote-transform-operation
-        (infinote-translate-operation user-id request-vector closer-target-vector operation)
-        closer-target-operation)))))
+        translated-operation
+        closer-target-operation
+        (infinote-cid-is-op user-id request-vector translated-operation closer-target-user closer-target-vector closer-target-operation)))))))
+
+(defun infinote-cid-is-op (user vector operation against-user against-vector against-operation)
+  (let ((op-1 (infinote-op-type (car operation)))
+        (op-2 (infinote-op-type (car against-operation))))
+    (if (not (member op-1 '(insert split)))
+        t
+      (if (and (equal op-1 'insert)
+               (member op-2 '(insert delete))
+               (/= (cadr operation) (cadr against-operation)))
+          (> (cadr operation) (cadr against-operation))
+        (< user against-user)))))
+
 
 (defun infinote-my-vector ()
   (lax-plist-get (lax-plist-get infinote-users infinote-user-id) 'vector))
@@ -646,8 +661,8 @@
           (let ((my-vector (infinote-my-vector)))
             (if (infinote-can-apply vector my-vector)
                 (let ((translated-operation (infinote-translate-operation user-id vector my-vector operation)))
-                  (when (equal op-type 'delete)
-                    (setq request (list user-id vector (infinote-contextualize-delete operation translated-operation))))
+                  ;(when (equal op-type 'delete)
+                  ;  (setq request (list user-id vector (infinote-contextualize-delete operation translated-operation))))
                   (infinote-apply-operation user-id translated-operation)
                   (push request infinote-request-log)
                   (infinote-increment-my-vector user-id)
@@ -658,14 +673,18 @@
 (defun infinote-apply-operation (user-id operation)
   (let ((infinote-inhibit-change-hooks t))
     (pcase operation
+      (`(split ,operation-1 ,operation-2)
+       (infinote-apply-operation user-id operation-1)
+       (infinote-apply-operation user-id
+                                 (infinote-transform-operation operation-2 operation-1 t)))
       (`(insert ,pos ,text)
        (save-excursion
          (goto-char (+ 1 pos))
-         (insert (propertize text `(faces (infinote-collab-text-properties (infinote-get-user-data user-id 'name)))))))
+         (insert text)))
       (`(insert-caret ,pos ,text)
        (save-excursion
          (goto-char (+ 1 pos))
-         (insert (propertize text `(faces (infinote-collab-text-properties (infinote-get-user-data user-id 'name)))))))
+         (insert text)))
       (`(delete ,pos ,len)
        (save-excursion
          (delete-region (+ 1 pos) (+ 1 pos len))))
@@ -710,7 +729,7 @@
                                         'type type)))
                  (let ((first-content-tag (car contents)))
                    (when (equal 'subscribe (car first-content-tag))
-                     (let ((group (xml-get-attribute first-content-tag 'group)))
+                     (let ((group (assoc-default 'group (cadr first-content-tag))))
                        (infinote-create-session name id group)
                        (infinote-send-subscribe-ack id)
                        (infinote-send-user-join infinote-user-name group)
@@ -776,5 +795,65 @@
                      (unless syncing (infinote-diff-user-vector user-id vector-diff))
                      (let ((request-vector (if syncing vector-diff (infinote-user-vector user-id))))
                        (infinote-handle-request user-id request-vector (infinote-xml-to-operation operation-xml))))))))))
+
+(defun infinote-test-session ()
+  (with-current-buffer (get-buffer-create " *test-results*")
+    (show-buffer nil (current-buffer))
+    (let ((test-files (directory-files "test" nil "\.xml$"))
+          (results-buffer (current-buffer))
+          (actual "")
+          (expected ""))
+      (loop for test-file in test-files
+            do (insert (format "%s %s\n" test-file (if (infinote-test-session-from-file (concat "test/" test-file))
+                   "passed!"
+                 (format "failed! expected: %s\ngot: %s" expected actual))))))))
+
+(defun infinote-test-xml-from-file (filename)
+  (remove-if #'stringp (car (xml-parse-file filename))))
+
+(defun infinote-test-run-command-from-xml-data (xml-data)  
+  (let ((tag (car xml-data))
+        (attributes (cadr xml-data))
+        (contents (remove-if #'stringp (cddr xml-data))))
+    (message (format "%s %s %s" tag attributes contents))
+    (cond
+     ((equal 'user tag)
+      (infinote-test-add-user (string-to-number (assoc-default 'id attributes))))
+     ((equal 'initial-buffer tag)
+      (infinote-test-initial-buffer contents))
+     ((equal 'request tag)
+      (infinote-test-request (infinote-read-vector (assoc-default 'time attributes))
+                             (string-to-number (assoc-default 'user attributes))
+                             (infinote-xml-to-operation (car contents))))
+     ((equal 'final-buffer tag)
+      (infinote-test-final-buffer contents)))))
+
+(defun infinote-test-run-commands-from-xml-data (xml-data)
+  (car (last (mapcar #'infinote-test-run-command-from-xml-data (cddr xml-data)))))
+
+(defun infinote-test-session-from-file (filename)
+  (let ((xml-data (infinote-test-xml-from-file filename)))
+    (with-temp-buffer
+      (setq syncing nil)
+      (infinote-test-run-commands-from-xml-data xml-data))))
+
+(defun infinote-test-segments-to-string (segments)
+  (message (format "%s" segments))
+  (mapconcat #'caddr (remove-if #'stringp segments) ""))
+
+(defun infinote-test-add-user (id)
+  (infinote-user-join (format "user-%d" id) id (infinote-read-vector "") (random* 1.0) 0 0 "test"))
+
+(defun infinote-test-initial-buffer (segments)
+  (insert (infinote-test-segments-to-string segments)))
+
+(defun infinote-test-request (time user operation)
+  (infinote-diff-user-vector user time)
+  (infinote-handle-request user (infinote-user-vector user) operation))
+
+(defun infinote-test-final-buffer (segments)
+  (setq expected (infinote-test-segments-to-string segments))
+  (setq actual (buffer-string))
+  (equal expected actual))
 
 (provide 'collab-infinote)
