@@ -1,15 +1,26 @@
 var $match_data = false;
-var $current_buffer = new Buffer("*scratch*");
+var $current_buffer;
 var $named_buffers = {};
 var $gensym_counter = 0;
 
+var $buffer_make_local_vars = [];
+
+add_to_init(function() {
+    FN_set_buffer(new Buffer("*scratch*"));
+});
+
 function Buffer(name) {
-    if (typeof(name) === 'undefined') {
-        name = "buffer_$" + ($gensym_counter++);
+    if (!(this instanceof Buffer)) {
+        throw "Called Buffer() without new";
     }
+    if (typeof(name) === 'undefined') {
+        name = "*anon_buffer_$*" + ($gensym_counter++);
+    }
+
     this.str = '';
     this.point = 0;
     this.name = name;
+    this.env = {};
 
     this.toString = function() {
         return "[Buffer " + this.name + "]";
@@ -22,10 +33,10 @@ function with_current_buffer(buf, body) {
     }
     var old_buffer = buf;
     try {
-        $current_buffer = buf;
+        FN_set_buffer(buf);
         body();
     } finally {
-        $current_buffer = old_buffer;
+        FN_set_buffer(old_buffer);
     }
 }
 
@@ -205,12 +216,34 @@ function FN_save_current_buffer_fn(fn) {
     try {
         fn();
     } finally {
-        $current_buffer = buffer;
+        FN_set_buffer(buffer);
     }
 }
 
+$buffer_var_cleanup = function() {}
 function FN_set_buffer(buf) {
+    $buffer_var_cleanup();
+
     $current_buffer = buf;
+
+    var old_globals = {};
+    var key;
+    for (key in $current_buffer.env) {
+        old_globals[key] = this[key];
+        this[key] = $current_buffer.env[key];
+    }
+    for (var i = 0; i < $buffer_make_local_vars.length; i++) {
+        key = $buffer_make_local_vars[i];
+        old_globals[key] = this[key];
+        this[key] = $current_buffer.env[key];
+    }
+
+    $buffer_var_cleanup = function() {
+        for (key in old_globals) {
+            $current_buffer.env[key] = this[key];
+            this[key] = old_globals.key;
+        }
+    };
 }
 
 function FN_process_buffer(process) {
@@ -244,8 +277,15 @@ function FN_generate_new_buffer(name) {
 }
 
 function FN_buffer_local_value(sym, buf) {
-    // TODO: buffer local variables
-    return this[sym];
+    if (sym in buf.env) {
+        return buf.env[sym];
+    } else {
+        return this[sym];
+    }
 }
 
 function FN_display_buffer() {}
+
+function buffer_add_make_local_var(sym) {
+    $buffer_make_local_vars.push(sym);
+}

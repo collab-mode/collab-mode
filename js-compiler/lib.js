@@ -1,6 +1,10 @@
 // List functions
 
 function cons_t(car, cdr) {
+    if (!(this instanceof cons_t)) {
+        throw "Called cons_t() without new";
+    }
+
     this.car = car;
     this.cdr = cdr;
     this.toString = function() {
@@ -418,10 +422,22 @@ function FN_memql(elt, list) {
     return FN_member(elt, list);
 }
 
-// Horrible hacks
-function init() {
+var init = function() {
+    // make sure init stuff doesn't get run twice
+    init = function() {};
+};
+
+function add_to_init(f) {
+    var old_init = init; // not actually needed
+    init = function() {
+        old_init();
+        f();
+    };
+}
+
+add_to_init(function() {
+    // Horrible hacks
     FN_infinote_collab_text_properties =
         FN_add_text_properties =
         function(){};
-}
-init();
+});

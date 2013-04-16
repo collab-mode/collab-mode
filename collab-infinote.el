@@ -175,6 +175,12 @@
       ;; append new data to the buffer and set up for parsing
       (goto-char (process-mark network-process))
       (insert string)
+
+     (with-current-buffer (get-buffer-create "*infinote-log*")
+      (save-excursion
+       (goto-char (point-max))
+       (insert (concat "\n<<< " string))))
+
       (set-marker (process-mark network-process) (point))
       (goto-char (point-min))
 
@@ -226,6 +232,10 @@
 
 (defun infinote-send-string (string)
   (assert infinote-connection)
+ (with-current-buffer (get-buffer-create "*infinote-log*")
+  (save-excursion
+   (goto-char (point-max))
+   (insert (concat "\n>>> " string))))
   (process-send-string infinote-connection string))
 
 (defun infinote-send-xml (xml-data)

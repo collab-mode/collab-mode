@@ -413,6 +413,21 @@
           xml-att-def-re
           xml-entity-value-re
           ))
+       (make-buffer-local-vars
+        '(
+          infinote-nodes
+          infinote-sessions
+          infinote-group-name
+          infinote-node-id
+          infinote-node-type
+          infinote-users
+          infinote-user-id
+          infinote-request-log
+          infinote-request-queue
+          infinote-my-last-sent-vector
+          infinote-inhibit-change-hooks
+          infinote-text-before-change
+          infinote-syncing))
        (result (apply #'concat
                 `(,@(loop for sym in interesting-functions
                      collect
@@ -427,8 +442,13 @@
                       (js-sym-trans sym)
                       " = "
                       (make-js `(quote ,(symbol-value sym)))
-                      ";\n"))))))
-
+                      ";\n"))
+                  ,@(loop for sym in make-buffer-local-vars
+                     collect
+                     (concat
+                      "buffer_add_make_local_var("
+                      (make-js `(quote ,sym))
+                      ");\n"))))))
  (with-temp-buffer
   (c-mode)
   (insert result)
