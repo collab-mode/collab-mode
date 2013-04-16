@@ -125,12 +125,20 @@ users, checks which are connected, and returns the appropriate list of entries."
     (collab-chat-buffer-receive body (collab-self-username))
     (collab-mode-cm-send-chat body)))
 
-(defun collab-chat-buffer-receive (msg username)
+(defun collab-chat-buffer-receive (msg username &optional whisper)
   (let* ((face (collab-mode-cm-chat-font-for-username username))
-	 (user-text (propertize username 'face `(:underline t . ,face)))
+	 (user-text (propertize
+                     (concat
+                      (if whisper "whisper from " "")
+                      username)
+                     'face `(:underline t . ,face)))
 	 (message-text (propertize msg 'face face)))
     (ewoc-enter-last collab-chat-ewoc
 		     (concat user-text ": " message-text))))
+
+(defun collab-chat-system-message (msg)
+  (let* ((text (propertize msg 'face '(:slant italic))))
+   (ewoc-enter-last collab-chat-ewoc text)))
 
 (defun collab-login ()
   "Prompts for a username and password. Passes username and
