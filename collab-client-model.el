@@ -218,7 +218,7 @@ TBD: how many times is this called, and in what contexts"
  ;(setq infinote-user (if (> user-id 0) 1 0))
  ;(unless other-buffer
    ;(collab-mode-network-init-remote-document collab-mode-cm-network-connection (buffer-string)))
- ;(add-hook 'post-command-hook #'collab-mode-cm-post-change-hook nil t)
+ (add-hook 'post-command-hook #'collab-mode-cm-post-change-hook nil t)
  ;(add-hook 'before-change-functions #'collab-mode-cm-before-change-hook nil t)
  ;(add-hook 'after-change-functions #'collab-mode-cm-after-change-hook nil t)
  )
