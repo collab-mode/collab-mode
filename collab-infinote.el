@@ -1,7 +1,7 @@
 (eval-when-compile (require 'cl))
 
-(load-file "xml.el")
-(load-file "xmlgen.el")
+(load-file (concat (file-name-directory load-file-name) "xml.el"))
+(load-file (concat (file-name-directory load-file-name) "xmlgen.el"))
 
 (defgroup infinote nil
   "infinote"
@@ -67,28 +67,38 @@
   "infinote"
   :lighter " Infinote"
   (if infinote-mode
-      (progn
-        (unless infinote-connection (infinote-connect-to-server))
-        (unless infinote-node-id
-          (let ((name (buffer-name)))
-          (with-current-buffer (process-buffer infinote-connection)
-            (infinote-send-add-node name))))
-        ;; (unless infinote-chat-buffer (infinote-join-chat))
-        ;; (unless infinote-users-buffer (infinote-create-users-buffer))
-        
-        (add-hook 'before-change-functions #'infinote-before-change nil t)
-        (add-hook 'after-change-functions #'infinote-after-change nil t)
-        (add-hook 'post-command-hook #'infinote-post-command nil t)
-        (add-hook 'kill-buffer-hook #'infinote-close-session nil t))
-    (remove-hook 'before-change-functions #'infinote-before-change t)
-    (remove-hook 'after-change-functions #'infinote-after-change t)
-    (remove-hook 'post-command-hook #'infinote-post-command t)
-    (remove-hook 'kill-buffer-hook #'infinote-close-session nil t)
-    (infinote-close-session)))
+      (infinote-init-this-buffer)
+    (infinote-deinit-this-buffer)))
+
+(defun infinote-init-this-buffer ()
+  (progn
+    (infinote-connect-to-server)
+    (unless infinote-node-id
+      (let ((name (buffer-name)))
+        (with-current-buffer (process-buffer infinote-connection)
+          (infinote-send-add-node name))))
+    ;; (unless infinote-chat-buffer (infinote-join-chat))
+    ;; (unless infinote-users-buffer (infinote-create-users-buffer))
+    
+    (add-hook 'before-change-functions #'infinote-before-change nil t)
+    (add-hook 'after-change-functions #'infinote-after-change nil t)
+    (add-hook 'post-command-hook #'infinote-post-command nil t)
+    (add-hook 'kill-buffer-hook #'infinote-close-session nil t)))
+
+(defun infinote-deinit-this-buffer ()
+  (remove-hook 'before-change-functions #'infinote-before-change t)
+  (remove-hook 'after-change-functions #'infinote-after-change t)
+  (remove-hook 'post-command-hook #'infinote-post-command t)
+  (remove-hook 'kill-buffer-hook #'infinote-close-session t)
+  (infinote-close-session))
+
+(defun infinote-connected-p ()
+  (and infinote-connection
+       (process-live-p infinote-connection)))
 
 (defun infinote-find-file (filename)
   (interactive "sInfinote file: ")
-  (unless infinote-connection (infinote-connect-to-server))
+  (infinote-connect-to-server)
   (with-current-buffer (process-buffer infinote-connection)
     (let ((existing-file (lax-plist-get infinote-nodes filename)))
       (if existing-file
@@ -115,7 +125,8 @@
 
 (defun infinote-close-session ()
   (when (buffer-live-p infinote-connection-buffer)
-    (when infinote-connection
+    (when (and infinote-connection
+               (process-live-p infinote-connection))
       (infinote-send-session-unsubscribe))
     (let ((group-name infinote-group-name))
       (with-current-buffer infinote-connection-buffer
@@ -135,12 +146,34 @@
 (defun infinote-server-buffer-killed ()
   (when (eq (current-buffer)
             infinote-connection-buffer)
+    (infinote-clean-up-connection)))
+
+(defun infinote-clean-up-connection ()
+    ;; TODO: un-infinote any open session buffers
     (setq infinote-connection nil)
-    (setq infinote-connection-ready nil)
-    ;; un-infinote any open session buffers
-    ))
+    (setq infinote-connection-ready nil))
+
+(defun infinote-disconnect-from-server ()
+  (if (buffer-live-p infinote-connection-buffer)
+      (kill-buffer infinote-connection-buffer)
+    (infinote-clean-up-connection)))
+
+(defun infinote-reconnect-to-server ()
+  (when infinote-connection
+      (infinote-disconnect-from-server))
+  (infinote-connect-to-server))
+
+(defun infinote-server-alive-p ()
+  (and infinote-connection
+       (process-live-p infinote-connection)))
 
 (defun infinote-connect-to-server ()
+  (unless (infinote-server-alive-p)
+    (infinote-clean-up-connection))
+
+  (when (string= "" infinote-user-name)
+    (error "infinote-user-name is blank, please set it"))
+  
   (unless infinote-connection
     (let* ((connection-name (format "*infinote-server-%s:%d*" infinote-server infinote-port))
            (network-process (open-network-stream connection-name connection-name infinote-server infinote-port)))
@@ -307,6 +340,7 @@
                   :len ,len)))
 
 (defun infinote-local-insert (pos text)
+  (put-text-property pos (+ pos (length text)) 'font-lock-face (infinote-user-face infinote-user-id))
   (let ((pos (- pos 1)))
     (infinote-send-insert pos text)
     (push (list infinote-user-id
@@ -483,10 +517,53 @@
                      user-id
                      (lax-plist-put user-data field value)))))
 
+(defun infinote-hue-to-color (hue)
+  "from hexrgb.el"
+  (let ((saturation 0.5)
+        (value 127))
+    (let (red green blue int-hue fract pp qq tt ww)
+      (setq hue      (* hue 6.0)        ; Sectors: 0 to 5
+            int-hue  (floor hue)
+            fract    (- hue int-hue)
+            pp       (* value (- 1 saturation))
+            qq       (* value (- 1 (* saturation fract)))
+            ww       (* value (- 1 (* saturation (- 1 (- hue int-hue))))))
+      (case int-hue
+        ((0 6) (setq red    value
+                     green  ww
+                     blue   pp))
+        (1 (setq red    qq
+                 green  value
+                 blue   pp))
+        (2 (setq red    pp
+                 green  value
+                 blue   ww))
+        (3 (setq red    pp
+                 green  qq
+                 blue   value))
+        (4 (setq red    ww
+                 green  pp
+                 blue   value))
+        (otherwise (setq red    value
+                         green  pp
+                         blue   qq)))
+      (format "#%02x%02x%02x" red green blue))))
+
+(defun infinote-user-color (user-id)
+  (let* ((name (infinote-get-user-data user-id 'name))
+         (cm-user (when (fboundp 'collab-user-from-username)
+                    (collab-user-from-username name))))
+    (if cm-user
+        (collab-mode-cm-color-for-user cm-user)
+      (infinote-hue-to-color (infinote-get-user-data user-id 'hue)))))
+
+(defun infinote-user-face (user-id)
+    (list :background (infinote-user-color user-id)))
+
 (defun infinote-insert-segment (author-id text)
-  (let ((infinote-inhibit-change-hooks t))
-    ;; TODO: propertize with author
-    (insert text)))
+  (let ((infinote-inhibit-change-hooks t)
+        (face (infinote-user-face user-id)))
+    (insert (propertize text 'font-lock-face face))))
 
 (defun infinote-operation-count (user-id vector)
   (or (lax-plist-get vector user-id) 0))
@@ -671,7 +748,8 @@
               (push request infinote-request-queue))))))))
 
 (defun infinote-apply-operation (user-id operation)
-  (let ((infinote-inhibit-change-hooks t))
+  (let ((infinote-inhibit-change-hooks t)
+        (face (infinote-user-face user-id)))
     (pcase operation
       (`(split ,operation-1 ,operation-2)
        (infinote-apply-operation user-id operation-1)
@@ -680,11 +758,11 @@
       (`(insert ,pos ,text)
        (save-excursion
          (goto-char (+ 1 pos))
-         (insert text)))
+         (insert (propertize text 'font-lock-face face))))
       (`(insert-caret ,pos ,text)
        (save-excursion
          (goto-char (+ 1 pos))
-         (insert text)))
+         (insert (propertize text 'font-lock-face face))))
       (`(delete ,pos ,len)
        (save-excursion
          (delete-region (+ 1 pos) (+ 1 pos len))))
