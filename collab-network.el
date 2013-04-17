@@ -25,9 +25,7 @@
         (with-demoted-errors (infinote-execute infinote-message)))
        (`(:cursor ,user ,cursor-loc)
         (with-current-buffer collab-mode-cm-buffer
-         (collab-cursor
-          (collab-mode-cm-format-user (collab-user-from-username user))
-          cursor-loc)))
+         (collab-cursor user cursor-loc)))
        (`(:users . ,users)
         (collab-mode-cm-new-users-received users))
        (`(:xmppfriends . ,friends)

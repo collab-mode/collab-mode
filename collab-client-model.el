@@ -152,6 +152,8 @@ so it doesn't rebroadcast itself into an infinite loop")
 (defun collab-mode-cm-new-users-received (users)
  (collab-self-user) ;; call this so that it can be re-cached if needed
  (setq collab-server-users users)
+ (collab-restrict-cursors-to-users
+  (mapcar #'collab-username-from-user collab-server-users))
  (let ((buffer (get-buffer "*Users*")))
   (when buffer
    (with-current-buffer buffer
