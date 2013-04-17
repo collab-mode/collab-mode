@@ -38,6 +38,8 @@
         (collab-mode-cm-new-rooms-received rooms))
        (`(:chat ,from-username ,msg)
         (collab-chat-buffer-receive msg from-username))
+       (`(:whisper ,from-username ,msg)
+        (collab-chat-buffer-receive msg from-username :whisper))
 
        ;; TODO: change server messages for these
        (`connected

@@ -1,0 +1,7 @@
+(:name collab-mode
+       :type github
+       :branch "master"
+       :load "collab-mode.el"
+       :username "collab-mode"
+       :pkgname "collab-mode"
+       :description "A collaborative editing mode for Emacs.")

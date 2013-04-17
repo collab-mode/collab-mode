@@ -69,7 +69,9 @@ so it doesn't rebroadcast itself into an infinite loop")
 
 (defun collab-server-friends-minus-server-users ()
  (loop for friend in collab-server-friends
-  if (not (collab-user-from-username (cadr friend)))
+  if (or
+      (not (collab-user-from-username (cadr friend)))
+      (not (equal (caddr friend) "offline")))
   collect friend))
 
 (defun collab-users ()
@@ -104,9 +106,48 @@ so it doesn't rebroadcast itself into an infinite loop")
     ,(collab-mode-cm-color-for-user
       (collab-user-from-username username)))))
 
+(defun string/starts-with (s arg)
+ "returns non-nil if string S starts with ARG.  Else nil."
+ (cond ((>= (length s) (length arg))
+        (string-equal (substring s 0 (length arg)) arg))
+  (t nil)))
+
+(defun string/ends-with (s ending)
+      "return non-nil if string S ends with ENDING."
+      (let ((elength (length ending)))
+        (string= (substring s (- 0 elength)) ending)))
+
+(defun collab-friends-matching-prefix (prefix)
+ (loop for friend in collab-server-friends
+  if (and
+      (string/starts-with (cadr friend) prefix)
+      (not (equal (caddr friend) "offline")))
+  collect (cadr friend)))
+
 (defun collab-mode-cm-send-chat (msg)
- (collab-network-send-to-server
-  `(:chat ,(collab-self-username) ,msg)))
+ (let* ((split (split-string msg ":"))
+        (prefix (car split)))
+  (if (cdr split)
+   (let ((possible-targets
+          (collab-friends-matching-prefix prefix)))
+    (pcase (length possible-targets)
+     (`0 (collab-chat-system-message
+          (format "no user starting with \"%s\" found." prefix))
+      nil)
+     (`1 (collab-network-send-string-to-server
+         (format "%s %s"
+          (car possible-targets)
+          (mapconcat #'identity (cdr split) ":"))
+         "<xmpp chat>")
+      t)
+     (n (collab-chat-system-message
+         (format (concat "%s users starting with \"%s\" found,"
+                  " please be more specific.")
+          n prefix)))
+     nil))
+   (collab-network-send-to-server
+    `(:chat ,(collab-self-username) ,msg))
+   t)))
 
 (defun collab-mode-cm-new-users-received (users)
  (collab-self-user) ;; call this so that it can be re-cached if needed
@@ -218,7 +259,7 @@ TBD: how many times is this called, and in what contexts"
  ;(setq infinote-user (if (> user-id 0) 1 0))
  ;(unless other-buffer
    ;(collab-mode-network-init-remote-document collab-mode-cm-network-connection (buffer-string)))
- ;(add-hook 'post-command-hook #'collab-mode-cm-post-change-hook nil t)
+ (add-hook 'post-command-hook #'collab-mode-cm-post-change-hook nil t)
  ;(add-hook 'before-change-functions #'collab-mode-cm-before-change-hook nil t)
  ;(add-hook 'after-change-functions #'collab-mode-cm-after-change-hook nil t)
  )
