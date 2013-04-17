@@ -1,6 +1,5 @@
 (require 'ewoc)
 (require 'password-cache)
-(require 'xmlgen)
 (require 'collab-infinote)
 (require 'collab-network)
 (require 'collab-client-model)
@@ -25,10 +24,10 @@ If POSITION is <= 1 then the overlay is deleted."
       (overlay-put (cdr (assoc user collab-users-list)) 'face `((foreground-color . "white") (background-color . ,color))))))
 
 
-(defun collab-mode (user-id)
+(defun collab-mode ()
   "Starts collab-mode and opens users buffer."
   (interactive "P")
-  (collab-mode-cm-init (or user-id 0)))
+  (collab-mode-cm-init)
 
 (define-derived-mode collab-users-mode tabulated-list-mode "Users Mode"
   "Major mode for managing connections with users"
