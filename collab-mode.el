@@ -10,7 +10,7 @@
   "Places a cursor for USER at POSITION with COLOR.
 If POSITION is <= 1 then the overlay is deleted."
   (interactive)
-  (setq color (collab-user-color user))
+  (setq color (or (collab-user-color user) "#808080"))
   (if (< position 1)
       (when (assoc user collab-users-list)
 	(progn
