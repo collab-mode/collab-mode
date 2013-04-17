@@ -26,8 +26,8 @@ If POSITION is <= 1 then the overlay is deleted."
 
 (defun collab-mode ()
   "Starts collab-mode and opens users buffer."
-  (interactive "P")
-  (collab-mode-cm-init)
+  (interactive)
+  (collab-mode-cm-init))
 
 (define-derived-mode collab-users-mode tabulated-list-mode "Users Mode"
   "Major mode for managing connections with users"

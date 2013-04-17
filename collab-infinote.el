@@ -79,7 +79,7 @@
           (infinote-send-add-node name))))
     ;; (unless infinote-chat-buffer (infinote-join-chat))
     ;; (unless infinote-users-buffer (infinote-create-users-buffer))
-    
+
     (add-hook 'before-change-functions #'infinote-before-change nil t)
     (add-hook 'after-change-functions #'infinote-after-change nil t)
     (add-hook 'post-command-hook #'infinote-post-command nil t)
@@ -173,7 +173,7 @@
 
   (when (string= "" infinote-user-name)
     (error "infinote-user-name is blank, please set it"))
-  
+
   (unless infinote-connection
     (let* ((connection-name (format "*infinote-server-%s:%d*" infinote-server infinote-port))
            (network-process (open-network-stream connection-name connection-name infinote-server infinote-port)))
@@ -257,7 +257,7 @@
 (defun infinote-send-xml (xml-data)
   (infinote-send-string (xmlgen xml-data)))
 
-(defun infinote-send-group-command (xml-data &optional group-name) 
+(defun infinote-send-group-command (xml-data &optional group-name)
   (let ((group (or group-name infinote-group-name)))
     (infinote-send-xml
      `(group :name ,group
@@ -274,7 +274,7 @@
   (infinote-send-xml
    '(auth :xmlns "urn:ietf:params:xml:ns:xmpp-sasl"
           :mechanism "ANONYMOUS")))
-  
+
 (defun infinote-send-sasl-response (username)
   (infinote-send-xml
    `(response :xmlns "urn:ietf:params:xml:ns:xmpp-sasl"
@@ -356,7 +356,7 @@
     (push (list infinote-user-id
                 (infinote-my-vector)
                 (list 'delete-caret pos text))
-          infinote-request-log) 
+          infinote-request-log)
     (infinote-increment-my-vector infinote-user-id)
     (setq infinote-my-last-sent-vector (infinote-my-vector))))
 
@@ -562,7 +562,7 @@
 
 (defun infinote-insert-segment (author-id text)
   (let ((infinote-inhibit-change-hooks t)
-        (face (infinote-user-face user-id)))
+        (face (infinote-user-face author-id)))
     (insert (propertize text 'font-lock-face face))))
 
 (defun infinote-operation-count (user-id vector)
@@ -836,7 +836,7 @@
                  (with-current-buffer session-buffer
                    (infinote-send-sync-ack)
                    (infinote-send-user-join infinote-user-name group-name)
-                   (setq infinote-my-last-sent-vector (infinote-my-vector))))) 
+                   (setq infinote-my-last-sent-vector (infinote-my-vector)))))
               (sync-segment
                   ;; fill in buffer data
                (when session-buffer
@@ -889,7 +889,7 @@
 (defun infinote-test-xml-from-file (filename)
   (remove-if #'stringp (car (xml-parse-file filename))))
 
-(defun infinote-test-run-command-from-xml-data (xml-data)  
+(defun infinote-test-run-command-from-xml-data (xml-data)
   (let ((tag (car xml-data))
         (attributes (cadr xml-data))
         (contents (remove-if #'stringp (cddr xml-data))))
