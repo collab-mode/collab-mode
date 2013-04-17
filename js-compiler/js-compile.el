@@ -358,6 +358,9 @@
           xml-maybe-do-ns
           xml-substitute-special
           xml-parse-string
+          xml-get-attribute
+          xml-get-attribute-or-nil
+          xml-node-attributes
           ))
        (interesting-vars
         '(
@@ -446,9 +449,9 @@
                   ,@(loop for sym in make-buffer-local-vars
                      collect
                      (concat
-                      "buffer_add_make_local_var("
-                      (make-js `(quote ,sym))
-                      ");\n"))))))
+                      "buffer_add_make_local_var('"
+                      (js-sym-trans sym)
+                      "');\n"))))))
  (with-temp-buffer
   (c-mode)
   (insert result)

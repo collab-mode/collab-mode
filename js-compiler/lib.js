@@ -244,10 +244,21 @@ function FN_message() {
 }
 
 // TODO?: real format
-function FN_format() {
-    var args = Array.prototype.slice.call(arguments, 0);
-    console.log("format called with " + args);
-    return "" + args;
+function FN_format(format) {
+    var args = Array.prototype.slice.call(arguments, 1);
+    console.log("format called with \"" + format + "\" " + args);
+    var i, j = 1;
+    var result = ""
+    for (i = 0; i < format.length; i++) {
+        if (format[i] === "%") {
+            i++;
+            result += arguments[j++];
+        } else {
+            result += format[i];
+        }
+    }
+
+    return result;
 }
 
 function FN_lax_plist_get(l, k) {
@@ -303,11 +314,11 @@ function FN_mapconcat(f, l, sep) {
 }
 
 function FN_numberp(n) {
-    return n === (0 + n);
+    return typeof(n) === 'number';
 }
 
 function FN_stringp(s) {
-    return typeof(s) === "string";
+    return typeof(s) === 'string';
 }
 
 function FN_number_to_string(n) {
@@ -316,6 +327,35 @@ function FN_number_to_string(n) {
 
 function FN_symbol_name(n) {
     return n;
+}
+
+function FN_nconc() {
+    var val = false;
+    var tail = false;
+
+    for (i = 0; i < arguments.length; i++) {
+        var tem = arguments[i];
+        if (tem === false) {
+            continue;
+        }
+        if (val === false) {
+            val = tem;
+        }
+        if (i + 1 === arguments.length) {
+            break;
+        }
+        while (FN_consp(tem)) {
+            tail = tem;
+            tem = tail.cdr;
+        }
+        tem = arguments[i + 1];
+        tail.cdr = tem;
+        if (tem === false) {
+            arguments[i + 1] = tail;
+        }
+    }
+
+    return val;
 }
 
 /*
@@ -420,6 +460,29 @@ function FN_string_to_number(str, base) {
 
 function FN_memql(elt, list) {
     return FN_member(elt, list);
+}
+
+function FN_split_string(str, separators, omit_nulls) {
+    if (typeof(separators) === 'undefined') {
+        separators = '\s+';
+    }
+    return str.split(new RegExp(separators));
+}
+
+function FN_zerop(n) {
+    return n === 0;
+}
+
+function FN_nth(l, n) {
+    var x = l;
+    while (FN_consp(x)) {
+        if (n === 0) {
+            return x.car;
+        }
+        n--;
+        x = x.cdr;
+    }
+    return false;
 }
 
 var init = function() {

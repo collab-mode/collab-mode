@@ -20,10 +20,13 @@ function FN_infinote_connect_to_server() {
     connection.buffer = new Buffer();
 
     infinote_connection_buffer = connection.buffer;
-    infinote_connection = connection;
-    infinote_group_name = "InfDirectory";
-    infinote_node_id = 0;
-    infinote_node_type = "InfDirectory";
+    FN_save_current_buffer_fn(function() {
+        FN_set_buffer(infinote_connection_buffer);
+        infinote_connection = connection;
+        infinote_group_name = "InfDirectory";
+        infinote_node_id = 0;
+        infinote_node_type = "InfDirectory";
+    });
     //FN_infinote_send_stream_header(infinote_server);
 }
 

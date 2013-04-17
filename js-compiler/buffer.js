@@ -21,6 +21,9 @@ function Buffer(name) {
     this.point = 0;
     this.name = name;
     this.env = {};
+    for (var key in $buffer_var_initialized_values) {
+        this.env[key] = $buffer_var_initialized_values[key];
+    }
 
     this.toString = function() {
         return "[Buffer " + this.name + "]";
@@ -220,8 +223,20 @@ function FN_save_current_buffer_fn(fn) {
     }
 }
 
-$buffer_var_cleanup = function() {}
+$buffer_var_initialized_values = {}
+$buffer_var_cleanup = function() {
+    for (var i = 0; i < $buffer_make_local_vars.length; i++) {
+        var key = $buffer_make_local_vars[i];
+        $buffer_var_initialized_values[key] = this[key];
+    }
+}
+
 function FN_set_buffer(buf) {
+    if ($current_buffer === buf) {
+        return;
+    }
+    console.log("switching to " + buf + "...");
+
     $buffer_var_cleanup();
 
     $current_buffer = buf;
@@ -239,6 +254,7 @@ function FN_set_buffer(buf) {
     }
 
     $buffer_var_cleanup = function() {
+        var key;
         for (key in old_globals) {
             $current_buffer.env[key] = this[key];
             this[key] = old_globals.key;
@@ -285,6 +301,26 @@ function FN_buffer_local_value(sym, buf) {
 }
 
 function FN_display_buffer() {}
+
+function FN_insert() {
+    var i;
+    var insert_str = '';
+    for (i = 0; i < arguments.length; i++) {
+        var x = arguments[i];
+        if (typeof x === 'number') {
+            insert_str += String.fromCharCode(x);
+        } else {
+            insert_str += x;
+        }
+    }
+    var p = $current_buffer.point;
+    var s = $current_buffer.str;
+    $current_buffer.str =
+        s.substring(0, p) +
+        insert_str +
+        s.substring(p);
+    $current_buffer.point += insert_str.length;
+}
 
 function buffer_add_make_local_var(sym) {
     $buffer_make_local_vars.push(sym);
