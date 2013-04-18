@@ -199,9 +199,8 @@
   (when (buffer-live-p (process-buffer network-process))
     (with-current-buffer (process-buffer network-process)
       ;; append new data to the buffer and set up for parsing
-      (goto-char (process-mark network-process))
+      (goto-char (point-max))
       (insert string)
-      (set-marker (process-mark network-process) (point))
       (goto-char (point-min))
 
       (block message-loop
@@ -227,9 +226,10 @@
 
           (let ((beg (point))
                 (xml-data))
-            (ignore-errors (setq xml-data (xml-parse-tag-1))) ; an error means we don't have enough data yet, no biggie
+            (ignore-errors (setq xml-data (xml-parse-tag))) ; an error means we don't have enough data yet, no biggie
             (if (not xml-data)
                 (return-from message-loop)
+	      (xml-parse-tag-1)
               (delete-region beg (point)) ; remove the tag we just parsed
               (infinote-handle-stanza xml-data))))))))
 
