@@ -1,4 +1,4 @@
-function FN_infinote_connect_to_server() {
+function FN_infinote_connect_to_server(callback) {
     if (infinote_connection !== false &&
         infinote_connection.readyState !== 3) {
         return;
@@ -10,6 +10,22 @@ function FN_infinote_connect_to_server() {
     connection.onopen = function() {
         console.log("socket opened");
         FN_infinote_send_stream_header(infinote_server);
+
+        var count = 0;
+        var interval_id = window.setInterval(function() {
+            count++;
+            with_current_buffer(connection.buffer, function() {
+                if (count > 100 || !infinote_connection) {
+                    console.log("giving up waiting for handshake");
+                    clearInterval(interval_id);
+                } else if (infinote_connection_ready) {
+                    clearInterval(interval_id);
+                    if (callback) {
+                        callback();
+                    }
+                }
+            });
+        });
     };
     connection.onerror = function(error) {
         console.log("socket error", error);
@@ -20,14 +36,12 @@ function FN_infinote_connect_to_server() {
     connection.buffer = new Buffer();
 
     infinote_connection_buffer = connection.buffer;
-    FN_save_current_buffer_fn(function() {
-        FN_set_buffer(infinote_connection_buffer);
+    with_current_buffer(infinote_connection_buffer, function() {
         infinote_connection = connection;
         infinote_group_name = "InfDirectory";
         infinote_node_id = 0;
         infinote_node_type = "InfDirectory";
     });
-    //FN_infinote_send_stream_header(infinote_server);
 }
 
 function infinote_filter(blob) {
@@ -51,7 +65,7 @@ function infinote_filter(blob) {
 
             var should_break = false;
             with_current_buffer(infinote_connection_buffer, function () {
-                FN_goto_char(0);
+                FN_goto_char(1);
 
                 try {
                     var xml_data = FN_xml_parse_tag_1();
@@ -64,7 +78,7 @@ function infinote_filter(blob) {
                     should_break = true;
                     return;
                 } else {
-                    infinote_connection_buffer.str = infinote_connection_buffer.str.substring(FN_point());
+                    infinote_connection_buffer.str = infinote_connection_buffer.str.substring(FN_point() - 1);
                     $("#log").append($("<pre>").addClass("in").text(xml_data + ""));
                     FN_infinote_handle_stanza(xml_data);
                 }
@@ -90,3 +104,36 @@ function FN_current_buffer() {
 
 function FN_infinote_mode() {}
 infinote_mode = false;
+
+var $editor;
+function ace_init() {
+    $editor = ace.edit("editor");
+    var buffer = FN_generate_new_buffer("bar");
+    buffer.env.infinote_mode = true;
+    var just_nuke_it = function() {
+        $editor.setValue($current_buffer.str, $current_buffer.point);
+    };
+    buffer.render_hook = {
+        inserted: just_nuke_it,
+        deleted: just_nuke_it
+    };
+    $editor.on("change", function(e) {
+        var start = $editor.session.doc.positionToIndex(e.data.range.start);
+        var end = $editor.session.doc.positionToIndex(e.data.range.end);
+
+        with_current_buffer(buffer, function() {
+            if (e.data.action === "insertText" || e.data.action === "insertLines") {
+                with_current_buffer
+                FN_infinote_before_change(start + 1, start + 1);
+                $current_buffer.str = $editor.getValue();
+                FN_infinote_after_change(start + 1, end + 1, 0);
+            } else if (e.data.action === "removeText" || e.data.action === "removeLines") {
+                FN_infinote_before_change(start + 1, end + 1);
+                $current_buffer.str = $editor.getValue();
+                FN_infinote_after_change(start + 1, start + 1, end - start);
+            }
+        });
+
+        console.log(e.data);
+    });
+}

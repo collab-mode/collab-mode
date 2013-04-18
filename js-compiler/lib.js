@@ -231,7 +231,7 @@ function FN_length(l) {
 }
 
 function FN_not(b) {
-    return !b;
+    return b === false;
 }
 
 function FN_substring(s, from, to) {
@@ -240,7 +240,7 @@ function FN_substring(s, from, to) {
 
 function FN_message() {
     var args = Array.prototype.slice.call(arguments, 0);
-    console.log("message called with " + args);
+    console.log(FN_format(args));
 }
 
 // TODO?: real format
@@ -285,13 +285,13 @@ function FN_lax_plist_put(l, k, val) {
 }
 
 function FN_copy_sequence(l) {
-    if (!x) {
+    if (l === false) {
         return false;
     }
-    var start = new cons_t(x.car, false);
     var x = l;
+    var start = new cons_t(x.car, false);
     var y = start;
-    while (FN_consp(x)) {
+    while (FN_consp(x.cdr)) {
         y.cdr = new cons_t(x.cdr.car, false);
         y = y.cdr;
         x = x.cdr;
@@ -382,8 +382,12 @@ function FN_nreverse(list) {
 
 function FN_apply(fn) {
     var args = Array.prototype.slice.call(arguments, 1);
-    var tail = args.pop();
-    fn.apply(this, args.concat(tail));
+    var x = args.pop();
+    while (x !== false) {
+        args.push(x.car);
+        x = x.cdr;
+    }
+    return fn.apply(this, args);
 }
 
 function FN_replace_regexp_in_string(re, rep, string) {
@@ -402,8 +406,8 @@ function FN_string_match(regexp, string, start) {
     }
 }
 
-function FN_error(msg) {
-    throw msg;
+function FN_error() {
+    throw FN_format.apply(this, arguments);
 }
 
 function FN_intern(x) {
@@ -466,7 +470,13 @@ function FN_split_string(str, separators, omit_nulls) {
     if (typeof(separators) === 'undefined') {
         separators = '\s+';
     }
-    return str.split(new RegExp(separators));
+    var result = str.split(new RegExp(separators));
+    if (omit_nulls) {
+        result = result.filter(function(e) {
+            return e !== '';
+        });
+    }
+    return FN_list.apply(this, result);
 }
 
 function FN_zerop(n) {
@@ -500,7 +510,8 @@ function add_to_init(f) {
 
 add_to_init(function() {
     // Horrible hacks
-    FN_infinote_collab_text_properties =
+    /*FN_infinote_collab_text_properties =
         FN_add_text_properties =
         function(){};
+*/
 });

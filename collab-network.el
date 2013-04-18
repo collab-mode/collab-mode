@@ -5,7 +5,7 @@
   (delete-process collab-server-process))
  (setq collab-server-process (open-network-stream "collab-server"
                               (get-buffer-create "*collab-server*")
-                              "cobbal.com" 10069 :type 'ssl))
+                              "collab-mode.com" 10069 :type 'ssl))
  (set-process-filter collab-server-process #'collab-network-receive-from-server))
 
 (setq collab-server-input-buffer "")

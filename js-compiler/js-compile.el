@@ -1,6 +1,16 @@
 ;;; -*- lexical-binding: t -*-
 
+(defvar js-uninterned-sym-trans-table nil)
+(defun js-uninterned-sym-trans (sym)
+ (or
+  (cdr (assq sym js-uninterned-sym-trans-table))
+  (cdar
+   (push (cons sym (gensym (symbol-name sym)))
+    js-uninterned-sym-trans-table))))
+
 (defun js-sym-trans (sym)
+ (if (not (intern-soft sym))
+  (setq sym (js-uninterned-sym-trans sym)))
  (cond
   ;; keywords ruin everything...
   ((eq sym 'default) "_$default")
@@ -253,6 +263,9 @@
    (`(save-current-buffer . ,body)
     (list (make-js `(save-current-buffer-fn (lambda () . ,body)))))
 
+   (`(save-excursion . ,body)
+    (list (make-js `(save-excursion-fn (lambda () . ,body)))))
+
    (`(,(pred
         (lambda (x)
          (member x
@@ -344,6 +357,7 @@
           infinote-affected-text
           infinote-contextualize-delete
           infinote-handle-request
+          infinote-apply-operation
           infinote-node-from-id
           infinote-handle-group-commands
           infinote-handle-group-command

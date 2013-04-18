@@ -18,9 +18,11 @@ function Buffer(name) {
     }
 
     this.str = '';
-    this.point = 0;
+    this.point = 1;
     this.name = name;
     this.env = {};
+    this.render_hook = false;
+
     for (var key in $buffer_var_initialized_values) {
         this.env[key] = $buffer_var_initialized_values[key];
     }
@@ -32,15 +34,19 @@ function Buffer(name) {
 
 function with_current_buffer(buf, body) {
     if (!(buf instanceof Buffer)) {
-        throw "named buffers not implemented";
+        buf = FN_get_buffer(buf);
+        if (!(buf instanceof Buffer)) {
+            throw "named buffers not implemented";
+        }
     }
-    var old_buffer = buf;
+    var old_buffer = $current_buffer;
     try {
         FN_set_buffer(buf);
-        body();
+        ret = body();
     } finally {
         FN_set_buffer(old_buffer);
     }
+    return ret;
 }
 
 function buffer_str() {
@@ -49,12 +55,13 @@ function buffer_str() {
 }
 
 function FN_goto_char(p) {
-    $current_buffer.point = Math.max(0, Math.min($current_buffer.str.length - 1, p));
+    p--;
+    $current_buffer.point = Math.max(0, Math.min($current_buffer.str.length, p));
     //console.log("(goto-char " + p + ") -> " + buffer_str());
 }
 
 function FN_forward_char(n) {
-    FN_goto_char($current_buffer.point + n);
+    FN_goto_char($current_buffer.point + n + 1);
 }
 
 $re_translation_cache = {};
@@ -112,7 +119,10 @@ function FN_looking_at(re) {
 function FN_char_after(pos) {
     if (typeof(pos) === 'undefined') {
         pos = $current_buffer.point;
+    } else {
+        pos--;
     }
+
     if (pos < 0 || pos >= $current_buffer.str.length) {
         return false;
     }
@@ -122,10 +132,11 @@ function FN_char_after(pos) {
 }
 
 function FN_point() {
-    return $current_buffer.point;
+    return $current_buffer.point + 1;
 }
 
 function FN_buffer_substring_no_properties(start, end) {
+    start--; end--;
     return $current_buffer.str.substring(start, end);
 }
 
@@ -137,7 +148,7 @@ function FN_match_string_no_properties(n) {
 }
 
 function FN_match_end() {
-    return $match_data.point + $match_data[0].length;
+    return $match_data.point + $match_data[0].length + 1;
 }
 
 function FN_match_data() {
@@ -184,6 +195,7 @@ function FN_buffer_size(buf) {
 }
 
 function FN_skip_chars_forward(str, lim) {
+    lim--;
     if (typeof(lim) === 'undefined') {
         lim = $current_buffer.str.length;
     }
@@ -199,10 +211,11 @@ function FN_skip_chars_forward(str, lim) {
 }
 
 function FN_point_marker() {
-    return $current_buffer.point;
+    return $current_buffer.point + 1;
 }
 
 function FN_re_search_forward(regexp, bound, noerror, count) {
+    bound--;
     var sub_buf = $current_buffer.str.substring($current_buffer.point, bound);
     $match_data = sub_buf.match(regexp);
     if ($match_data === null) {
@@ -211,14 +224,25 @@ function FN_re_search_forward(regexp, bound, noerror, count) {
         $match_data.point = $current_buffer.point;
         $current_buffer.point += $match_data[0].length;
     }
-    return $current_buffer.point;
+    return $current_buffer.point + 1;
 }
 
 function FN_save_current_buffer_fn(fn) {
     var buffer = $current_buffer;
     try {
-        fn();
+        return fn();
     } finally {
+        FN_set_buffer(buffer);
+    }
+}
+
+function FN_save_excursion_fn(fn) {
+    var buffer = $current_buffer;
+    var point = buffer.point;
+    try {
+        return fn();
+    } finally {
+        buffer.point = point;
         FN_set_buffer(buffer);
     }
 }
@@ -292,6 +316,7 @@ function FN_generate_new_buffer(name) {
     }
 }
 
+/*
 function FN_buffer_local_value(sym, buf) {
     if (sym in buf.env) {
         return buf.env[sym];
@@ -299,6 +324,7 @@ function FN_buffer_local_value(sym, buf) {
         return this[sym];
     }
 }
+*/
 
 function FN_display_buffer() {}
 
@@ -319,7 +345,23 @@ function FN_insert() {
         s.substring(0, p) +
         insert_str +
         s.substring(p);
+
+    if ($current_buffer.render_hook) {
+        $current_buffer.render_hook.inserted(p, insert_str);
+    }
+
     $current_buffer.point += insert_str.length;
+}
+
+function FN_delete_region(start, end) {
+    start--; end--;
+    var p = $current_buffer.point;
+    var s = $current_buffer.str;
+    $current_buffer.str = s.substring(0, start) + s.substring(end);
+
+    if ($current_buffer.render_hook) {
+        $current_buffer.render_hook.deleted(start, end);
+    }
 }
 
 function buffer_add_make_local_var(sym) {

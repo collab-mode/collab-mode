@@ -1,32 +1,97 @@
+<!DOCTYPE html>
 <html>
  <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+ <script src="http://rawgithub.com/ajaxorg/ace-builds/master/src-noconflict/ace.js" type="text/javascript" charset="utf-8"></script>
  <script src="lib.js"></script>
  <script src="buffer.js"></script>
  <script src="tmp"></script>
  <script src="infinote.js"></script>
  <!--<script>console.log(FN_xmlgen(FN_list("p", ":class", "big")));</script>-->
  <script>
-  init()
-  function foo() {
-  FN_infinote_connect_to_server();
+  $(function() {
+  init();
+  ace_init();
+
+  FN_infinote_connect_to_server(function() {
+  FN_infinote_find_file('bar');
+  });
+
+  });
+
+  function toggle_log() {
+  var log = $("#log");
+  var ed = $("#editor");
+  if (log.is(":visible")) {
+  log.fadeOut(100, function() {
+  ed.fadeIn(100);
+  });
+  } else {
+  ed.fadeOut(100, function() {
+  log.fadeIn(100);
+  });
+  }
   }
  </script>
  <style>
+  html,body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  }
+  #log-button {
+  margin-top: 10px;
+  margin-left: 10px;
+  height: 26px;
+  width: 80px;
+  }
+  #log {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: calc(100%);
+  height: calc(100% - 46px);
+  overflow: auto;
+  }
   #log .in {
+  width: calc(100% - 20px);
+  margin: 10px;
   background-color: #cfc;
+  white-space: pre-wrap;       /* css-3 */
+  white-space: -moz-pre-wrap;  /* Mozilla, since 1999 */
+  white-space: -pre-wrap;      /* Opera 4-6 */
+  white-space: -o-pre-wrap;    /* Opera 7 */
+  word-wrap: break-word;       /* Internet Explorer 5.5+ */
   }
   #log .out {
+  width: calc(100% - 20px);
+  margin: 10px;
   background-color: #fcc;
+  white-space: pre-wrap;       /* css-3 */
+  white-space: -moz-pre-wrap;  /* Mozilla, since 1999 */
+  white-space: -pre-wrap;      /* Opera 4-6 */
+  white-space: -o-pre-wrap;    /* Opera 7 */
+  word-wrap: break-word;       /* Internet Explorer 5.5+ */
   }
-  </style>
+  #editor-container {
+  position: relative;
+  width: 100%;
+  height: calc(100% - 46px);
+  margin: auto;
+  }
+  #editor {
+  position: absolute;
+  top: 0px;
+  bottom: 0px;
+  left: 0px;
+  right: 0px;
+  }
+ </style>
  <body>
-  <button onclick="foo()">
-   connect
-  </button>
-  <button onclick="FN_infinote_find_file('bar')">
-   open bar
-  </button>
-  <div id="log">
+  <div id="editor-container">
+   <div id="editor"></div>
+  </div>
+  <button id="log-button" onclick="toggle_log()">log</button>
+  <div id="log" style="display: none;">
   </div>
  </body>
 </html>
