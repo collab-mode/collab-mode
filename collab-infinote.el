@@ -65,7 +65,7 @@
 
 (define-minor-mode infinote-mode
   "infinote"
-  :lighter " Infinote"
+  :lighter " collab"
   (if infinote-mode
       (infinote-init-this-buffer)
     (infinote-deinit-this-buffer)))
@@ -841,7 +841,7 @@
                   ;; fill in buffer data
                (when session-buffer
                  (with-current-buffer session-buffer
-                   (infinote-insert-segment (assoc-default 'author attributes) (car contents)))))
+                   (infinote-insert-segment (string-to-number (assoc-default 'author attributes)) (car contents)))))
               ((user-join sync-user)
                ;; store user data
                (let ((name (assoc-default 'name attributes))
