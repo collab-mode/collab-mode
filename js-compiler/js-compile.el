@@ -429,6 +429,7 @@
           xml-default-decl-re
           xml-att-def-re
           xml-entity-value-re
+          xml-entity-expansion-limit
           ))
        (make-buffer-local-vars
         '(

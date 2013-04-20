@@ -80,7 +80,7 @@ function re_translate(re) {
                 }
                 in_backslash = !in_backslash;
             } else if (in_backslash) {
-                if (new_re[i] !== '(' && new_re[i] !== ')') {
+                if (new_re[i] !== '(' && new_re[i] !== ')' && new_re[i] !== '|') {
                     result += "\\";
                 }
                 result += new_re[i];
@@ -90,7 +90,7 @@ function re_translate(re) {
                     i++;
                 }
             } else {
-                if (new_re[i] === '(' || new_re[i] === ')') {
+                if (new_re[i] === '(' || new_re[i] === ')' || new_re[i] === '|') {
                     result += "\\";
                 }
                 result += new_re[i];
@@ -145,6 +145,9 @@ function FN_match_string_no_properties(n) {
         return $match_data[n];
     }
     return false;
+}
+function FN_match_string(n) {
+    return FN_match_string_no_properties(n);
 }
 
 function FN_match_end() {
@@ -366,4 +369,12 @@ function FN_delete_region(start, end) {
 
 function buffer_add_make_local_var(sym) {
     $buffer_make_local_vars.push(sym);
+}
+
+function FN_replace_match(newtext, fixed, literal) {
+    var start = $match_data.index + 1;
+    var end = start + $match_data[0].length;
+    FN_delete_region(start, end);
+    FN_goto_char(start);
+    FN_insert(newtext);
 }

@@ -106,9 +106,9 @@ function FN_infinote_mode() {}
 infinote_mode = false;
 
 var $editor;
-function ace_init() {
+function ace_init(file) {
     $editor = ace.edit("editor");
-    var buffer = FN_generate_new_buffer("bar");
+    var buffer = FN_generate_new_buffer(file);
     buffer.env.infinote_mode = true;
     var just_nuke_it = function() {
         $editor.setValue($current_buffer.str, $current_buffer.point);

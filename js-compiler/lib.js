@@ -234,6 +234,18 @@ function FN_not(b) {
     return b === false;
 }
 
+function FN_null(b) {
+    return b === false;
+}
+
+function FN_string() {
+    var result = '';
+    for (var i = 0; i < arguments.length; i++) {
+        result += String.fromCharCode(arguments[i]);
+    }
+    return result;
+}
+
 function FN_substring(s, from, to) {
     return s.substring(from, to);
 }
@@ -493,6 +505,10 @@ function FN_nth(l, n) {
         x = x.cdr;
     }
     return false;
+}
+
+function FN_decode_char(charset, code_point) {
+    return code_point;
 }
 
 var init = function() {
