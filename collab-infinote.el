@@ -62,10 +62,16 @@
 (make-variable-buffer-local 'infinote-text-before-change)
 (defvar infinote-syncing nil "In the process of syncing this document")
 (make-variable-buffer-local 'infinote-syncing)
+(defvar infinote-original-contents "" "The buffer contents before syncing with the infinote server")
+(make-variable-buffer-local 'infinote-original-contents)
+(defvar infinote-original-mark nil "The buffer mark before syncing with the infinote server")
+(make-variable-buffer-local 'infinote-original-mark)
+(defvar infinote-original-point 1 "The buffer point before syncing with the infinote server")
+(make-variable-buffer-local 'infinote-original-point)
 
 (define-minor-mode infinote-mode
   "infinote"
-  :lighter " collab"
+  :lighter " Infinote"
   (if infinote-mode
       (infinote-init-this-buffer)
     (infinote-deinit-this-buffer)))
@@ -73,6 +79,9 @@
 (defun infinote-init-this-buffer ()
   (progn
     (infinote-connect-to-server)
+    ; things to handle:
+    ; no file on server
+    ; file on server
     (unless infinote-node-id
       (let ((name (buffer-name)))
         (with-current-buffer (process-buffer infinote-connection)
@@ -92,9 +101,18 @@
   (remove-hook 'kill-buffer-hook #'infinote-close-session t)
   (infinote-close-session))
 
+(defun infinote-set-major-mode ()
+  (let ((mode (assoc-default (buffer-name) auto-mode-alist 'string-match)))
+    (when mode
+      (set-auto-mode-0 mode tq)))))
+
 (defun infinote-connected-p ()
   (and infinote-connection
        (process-live-p infinote-connection)))
+
+(defun infinote-share-this-file ()
+  (interactive)
+  (infinote-find-file (buffer-name)))
 
 (defun infinote-find-file (filename)
   (interactive "sInfinote file: ")
@@ -109,16 +127,23 @@
   (unless infinote-inhibit-change-hooks
     (setq infinote-before-change-text (buffer-substring-no-properties start end))))
 
+(defun infinote-active-group-p (group-name)
+  (and (infinote-connected-p)
+       (with-current-buffer (process-buffer infinote-connection)
+	 (lax-plist-get infinote-sessions group-name))))
+
 (defun infinote-after-change (start end previous-length)
   (unless infinote-inhibit-change-hooks
-    (let ((insert-text (buffer-substring-no-properties start end))
-          (changed? (> previous-length 0))
-          (inserted? (> end start)))
-      (assert (>= end start))
-      (when changed?
-        (infinote-local-delete start infinote-before-change-text))
-      (when inserted?
-        (infinote-local-insert start insert-text)))))
+    (if (infinote-active-group-p infinote-group-name)
+	(let ((insert-text (buffer-substring-no-properties start end))
+	      (changed? (> previous-length 0))
+	      (inserted? (> end start)))
+	  (assert (>= end start))
+	  (when changed?
+	    (infinote-local-delete start infinote-before-change-text))
+	  (when inserted?
+	    (infinote-local-insert start insert-text)))
+      (infinote-find-file (buffer-name)))))
 
 (defun infinote-post-command ()
   )
@@ -149,7 +174,9 @@
     (infinote-clean-up-connection)))
 
 (defun infinote-clean-up-connection ()
-    ;; TODO: un-infinote any open session buffers
+    (let ((sessions (cddr infinote-sessions)))
+      (loop for session on sessions by #'cddr
+	    do (kill-buffer (cadr session))))
     (setq infinote-connection nil)
     (setq infinote-connection-ready nil))
 
@@ -378,17 +405,27 @@
    ";"))
 
 (defun infinote-create-session (name id group-name)
-  (let ((new-buffer (get-buffer name)))
-    (when (or (not new-buffer)
-              (not (buffer-local-value 'infinote-mode new-buffer))
-              (buffer-local-value 'infinote-node-id new-buffer))
-      (setq new-buffer (generate-new-buffer name)))
+  (let ((new-buffer (get-buffer name))
+	(contents "")
+	(new-point 1)
+	new-mark)
+    (when new-buffer
+      (with-current-buffer new-buffer
+	(setq contents (buffer-substring-no-properties (point-min) (point-max)))
+	(setq new-point (point))
+	(setq new-mark (mark)))
+      (kill-buffer new-buffer))
+    (setq new-buffer (generate-new-buffer name))
     (with-current-buffer new-buffer
+      (infinote-set-major-mode)
       (setq infinote-group-name group-name)
       (setq infinote-node-id id)
       (setq infinote-node-type "InfText")
+      (setq infinote-original-contents contents)
+      (setq infinote-original-mark new-mark)
+      (setq infinote-original-point new-point)
       (unless infinote-mode (infinote-mode))
-      (display-buffer (current-buffer)))
+      (switch-to-buffer (current-buffer)))
     (setq infinote-sessions (lax-plist-put infinote-sessions group-name new-buffer))))
 
 (defun infinote-user-join (name id vector hue caret selection status)
@@ -405,8 +442,11 @@
   (when (equal name infinote-user-name)
     (setq infinote-user-id id)
     (unless (or infinote-syncing
-                (= (point-min) (point-max)))
-      (infinote-local-insert 1 (buffer-substring-no-properties (point-min) (point-max))))
+		(not (= (point-min) (point-max)))
+                (equal infinote-original-contents ""))
+      (insert infinote-original-contents))
+    (goto-char infinote-original-point)
+    (set-mark infinote-original-mark)
     (setq infinote-syncing nil)))
 
 (defun infinote-read-vector (vector-string)
@@ -734,12 +774,12 @@
           (push request infinote-request-log)
           (infinote-increment-my-vector user-id))
       (let ((op-type (infinote-op-type (car operation))))
+	(when (member op-type '(undo redo))
+	  (infinote-find-file (buffer-name)))
         (when (member op-type '(insert delete))
           (let ((my-vector (infinote-my-vector)))
             (if (infinote-can-apply vector my-vector)
                 (let ((translated-operation (infinote-translate-operation user-id vector my-vector operation)))
-                  ;(when (equal op-type 'delete)
-                  ;  (setq request (list user-id vector (infinote-contextualize-delete operation translated-operation))))
                   (infinote-apply-operation user-id translated-operation)
                   (push request infinote-request-log)
                   (infinote-increment-my-vector user-id)
@@ -829,8 +869,12 @@
               (sync-begin
                (when session-buffer
                  (with-current-buffer session-buffer
-                   (setq infinote-syncing t)))) ; not really needed
+                   (setq infinote-syncing t))))
               (sync-end
+	       (when session-buffer
+		 (with-current-buffer session-buffer
+		   (goto-char infinote-original-point)
+		   (set-mark infinote-original-mark)))
                (when infinote-verbose (message (format "Session buffer %S" session-buffer)))
                (when session-buffer
                  (with-current-buffer session-buffer
