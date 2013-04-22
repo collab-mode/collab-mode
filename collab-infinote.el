@@ -849,102 +849,105 @@
   (mapcar #'infinote-handle-group-command commands))
 
 (defun infinote-handle-group-command (command-xml-data)
-  (let ((command (car command-xml-data))
-        (attributes (cadr command-xml-data))
-        (contents (cddr command-xml-data))
-        (session-buffer (lax-plist-get infinote-sessions group-name)))
-    (when infinote-verbose (message (format "Got group %S command %S" group-name command-xml-data)))
-    (case command
-              (welcome
-               (infinote-send-explore 0))
-              (explore-begin) ; not really needed
-              (explore-end
-               (setq infinote-connection-ready t))
-              (add-node
-               ;; add node to file list
-               (let ((id (string-to-number (assoc-default 'id attributes)))
-                     (name (assoc-default 'name attributes))
-                     (parent (string-to-number (assoc-default 'id attributes)))
-                     (type (assoc-default 'type attributes)))
-                 (setq infinote-nodes
-                       (lax-plist-put infinote-nodes
-                                  name
-                                  (list 'id id
-                                        'parent parent
-                                        'name name
-                                        'type type)))
-                 (let ((first-content-tag (car contents)))
-                   (when (equal 'subscribe (car first-content-tag))
-                     (let ((group (assoc-default 'group (cadr first-content-tag))))
-                       (infinote-create-session name id group)
-                       (infinote-send-subscribe-ack id)
-                       (infinote-send-user-join infinote-user-name group)
-                       (setq infinote-my-last-sent-vector (infinote-my-vector)))))))
-              (sync-in
-               ;; send document sync
-               )
-              (remove-node) ; not supported
-              (subscribe-session
-               ;; add session and ack
-               (let* ((id (string-to-number (assoc-default 'id attributes)))
-                      (name (lax-plist-get (infinote-node-from-id id) 'name))
-                      (group (assoc-default 'group attributes)))
-                 (infinote-create-session name id group)
-                 (infinote-send-subscribe-ack id)))
-              (subscribe-chat
-               ;; add chat and ack
-               )
-              (sync-begin
+      (let ((command (car command-xml-data))
+            (attributes (cadr command-xml-data))
+            (contents (cddr command-xml-data))
+            (session-buffer (lax-plist-get infinote-sessions group-name)))
+        (condition-case
+            nil
+            (when infinote-verbose (message (format "Got group %S command %S" group-name command-xml-data)))
+          (case command
+            (welcome
+             (infinote-send-explore 0))
+            (explore-begin) ; not really needed
+            (explore-end
+             (setq infinote-connection-ready t))
+            (add-node
+             ;; add node to file list
+             (let ((id (string-to-number (assoc-default 'id attributes)))
+                   (name (assoc-default 'name attributes))
+                   (parent (string-to-number (assoc-default 'id attributes)))
+                   (type (assoc-default 'type attributes)))
+               (setq infinote-nodes
+                     (lax-plist-put infinote-nodes
+                                    name
+                                    (list 'id id
+                                          'parent parent
+                                          'name name
+                                          'type type)))
+               (let ((first-content-tag (car contents)))
+                 (when (equal 'subscribe (car first-content-tag))
+                   (let ((group (assoc-default 'group (cadr first-content-tag))))
+                     (infinote-create-session name id group)
+                     (infinote-send-subscribe-ack id)
+                     (infinote-send-user-join infinote-user-name group)
+                     (setq infinote-my-last-sent-vector (infinote-my-vector)))))))
+            (sync-in
+             ;; send document sync
+             )
+            (remove-node) ; not supported
+            (subscribe-session
+             ;; add session and ack
+             (let* ((id (string-to-number (assoc-default 'id attributes)))
+                    (name (lax-plist-get (infinote-node-from-id id) 'name))
+                    (group (assoc-default 'group attributes)))
+               (infinote-create-session name id group)
+               (infinote-send-subscribe-ack id)))
+            (subscribe-chat
+             ;; add chat and ack
+             )
+            (sync-begin
+             (when session-buffer
+               (with-current-buffer session-buffer
+                 (setq infinote-syncing t))))
+            (sync-end
+             (when session-buffer
+               (with-current-buffer session-buffer
+                 (goto-char (min infinote-original-point (point-max)))
+                 (set-mark (and infinote-original-mark (min infinote-original-mark (point-max))))))
+             (when infinote-verbose (message (format "Session buffer %S" session-buffer)))
+             (when session-buffer
+               (with-current-buffer session-buffer
+                 (infinote-send-sync-ack)
+                 (infinote-send-user-join infinote-user-name group-name)
+                 (setq infinote-my-last-sent-vector (infinote-my-vector)))))
+            (sync-segment
+             ;; fill in buffer data
+             (when session-buffer
+               (with-current-buffer session-buffer
+                 (infinote-insert-segment (string-to-number (assoc-default 'author attributes)) (car contents)))))
+            ((user-join sync-user)
+             ;; store user data
+             (let ((name (assoc-default 'name attributes))
+                   (id (string-to-number (assoc-default 'id attributes)))
+                   (vector (infinote-read-vector (assoc-default 'time attributes)))
+                   (hue (string-to-number (assoc-default 'hue attributes)))
+                   (caret (string-to-number (assoc-default 'caret attributes)))
+                   (selection (string-to-number (assoc-default 'selection attributes)))
+                   (status (assoc-default 'status attributes))
+                   (syncing (eq command 'sync-user)))
                (when session-buffer
                  (with-current-buffer session-buffer
-                   (setq infinote-syncing t))))
-              (sync-end
-	       (when session-buffer
-		 (with-current-buffer session-buffer
-		   (goto-char (min infinote-original-point (point-max)))
-		   (set-mark (and infinote-original-mark (min infinote-original-mark (point-max))))))
-               (when infinote-verbose (message (format "Session buffer %S" session-buffer)))
+                   (infinote-user-join name id vector hue caret selection status)))))
+            (user-rejoin
+             ;; store user data
+             )
+            (session-close) ; not supported
+            (user-status-change) ; not supported
+            (sync-message) ; not supported
+            (message) ; not supported
+            ((request sync-request)
+             (let ((user-id (string-to-number (assoc-default 'user attributes)))
+                   (vector-diff (infinote-read-vector (assoc-default 'time attributes)))
+                   (operation-xml (car contents))
+                   (syncing (eq command 'sync-request)))
+               ;; pass request to handler
                (when session-buffer
                  (with-current-buffer session-buffer
-                   (infinote-send-sync-ack)
-                   (infinote-send-user-join infinote-user-name group-name)
-                   (setq infinote-my-last-sent-vector (infinote-my-vector)))))
-              (sync-segment
-                  ;; fill in buffer data
-               (when session-buffer
-                 (with-current-buffer session-buffer
-                   (infinote-insert-segment (string-to-number (assoc-default 'author attributes)) (car contents)))))
-              ((user-join sync-user)
-               ;; store user data
-               (let ((name (assoc-default 'name attributes))
-                     (id (string-to-number (assoc-default 'id attributes)))
-                     (vector (infinote-read-vector (assoc-default 'time attributes)))
-                     (hue (string-to-number (assoc-default 'hue attributes)))
-                     (caret (string-to-number (assoc-default 'caret attributes)))
-                     (selection (string-to-number (assoc-default 'selection attributes)))
-                     (status (assoc-default 'status attributes))
-                     (syncing (eq command 'sync-user)))
-                 (when session-buffer
-                   (with-current-buffer session-buffer
-                     (infinote-user-join name id vector hue caret selection status)))))
-              (user-rejoin
-               ;; store user data
-               )
-              (session-close) ; not supported
-              (user-status-change) ; not supported
-              (sync-message) ; not supported
-              (message) ; not supported
-              ((request sync-request)
-               (let ((user-id (string-to-number (assoc-default 'user attributes)))
-                     (vector-diff (infinote-read-vector (assoc-default 'time attributes)))
-                     (operation-xml (car contents))
-                     (syncing (eq command 'sync-request)))
-                 ;; pass request to handler
-                 (when session-buffer
-                   (with-current-buffer session-buffer
-                     (unless syncing (infinote-diff-user-vector user-id vector-diff))
-                     (let ((request-vector (if syncing vector-diff (infinote-user-vector user-id))))
-                       (infinote-handle-request user-id request-vector (infinote-xml-to-operation operation-xml))))))))))
+                   (unless syncing (infinote-diff-user-vector user-id vector-diff))
+                   (let ((request-vector (if syncing vector-diff (infinote-user-vector user-id))))
+                     (infinote-handle-request user-id request-vector (infinote-xml-to-operation operation-xml))))))))
+        (error (when session-buffer (with-current-buffer session-buffer (infinote-share-this-file)))))))
 
 (defun infinote-test-session ()
   (with-current-buffer (get-buffer-create " *test-results*")
