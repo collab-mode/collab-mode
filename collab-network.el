@@ -34,8 +34,9 @@ USE-SSL should be non-nil if the server is running ssl")
        (`(:infinote ,infinote-message)
         (with-demoted-errors (infinote-execute infinote-message)))
        (`(:cursor ,user ,cursor-loc)
-        (with-current-buffer collab-mode-cm-buffer
-         (collab-cursor user cursor-loc)))
+        (when collab-mode-cm-buffer
+	  (with-current-buffer collab-mode-cm-buffer
+	    (collab-cursor user cursor-loc))))
        (`(:users . ,users)
         (collab-mode-cm-new-users-received users))
        (`(:xmppfriends . ,friends)
