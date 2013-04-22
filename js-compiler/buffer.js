@@ -18,7 +18,7 @@ function Buffer(name) {
     }
 
     this.str = '';
-    this.point = 1;
+    this.point = 0;
     this.name = name;
     this.env = {};
     this.render_hook = false;
@@ -49,9 +49,10 @@ function with_current_buffer(buf, body) {
     return ret;
 }
 
-function buffer_str() {
-    return "[[" + $current_buffer.str.substring(0, $current_buffer.point) +
-        "|" + $current_buffer.str.substring($current_buffer.point) + "]]";
+function buffer_str(buf) {
+    buf = buf || $current_buffer ;
+    return "[[" + buf.str.substring(0, buf.point) +
+        "|" + buf.str.substring(buf.point) + "]]";
 }
 
 function FN_goto_char(p) {
@@ -135,13 +136,21 @@ function FN_point() {
     return $current_buffer.point + 1;
 }
 
+function FN_point_min() {
+    return 1;
+}
+
+function FN_point_max() {
+    return 1 + $current_buffer.str.length;
+}
+
 function FN_buffer_substring_no_properties(start, end) {
     start--; end--;
     return $current_buffer.str.substring(start, end);
 }
 
 function FN_match_string_no_properties(n) {
-    if ($match_data !== null && n in $match_data) {
+    if ($match_data !== null && n in $match_data && typeof($match_data[n]) !== 'undefined') {
         return $match_data[n];
     }
     return false;
@@ -150,8 +159,21 @@ function FN_match_string(n) {
     return FN_match_string_no_properties(n);
 }
 
-function FN_match_end() {
-    return $match_data.point + $match_data[0].length + 1;
+function FN_match_beginning(n) {
+    if (n !== 0) {
+        throw "submatch positions not supported";
+    }
+    return $match_data.point + $match_data.index + 1;
+}
+
+function FN_match_end(n) {
+    if (n !== 0) {
+        // probably incorrect
+        var nindex = $match_data[0].lastIndexOf($match_data[n]);
+        return $match_data.point + $match_data.index + nindex + $match_data[n].length + 1;
+    } else {
+        return $match_data.point + $match_data.index + $match_data[0].length + 1;
+    }
 }
 
 function FN_match_data() {
@@ -262,7 +284,7 @@ function FN_set_buffer(buf) {
     if ($current_buffer === buf) {
         return;
     }
-    console.log("switching to " + buf + "...");
+    //console.log("switching to " + buf + "...");
 
     $buffer_var_cleanup();
 
@@ -362,6 +384,13 @@ function FN_delete_region(start, end) {
     var s = $current_buffer.str;
     $current_buffer.str = s.substring(0, start) + s.substring(end);
 
+    if (p >= end) {
+        p -= (end - start);
+    } else if (p >= start) {
+        p = start;
+    }
+    $current_buffer.point = p;
+
     if ($current_buffer.render_hook) {
         $current_buffer.render_hook.deleted(start, end);
     }
@@ -372,7 +401,7 @@ function buffer_add_make_local_var(sym) {
 }
 
 function FN_replace_match(newtext, fixed, literal) {
-    var start = $match_data.index + 1;
+    var start = $match_data.point + $match_data.index + 1;
     var end = start + $match_data[0].length;
     FN_delete_region(start, end);
     FN_goto_char(start);

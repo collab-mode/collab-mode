@@ -427,14 +427,20 @@ function FN_intern(x) {
 }
 
 function FN_assoc(key, list) {
-    var x = list;
-    while (x !== false) {
-        if (x.car === key) {
-            return x;
-        }
-        x = x.cdr;
+    if (list === xml_entity_alist) {
+        console.log(key);
     }
-    return false;
+
+    while (true) {
+        if (!FN_consp(list)
+            || (FN_consp(list.car)
+                && list.car.car === key)) {
+
+            break;
+        }
+        list = list.cdr;
+    }
+    return FN_car(list);
 }
 
 function FN_assoc_default(key, list, test, $default) {

@@ -44,8 +44,16 @@
    button {
    margin-top: 10px;
    margin-left: 10px;
+   float: left;
    height: 26px;
    width: 80px;
+   }
+   select {
+   margin-top: 10px;
+   margin-right: 10px;
+   float: right;
+   height: 26px;
+   width: 200px;
    }
    #log {
    position: absolute;
@@ -94,8 +102,9 @@
   <div id="editor-container">
    <div id="editor"></div>
   </div>
-  <button id="log-button" onclick="toggle_log()">chat</button>
+  <button id="chat-button" onclick="toggle_log()">chat</button>
   <button id="log-button" onclick="toggle_log()">log</button>
+  <select id="mode-select"></select>
   <div id="log" style="display: none;">
   </div>
  </body>

@@ -417,6 +417,7 @@
           xml-nmtokens-re
           xml-char-ref-re
           xml-entity-ref
+          xml-entity-alist
           xml-entity-or-char-ref-re
           xml-pe-reference-re
           xml-reference-re
