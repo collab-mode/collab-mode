@@ -162,9 +162,8 @@ so it doesn't rebroadcast itself into an infinite loop")
       t)
      (n (collab-chat-system-message
          (format (concat "%s users starting with \"%s\" found,"
-                  " please be more specific.")
-          n prefix)))
-     nil))
+			 " please be more specific.")
+		 n prefix)))))
    (collab-network-send-to-server
     `(:chat ,(collab-self-username) ,msg))
    t)))
