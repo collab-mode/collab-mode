@@ -34,9 +34,9 @@ USE-SSL should be non-nil if the server is running ssl")
        (`(:infinote ,infinote-message)
         (with-demoted-errors (infinote-execute infinote-message)))
        (`(:cursor ,user ,cursor-loc)
-        (when collab-mode-cm-buffer
-	  (with-current-buffer collab-mode-cm-buffer
-	    (collab-cursor user cursor-loc))))
+        (when (buffer-live-p collab-mode-cm-buffer)
+         (with-current-buffer collab-mode-cm-buffer
+          (collab-cursor user cursor-loc))))
        (`(:users . ,users)
         (collab-mode-cm-new-users-received users))
        (`(:xmppfriends . ,friends)
@@ -62,7 +62,7 @@ USE-SSL should be non-nil if the server is running ssl")
 
        (`(:error . ,_) nil)
 
-       (msg (error "unknown server message: %S" msg)))))))
+       (msg (message "unknown server message: %S" msg)))))))
 
 (defun collab-network-send-to-server (request &optional command)
  (collab-network-send-string-to-server
