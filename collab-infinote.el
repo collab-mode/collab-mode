@@ -35,9 +35,9 @@
 
 ;; connection (process-buffer) locals
 (defvar infinote-nodes nil "Nodes (documents and subdirectories) on a server")
-(make-variable-buffer-local 'infinote-nodes)
+;(make-variable-buffer-local 'infinote-nodes)
 (defvar infinote-sessions nil "Active infinote sessions with a server")
-(make-variable-buffer-local 'infinote-sessions)
+;(make-variable-buffer-local 'infinote-sessions)
 
 ;; session (document-buffer) locals
 (defvar infinote-group-name nil "Session group for this document")
@@ -104,7 +104,7 @@
 (defun infinote-set-major-mode ()
   (let ((mode (assoc-default (buffer-name) auto-mode-alist 'string-match)))
     (when mode
-      (set-auto-mode-0 mode tq)))))
+      (set-auto-mode-0 mode t))))
 
 (defun infinote-connected-p ()
   (and infinote-connection
@@ -146,7 +146,13 @@
       (infinote-find-file (buffer-name)))))
 
 (defun infinote-post-command ()
-  )
+  (let ((caret (point))
+	(selection (or (and mark-active
+			    (- (mark) (point)))
+		       0)))
+    (infinote-move-caret infinote-user-id caret selection)
+    (infinote-send-move-caret (- caret 1) selection)
+    (setq infinote-my-last-sent-vector (infinote-my-vector))))
 
 (defun infinote-close-session ()
   (when (buffer-live-p infinote-connection-buffer)
@@ -186,8 +192,8 @@
     (infinote-clean-up-connection)))
 
 (defun infinote-reconnect-to-server ()
-  (when infinote-connection
-      (infinote-disconnect-from-server))
+  (interactive)
+  (infinote-disconnect-from-server)
   (infinote-connect-to-server))
 
 (defun infinote-server-alive-p ()
@@ -356,6 +362,11 @@
                :hue ,infinote-hue)
    group))
 
+(defun infinote-send-move-caret (caret selection)
+  (infinote-send-request
+   `(move :caret ,caret
+	  :selection ,selection)))
+
 (defun infinote-send-insert (pos text)
   (infinote-send-request
    `(insert-caret :pos ,pos
@@ -413,7 +424,7 @@
       (with-current-buffer new-buffer
 	(setq contents (buffer-substring-no-properties (point-min) (point-max)))
 	(setq new-point (point))
-	(setq new-mark (mark)))
+	(setq new-mark (and mark-active (mark))))
       (kill-buffer new-buffer))
     (setq new-buffer (generate-new-buffer name))
     (with-current-buffer new-buffer
@@ -438,15 +449,17 @@
                                'hue hue
                                'caret caret
                                'selection selection
-                               'status status)))
+                               'status status
+			       'caret-overlay (make-overlay 0 0 nil t)
+			       'selection-overlay (make-overlay 0 0 nil t))))
+  (overlay-put (infinote-get-user-data id 'caret-overlay) 'face (infinote-user-caret-face id))
+  (overlay-put (infinote-get-user-data id 'selection-overlay) 'face (infinote-user-selection-face id))
   (when (equal name infinote-user-name)
     (setq infinote-user-id id)
     (unless (or infinote-syncing
 		(not (= (point-min) (point-max)))
                 (equal infinote-original-contents ""))
       (insert infinote-original-contents))
-    (goto-char infinote-original-point)
-    (set-mark infinote-original-mark)
     (setq infinote-syncing nil)))
 
 (defun infinote-read-vector (vector-string)
@@ -557,10 +570,10 @@
                      user-id
                      (lax-plist-put user-data field value)))))
 
-(defun infinote-hue-to-color (hue)
+(defun infinote-hue-to-color (hue &optional saturation value)
   "from hexrgb.el"
-  (let ((saturation 0.5)
-        (value 127))
+  (let ((saturation (or saturation 0.75))
+        (value (or (floor (* value 255)) 200)))
     (let (red green blue int-hue fract pp qq tt ww)
       (setq hue      (* hue 6.0)        ; Sectors: 0 to 5
             int-hue  (floor hue)
@@ -589,16 +602,22 @@
                          blue   qq)))
       (format "#%02x%02x%02x" red green blue))))
 
-(defun infinote-user-color (user-id)
+(defun infinote-user-color (user-id saturation value)
   (let* ((name (infinote-get-user-data user-id 'name))
          (cm-user (when (fboundp 'collab-user-from-username)
                     (collab-user-from-username name))))
     (if cm-user
         (collab-mode-cm-color-for-user cm-user)
-      (infinote-hue-to-color (infinote-get-user-data user-id 'hue)))))
+      (infinote-hue-to-color (infinote-get-user-data user-id 'hue) saturation value))))
 
 (defun infinote-user-face (user-id)
-    (list :background (infinote-user-color user-id)))
+  (list :background (infinote-user-color user-id 0.3 1.0)))
+
+(defun infinote-user-caret-face (user-id)
+  (list :background (infinote-user-color user-id 0.9 1.0)))
+
+(defun infinote-user-selection-face (user-id)
+  (list :background (infinote-user-color user-id 0.5 1.0)))
 
 (defun infinote-insert-segment (author-id text)
   (let ((infinote-inhibit-change-hooks t)
@@ -644,7 +663,8 @@
    ((member op '(delete delete-caret)) 'delete)
    ((member op '(insert insert-caret)) 'insert)
    ((member op '(undo undo-caret)) 'undo)
-   ((member op '(redo redo-caret)) 'redo)))
+   ((member op '(redo redo-caret)) 'redo)
+   ((member op '(move)) 'move)))
 
 (defun infinote-transform-operation (operation against-operation cid-is-op)
  "Get an operation transformed against another operation."
@@ -767,6 +787,10 @@
   (destructuring-bind (op pos len) operation
     (list op pos (infinote-affected-text currently-applicable-operation))))
 
+(defun infinote-move-caret (user-id caret selection)
+  (move-overlay (infinote-get-user-data user-id 'caret-overlay) caret (+ caret 1))
+  (move-overlay (infinote-get-user-data user-id 'selection-overlay) caret (+ caret selection)))
+
 (defun infinote-handle-request (user-id vector operation)
   (let ((request (list user-id vector operation)))
     (if syncing
@@ -774,6 +798,8 @@
           (push request infinote-request-log)
           (infinote-increment-my-vector user-id))
       (let ((op-type (infinote-op-type (car operation))))
+	(when (equal op-type 'move)
+	  (infinote-move-caret user-id (+ 1 (cadr operation)) (caddr operation)))
 	(when (member op-type '(undo redo))
 	  (infinote-find-file (buffer-name)))
         (when (member op-type '(insert delete))
@@ -830,7 +856,7 @@
               (welcome
                (infinote-send-explore 0))
               (explore-begin) ; not really needed
-              (explore-end ; not really needed
+              (explore-end
                (setq infinote-connection-ready t))
               (add-node
                ;; add node to file list
@@ -873,8 +899,8 @@
               (sync-end
 	       (when session-buffer
 		 (with-current-buffer session-buffer
-		   (goto-char infinote-original-point)
-		   (set-mark infinote-original-mark)))
+		   (goto-char (min infinote-original-point (point-max)))
+		   (set-mark (and infinote-original-mark (min infinote-original-mark (point-max))))))
                (when infinote-verbose (message (format "Session buffer %S" session-buffer)))
                (when session-buffer
                  (with-current-buffer session-buffer
