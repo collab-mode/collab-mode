@@ -33,6 +33,17 @@ so it doesn't rebroadcast itself into an infinite loop")
  (when collab-mode-cm-XMPP-username
   (collab-network-send-to-server nil "<xmpp friends>")))
 
+(defun collab-mode-cm-connect (username password)
+ (setq collab-mode-cm-network-connection
+  (collab-mode-network-connect))
+ (collab-list-users)
+ (if (and username password)
+  (collab-mode-cm-xmpp-login username password)
+  (collab-mode-cm-post-login)))
+
+(defun collab-mode-cm-post-login ()
+ (infinote-connect-to-server))
+
 (defun collab-mode-cm-xmpp-login (username password)
  "Perform XMPP login with provided username and password"
  (setq collab-mode-cm-last-attempted-login username)
@@ -149,22 +160,26 @@ so it doesn't rebroadcast itself into an infinite loop")
     `(:chat ,(collab-self-username) ,msg))
    t)))
 
+(defun collab-mode-cm-revert-user-list-buffer ()
+ (let ((buffer (get-buffer "*Collab Users*")))
+  (when buffer
+   ;; workaround for a bug where revert scrolls another window
+   (let* ((window (selected-window))
+          (start (window-start window)))
+    (with-current-buffer buffer
+     (revert-buffer t t t))
+    (set-window-start window start)))))
+
 (defun collab-mode-cm-new-users-received (users)
  (collab-self-user) ;; call this so that it can be re-cached if needed
  (setq collab-server-users users)
  (collab-restrict-cursors-to-users
   (mapcar #'collab-username-from-user collab-server-users))
- (let ((buffer (get-buffer "*Users*")))
-  (when buffer
-   (with-current-buffer buffer
-    (revert-buffer t t t)))))
+ (collab-mode-cm-revert-user-list-buffer))
 
 (defun collab-mode-cm-new-friends-received (friends)
  (setq collab-server-friends friends)
- (let ((buffer (get-buffer "*Users*")))
-  (when buffer
-   (with-current-buffer buffer
-    (revert-buffer t t t)))))
+ (collab-mode-cm-revert-user-list-buffer))
 
 (defun collab-mode-cm-new-rooms-received (rooms)
  (setq collab-server-rooms rooms))
@@ -181,8 +196,9 @@ so it doesn't rebroadcast itself into an infinite loop")
    (run-at-time 3 nil #'collab-mode-cm-update-friend-list)
    (run-at-time t 5 #'collab-mode-cm-update-friend-list)
    (setq infinote-user-name collab-mode-cm-XMPP-username)
-   (infinote-connect-to-server))
-  (setq collab-mode-cm-XMPP-username nil)))
+   (collab-mode-cm-update-user-list))
+  (setq collab-mode-cm-XMPP-username nil))
+ (collab-mode-cm-post-login))
 
 (defun collab-mode-cm-post-change-hook ()
  "send a cursor update if changed"
@@ -206,23 +222,29 @@ so it doesn't rebroadcast itself into an infinite loop")
  (collab-mode-cm-update-room-list)
  (collab-mode-cm-update-user-list))
 
-(defun collab-mode-cm-init ()
- "Initialization for the client model
-TBD: how many times is this called, and in what contexts"
+(defun collab-mode-cm-init-this-buffer ()
+ "Initialization for the client model"
+ (when (buffer-live-p collab-mode-cm-buffer)
+  (with-current-buffer collab-mode-cm-buffer
+   (collab-mode 0)))
  (setq collab-mode-cm-buffer (current-buffer))
- ;(set (make-local-variable 'collab-mode-cm-other-buffer)
-  ;(or other-buffer (get-buffer-create "*mirror*")))
- (set (make-local-variable 'collab-mode-cm-network-connection)
-  (collab-mode-network-connect "ec2.alcobb.com" 10068))
  (setq collab-mode-cm-text-to-be-changed "")
  (setq collab-server-users '())
  (setq collab-server-friends '())
  (setq collab-server-rooms '())
- (add-hook 'post-command-hook #'collab-mode-cm-post-change-hook nil t))
+ (add-hook 'post-command-hook #'collab-mode-cm-post-change-hook nil t)
+ (if (not infinote-mode)
+  (infinote-share-this-file)))
 
-(defun collab-mode-network-connect (host port)
- "connect to collabserver located at host:port"
- ;(infinote-init)
+(defun collab-mode-cm-deinit-this-buffer ()
+ (remove-hook 'post-command-hook #'collab-mode-cm-post-change-hook t)
+ (infinote-deinit-this-buffer))
+
+(defun collab-mode-connected-p ()
+ (when (boundp 'collab-server-process)
+  (process-live-p collab-server-process)))
+
+(defun collab-mode-network-connect ()
  (collab-network-connect-to-server)
  (collab-mode-cm-update-user-list)
  `(opaque-network-object ,(current-buffer)))

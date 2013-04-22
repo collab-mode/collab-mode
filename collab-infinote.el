@@ -89,6 +89,8 @@
     ;; (unless infinote-chat-buffer (infinote-join-chat))
     ;; (unless infinote-users-buffer (infinote-create-users-buffer))
 
+    (collab-mode t)
+
     (add-hook 'before-change-functions #'infinote-before-change nil t)
     (add-hook 'after-change-functions #'infinote-after-change nil t)
     (add-hook 'post-command-hook #'infinote-post-command nil t)
