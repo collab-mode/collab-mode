@@ -42,6 +42,8 @@ so it doesn't rebroadcast itself into an infinite loop")
   (collab-mode-cm-post-login)))
 
 (defun collab-mode-cm-post-login ()
+ (setq infinote-user-name (collab-self-username))
+ (setq infinote-hue (collab-mode-cm-hue-for-user (collab-self-user)))
  (infinote-connect-to-server))
 
 (defun collab-mode-cm-xmpp-login (username password)
@@ -52,12 +54,19 @@ so it doesn't rebroadcast itself into an infinite loop")
  (collab-mode-cm-update-user-list))
 
 (defun collab-mode-cm-rgb-to-color (r g b)
- (format "#%02x%02x%02x" r g b))
+ ;;(format "#%02x%02x%02x" r g b)
+ ;; err, it used to be rgb anyway...
+ (infinote-hue-to-color (/ r 255.0) 0.7 1.0))
 
 (defun collab-mode-cm-color-for-user (user)
  (pcase user
   (`(,num ,ip ,port ,username ,r ,g ,b . ,_)
    (collab-mode-cm-rgb-to-color r g b))))
+
+(defun collab-mode-cm-hue-for-user (user)
+ (pcase user
+  (`(,num ,ip ,port ,username ,r ,g ,b . ,_)
+   (/ r 255.0))))
 
 (defun collab-mode-cm-format-user (user)
  (pcase user
@@ -196,6 +205,8 @@ so it doesn't rebroadcast itself into an infinite loop")
    (run-at-time 3 nil #'collab-mode-cm-update-friend-list)
    (run-at-time t 5 #'collab-mode-cm-update-friend-list)
    (setq infinote-user-name collab-mode-cm-XMPP-username)
+   (setq infinote-hue
+    (collab-mode-cm-hue-for-user (collab-self-user)))
    (collab-mode-cm-update-user-list))
   (setq collab-mode-cm-XMPP-username nil))
  (collab-mode-cm-post-login))
