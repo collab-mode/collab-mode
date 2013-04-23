@@ -32,6 +32,7 @@
 (defvar infinote-connection-buffer nil "Process buffer for connection to server")
 (defvar infinote-connection-ready nil "non-nil when the connection auth'd and handshook")
 (defvar infinote-verbose nil "Print debug messages")
+(defvar infinote-max-op-eval-depth 10 "Sometimes a rebase just isn't worth it")
 
 ;; connection (process-buffer) locals
 (defvar infinote-nodes nil "Nodes (documents and subdirectories) on a server")
@@ -805,7 +806,8 @@
 	(when (member op-type '(undo redo))
 	  (infinote-find-file (buffer-name)))
         (when (member op-type '(insert delete))
-          (let ((my-vector (infinote-my-vector)))
+          (let ((my-vector (infinote-my-vector))
+                (max-lisp-eval-depth infinote-max-op-eval-depth))
             (if (infinote-can-apply vector my-vector)
                 (let ((translated-operation (infinote-translate-operation user-id vector my-vector operation)))
                   (infinote-apply-operation user-id translated-operation)
