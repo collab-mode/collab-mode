@@ -34,12 +34,12 @@ select {
     position: absolute;
     top: 0;
     left: 0;
-    width: calc(100%);
-    height: calc(100% - 46px);
+    width: -webkit-calc(100%);
+    height: -webkit-calc(100% - 46px);
     overflow: auto;
 }
 #log .in {
-    width: calc(100% - 20px);
+    width: -webkit-calc(100% - 20px);
     margin: 10px;
     background-color: #cfc;
     white-space: pre-wrap;       /* css-3 */
@@ -49,7 +49,7 @@ select {
     word-wrap: break-word;       /* Internet Explorer 5.5+ */
 }
 #log .out {
-    width: calc(100% - 20px);
+    width: -webkit-calc(100% - 20px);
     margin: 10px;
     background-color: #fcc;
     white-space: pre-wrap;       /* css-3 */
@@ -61,7 +61,7 @@ select {
 #editor-container {
     position: relative;
     width: 100%;
-    height: calc(100% - 46px);
+    height: -webkit-calc(100% - 46px);
     margin: auto;
 }
 #editor {
@@ -84,7 +84,7 @@ select {
 #login-box {
     /*position: absolute;
       */
-    margin-left: calc(50% - 200px);
+    margin-left: -webkit-calc(50% - 200px);
     margin-right: auto;
     margin-top: 100px;
     padding-top: 30px;
