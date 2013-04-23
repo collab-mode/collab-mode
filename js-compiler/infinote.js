@@ -164,7 +164,7 @@ function ace_init(file) {
         jsx: ["JSX", "jsx", "text/x-jsx", "other"],
         latex: ["LaTeX", "latex|tex|ltx|bib", "application/x-latex", "other"],
         less: ["LESS", "less", "text/x-less"],
-        lisp: ["Lisp", "\\*scratch\\*|lisp|scm|rkt|el", "text/x-lisp", "other"],
+        lisp: ["Lisp", "*\\*scratch\\*|lisp|scm|rkt|el", "text/x-lisp", "other"],
         liquid: ["Liquid", "liquid", "text/x-liquid", "other"],
         lua: ["Lua", "lua", "text/x-lua"],
         luapage: ["LuaPage", "lp", "text/x-luapage", "other"],
