@@ -131,8 +131,10 @@ function FN_current_buffer() {
     return $current_buffer;
 }
 
-function FN_infinote_mode() {}
-infinote_mode = false;
+function FN_infinote_mode() {
+    FN_infinote_init_this_buffer();
+    infinote_mode = true;
+}
 
 var $editor;
 function ace_init(file) {
@@ -265,6 +267,7 @@ $(function() {
         ace_init(file);
 
         FN_infinote_connect_to_server(function() {
+            console.log("FIND ME " + file);
             FN_infinote_find_file(file);
         });
 
@@ -289,3 +292,15 @@ function toggle_log() {
         });
     }
 }
+
+function FN_windows_showing_buffer() {
+    return false;
+}
+
+function FN_infinote_set_major_mode() {}
+function FN_infinote_user_selection_face() {}
+function FN_infinote_user_caret_face() {}
+function FN_infinote_user_face() {}
+function FN_infinote_send_move_caret() {}
+function FN_infinote_move_caret() {}
+infinote_max_op_eval_depth = 7;

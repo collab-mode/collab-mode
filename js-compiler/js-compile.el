@@ -376,46 +376,10 @@
           infinote-handle-group-command
           infinote-cid-is-op
           infinote-split-operation
-
-collab-mode-cm-update-room-list
-collab-mode-cm-update-user-list
-collab-mode-cm-update-friend-list
-collab-mode-cm-connect
-collab-mode-cm-post-login
-collab-mode-cm-xmpp-login
-collab-mode-cm-rgb-to-color
-collab-mode-cm-color-for-user
-collab-mode-cm-hue-for-user
-collab-mode-cm-format-user
-collab-server-friends-minus-server-users
-collab-users
-collab-user-from-username
-collab-username-from-user
-collab-self-user
-collab-self-username
-collab-mode-cm-chat-font-for-username
-string/starts-with
-string/ends-with
-collab-friends-matching-prefix
-collab-mode-cm-send-chat
-collab-mode-cm-revert-user-list-buffer
-collab-mode-cm-new-users-received
-collab-mode-cm-new-friends-received
-collab-mode-cm-new-rooms-received
-collab-mode-cm-current-room
-collab-mode-cm-login-status-changed
-collab-mode-cm-post-change-hook
-collab-invite-user
-collab-mode-cm-invite-received
-collab-mode-cm-init-this-buffer
-collab-mode-cm-deinit-this-buffer
-collab-mode-connected-p
-collab-mode-network-connect
-
-collab-network-connect-to-server
-collab-network-receive-from-server
-collab-network-send-to-server
-collab-network-send-string-to-server
+          infinote-share-this-file
+          infinote-active-group-p
+          infinote-connected-p
+          infinote-init-this-buffer
 
           xmlgen
           xmlgen-extract-plist
@@ -435,7 +399,6 @@ collab-network-send-string-to-server
         '(
           infinote-server
           infinote-port
-          infinote-user-name
           infinote-hue
           infinote-connection
           infinote-connection-buffer
@@ -454,6 +417,7 @@ collab-network-send-string-to-server
           infinote-inhibit-change-hooks
           infinote-before-change-text
           infinote-syncing
+          infinote-mode
 
           xmlgen-escape-attribute-vals
           xmlgen-escape-elm-vals
@@ -489,8 +453,6 @@ collab-network-send-string-to-server
           ))
        (make-buffer-local-vars
         '(
-          infinote-nodes
-          infinote-sessions
           infinote-group-name
           infinote-node-id
           infinote-node-type
@@ -501,7 +463,13 @@ collab-network-send-string-to-server
           infinote-my-last-sent-vector
           infinote-inhibit-change-hooks
           infinote-text-before-change
-          infinote-syncing))
+          infinote-syncing
+          infinote-original-contents
+          infinote-original-mark
+          infinote-original-point
+          infinote-original-windows
+          infinote-sync-finished
+          ))
        (result (apply #'concat
                 `(,@(loop for sym in interesting-functions
                      collect

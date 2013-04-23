@@ -30,6 +30,7 @@ select {
     width: 200px;
 }
 #log {
+    background-color: #fff;
     position: absolute;
     top: 0;
     left: 0;

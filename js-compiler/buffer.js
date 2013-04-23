@@ -22,6 +22,7 @@ function Buffer(name) {
     this.name = name;
     this.env = {};
     this.render_hook = false;
+    this.killed = false;
 
     for (var key in $buffer_var_initialized_values) {
         this.env[key] = $buffer_var_initialized_values[key];
@@ -344,6 +345,12 @@ function FN_generate_new_buffer(name) {
     var i = 1;
     var new_name = name;
     while(true) {
+        if (new_name in $named_buffers &&
+            $named_buffers[new_name].killed) {
+
+            $named_buffers[new_name].killed = false;
+            return $named_buffers[new_name];
+        }
         if (!(new_name in $named_buffers)) {
             var buf = new Buffer(new_name);
             $named_buffers[new_name] = buf;
@@ -420,3 +427,47 @@ function FN_replace_match(newtext, fixed, literal) {
     FN_goto_char(start);
     FN_insert(newtext);
 }
+
+function FN_process_live_p(p) {
+    if (p instanceof WebSocket) {
+        return p.readyState === p.OPEN;
+    }
+    return false;
+}
+
+function FN_buffer_name(buffer) {
+    if (buffer instanceof Buffer) {
+        return buffer.name;
+    }
+    return false;
+}
+
+function FN_kill_buffer(buffer) {
+    buffer.str = '';
+    buffer.killed = true;
+    for (var key in $buffer_var_initialized_values) {
+        buffer.env[key] = $buffer_var_initialized_values[key];
+    }
+}
+
+function FN_switch_to_buffer() {}
+
+function FN_make_overlay() {
+    return false;
+}
+
+function FN_set_window_buffer() {}
+
+function FN_set_mark() {}
+
+function FN_propertize(str) {
+    return str;
+}
+
+function FN_overlay_put() {}
+function FN_put_text_property() {}
+function FN_mark() {
+    return false;
+}
+
+mark_active = false;

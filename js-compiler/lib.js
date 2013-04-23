@@ -550,6 +550,10 @@ function FN_remove(e, l) {
     return start;
 }
 
+function FN_min() {
+    return Math.min.apply(this, arguments);
+}
+
 function test_functions() {
     console.log("Testing functions...");
     var good = 0;
