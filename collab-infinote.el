@@ -37,6 +37,7 @@
 (defvar infinote-connection-ready nil "non-nil when the connection auth'd and handshook")
 (defvar infinote-verbose nil "Print debug messages")
 (defvar infinote-max-op-eval-depth 10 "Sometimes a rebase just isn't worth it")
+(defcustom infinote-disable-collab-mode nil "Infinote-only" :group 'infinote :type 'boolean)
 
 ;; connection (process-buffer) locals
 (defvar infinote-nodes nil "Nodes (documents and subdirectories) on a server")
@@ -102,7 +103,8 @@
     ;; (unless infinote-chat-buffer (infinote-join-chat))
     ;; (unless infinote-users-buffer (infinote-create-users-buffer))
 
-    (collab-mode t)
+    (unless infinote-disable-collab-mode
+      (collab-mode t))
 
     (add-hook 'before-change-functions #'infinote-before-change nil t)
     (add-hook 'after-change-functions #'infinote-after-change nil t)
@@ -377,7 +379,7 @@
    `(user-join :seq "0"
                :name ,name
                :status "active"
-               :time ,(infinote-vector-to-string (infinote-my-vector))
+               :time ,(infinote-vector-to-string infinote-sync-vector)
                :caret "0"
                :hue ,infinote-hue)
    group))
