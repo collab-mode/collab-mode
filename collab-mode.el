@@ -172,6 +172,12 @@ users, checks which are connected, and returns the appropriate list of entries."
 
 (defun collab-insert-share-URL ()
  (interactive)
- (insert "http://collab-mode.com/collab-js?room=main"))
+ (insert
+  "http://collab-mode.com/collab-js/"
+   (if (buffer-live-p collab-mode-cm-buffer)
+    (concat "#"
+     (url-hexify-string
+      (buffer-name collab-mode-cm-buffer)))
+    "")))
 
 (provide 'collab-mode)

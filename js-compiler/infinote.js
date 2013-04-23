@@ -1,5 +1,4 @@
 function FN_infinote_connect_to_server(callback) {
-    return;
     if (infinote_connection !== false &&
         infinote_connection.readyState !== 3) {
         return;
@@ -250,4 +249,43 @@ function ace_init(file) {
             }
         });
     });
+}
+
+$(function() {
+    init();
+    var room = unescape(window.location.hash).substring(1);
+    $("#room-input").val(room);
+
+    $("#login-box input[type=submit]").on('click', function (e) {
+        $("#login-box").hide();
+        $("#main-app").show();
+
+        var file = $("#room-input").val();
+        infinote_user_name = $("#username-input").val();
+        ace_init(file);
+
+        FN_infinote_connect_to_server(function() {
+            FN_infinote_find_file(file);
+        });
+
+        $editor.focus();
+
+        e.preventDefault();
+        return false;
+    });
+    $("#username-input").focus();
+});
+
+function toggle_log() {
+    var log = $("#log");
+    var ed = $("#editor");
+    if (log.is(":visible")) {
+        log.fadeOut(100, function() {
+            ed.fadeIn(100);
+        });
+    } else {
+        ed.fadeOut(100, function() {
+            log.fadeIn(100);
+        });
+    }
 }

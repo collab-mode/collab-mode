@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+ <head>
+  <title>collab-mode.el</title>
+  <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script src="http://rawgithub.com/ajaxorg/ace-builds/master/src-noconflict/ace.js" type="text/javascript" charset="utf-8"></script>
+  <script src="reader.js"></script>
+  <script src="lib.js"></script>
+  <script src="buffer.js"></script>
+  <script src="_compiled.js"></script>
+  <script src="infinote.js"></script>
+  <link rel="stylesheet" type="text/css" href="style.css">
+ </head>
+ <body>
+  <div id="login-box">
+   <h2>collab-mode-js</h2>
+   <form>
+    <table>
+     <tr>
+      <td><label for="room">room: </label></td>
+      <td><input id="room-input" name="room"></td>
+     </tr>
+     <tr>
+      <td><label for="username">username: </label></td>
+      <td><input id="username-input" name="username"></td>
+     </tr>
+     <tr>
+      <td></td>
+      <td><input type="submit" value="Connect" onclick="return false;"></td>
+     </tr>
+    </table>
+   </form>
+  </div>
+  <div id="main-app" style="display: none;">
+   <div id="editor-container">
+    <div id="editor"></div>
+   </div>
+   <!--<button id="chat-button" onclick="toggle_log()">chat</button>-->
+   <button id="log-button" onclick="toggle_log()">log</button>
+   <div id="connection-status-wrapper">
+    <div id="connection-status">Disconnected</div>
+   </div>
+   <select id="mode-select"></select>
+   <div id="log" style="display: none;">
+   </div>
+  </div>
+ </body>
+</html>
