@@ -1001,7 +1001,7 @@
 			(unless syncing (infinote-diff-user-vector user-id vector-diff))
 			(let ((request-vector (if syncing vector-diff (infinote-user-vector user-id))))
 			  (infinote-handle-request user-id request-vector (infinote-xml-to-operation operation-xml)))))))))
-      (nil (when session-buffer (with-current-buffer session-buffer (infinote-share-this-file)))))))
+      (error (when session-buffer (with-current-buffer session-buffer (infinote-share-this-file)))))))
 
 (defun infinote-test-session ()
   (with-current-buffer (get-buffer-create " *test-results*")
