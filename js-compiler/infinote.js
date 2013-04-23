@@ -164,7 +164,7 @@ function ace_init(file) {
         jsx: ["JSX", "jsx", "text/x-jsx", "other"],
         latex: ["LaTeX", "latex|tex|ltx|bib", "application/x-latex", "other"],
         less: ["LESS", "less", "text/x-less"],
-        lisp: ["Lisp", "lisp|scm|rkt|el", "text/x-lisp", "other"],
+        lisp: ["Lisp", "*scratch*|lisp|scm|rkt|el", "text/x-lisp", "other"],
         liquid: ["Liquid", "liquid", "text/x-liquid", "other"],
         lua: ["Lua", "lua", "text/x-lua"],
         luapage: ["LuaPage", "lp", "text/x-luapage", "other"],
@@ -204,15 +204,27 @@ function ace_init(file) {
     mode_array.sort(function(a, b) {
         return SupportedModes[a][0].localeCompare(SupportedModes[b][0]);
     });
+    var selected_mode = "text";
     for (var i = 0; i < mode_array.length; i++) {
         $("<option/>")
             .attr("value", mode_array[i])
             .text(SupportedModes[mode_array[i]][0])
             .appendTo("#mode-select");
+
+        var pattern = SupportedModes[mode_array[i]][1];
+        var subPatterns = pattern.split('|');
+        for (var j = 0; j < subPatterns.length; j++) {
+            var p = subPatterns[j];
+            if (p[0] === '*') {
+                p = '^' + p.substring(1) + '$';
+            } else {
+                p = '\\.' + p + '$';
+            }
+            if (file.match(p)) {
+                selected_mode = mode_array[i];
+            }
+        }
     }
-    $("#mode-select").val("text").change(function() {
-        $editor.getSession().setMode("ace/mode/" + $("#mode-select").val());
-    });
 
     document.title = file;
 
@@ -252,6 +264,11 @@ function ace_init(file) {
                 FN_infinote_after_change(start + 1, start + 1, end - start);
             }
         });
+    });
+
+    $editor.getSession().setMode("ace/mode/" + selected_mode);
+    $("#mode-select").val(selected_mode).change(function() {
+        $editor.getSession().setMode("ace/mode/" + $("#mode-select").val());
     });
 }
 
