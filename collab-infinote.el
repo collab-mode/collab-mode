@@ -69,6 +69,10 @@
 (make-variable-buffer-local 'infinote-original-mark)
 (defvar infinote-original-point 1 "The buffer point before syncing with the infinote server")
 (make-variable-buffer-local 'infinote-original-point)
+(defvar infinote-original-windows '() "The windows that should be displaed")
+(make-variable-buffer-local 'infinote-original-windows)
+(defvar infinote-sync-finished nil "bool saying sync happened")
+(make-variable-buffer-local 'infinote-sync-finished)
 
 (define-minor-mode infinote-mode
   "infinote"
@@ -228,6 +232,10 @@
 (defun infinote-wait-for-connection ()
   (while (and infinote-connection
               (not infinote-connection-ready))
+    (accept-process-output infinote-connection)))
+
+(defun infinote-wait-for-resync-finish ()
+  (while (not infinote-sync-finished)
     (accept-process-output infinote-connection)))
 
 (defun infinote-filter (network-process string)
@@ -418,15 +426,24 @@
          finally return vector-strings)
    ";"))
 
+(defun windows-showing-buffer (buf)
+ (apply #'append
+  (loop for frame in (frame-list)
+   collect (loop for window in (window-list frame)
+            if (eq (window-buffer window) buf)
+            collect window))))
+
 (defun infinote-create-session (name id group-name)
   (let ((new-buffer (get-buffer name))
 	(contents "")
 	(new-point 1)
+        (buffer-windows '())
 	new-mark)
     (when new-buffer
       (with-current-buffer new-buffer
 	(setq contents (buffer-substring-no-properties (point-min) (point-max)))
 	(setq new-point (point))
+        (setq buffer-windows (windows-showing-buffer new-buffer))
 	(setq new-mark (and mark-active (mark))))
       (kill-buffer new-buffer))
     (setq new-buffer (generate-new-buffer name))
@@ -438,6 +455,7 @@
       (setq infinote-original-contents contents)
       (setq infinote-original-mark new-mark)
       (setq infinote-original-point new-point)
+      (setq infinote-original-windows buffer-windows)
       (unless infinote-mode (infinote-mode))
       (switch-to-buffer (current-buffer)))
     (setq infinote-sessions (lax-plist-put infinote-sessions group-name new-buffer))))
@@ -906,7 +924,11 @@
                       (when session-buffer
                         (with-current-buffer session-buffer
                           (goto-char (min infinote-original-point (point-max)))
-                          (set-mark (and infinote-original-mark (min infinote-original-mark (point-max))))))
+                          (set-mark (and infinote-original-mark (min infinote-original-mark (point-max))))
+                          (loop for window in infinote-original-windows
+                            do (set-window-buffer window session-buffer))
+                          (setq infinote-sync-finished t)
+                         (setq infinote-original-windows nil)))
                       (when infinote-verbose (message (format "Session buffer %S" session-buffer)))
                       (when session-buffer
                         (with-current-buffer session-buffer
