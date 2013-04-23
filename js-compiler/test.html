@@ -6,7 +6,7 @@
   <script src="http://rawgithub.com/ajaxorg/ace-builds/master/src-noconflict/ace.js" type="text/javascript" charset="utf-8"></script>
   <script src="lib.js"></script>
   <script src="buffer.js"></script>
-  <script src="tmp"></script>
+  <script src="_compiled.js"></script>
   <script src="infinote.js"></script>
   <!--<script>console.log(FN_xmlgen(FN_list("p", ":class", "big")));</script>-->
   <script>
@@ -47,6 +47,15 @@
    float: left;
    height: 26px;
    width: 80px;
+   }
+   #connection-status-wrapper {
+   margin-top: 10px;
+   margin-left: 10px;
+   float: left;
+   line-height: 26px;
+   }
+   #connection-status {
+   font-family: Sans;
    }
    select {
    margin-top: 10px;
@@ -104,6 +113,9 @@
   </div>
   <button id="chat-button" onclick="toggle_log()">chat</button>
   <button id="log-button" onclick="toggle_log()">log</button>
+  <div id="connection-status-wrapper">
+   <div id="connection-status">Disconnected</div>
+  </div>
   <select id="mode-select"></select>
   <div id="log" style="display: none;">
   </div>

@@ -7,7 +7,24 @@ function FN_infinote_connect_to_server(callback) {
     var url = 'ws://' + /*infinote_server*/ 'collab-mode.com' + ':' +
         (infinote_port + 1);
     var connection = new WebSocket(url, ['binary']);
+
+    var update_state_ui = function() {
+        switch (connection.readyState) {
+        case connection.CONNECTING:
+            $("#connection-status").text("Connecting...");
+            break;
+        case connection.OPEN:
+            $("#connection-status").text("Connected.");
+            break;
+        case connection.CLOSING:
+        case connection.CLOSED:
+            $("#connection-status").text("Connection closed.");
+            break;
+        }
+    };
+
     connection.onopen = function() {
+        update_state_ui();
         console.log("socket opened");
         FN_infinote_send_stream_header(infinote_server);
 
@@ -15,7 +32,7 @@ function FN_infinote_connect_to_server(callback) {
         var interval_id = window.setInterval(function() {
             count++;
             with_current_buffer(connection.buffer, function() {
-                if (count > 100 || !infinote_connection) {
+                if (count > 1000 || !infinote_connection) {
                     console.log("giving up waiting for handshake");
                     clearInterval(interval_id);
                 } else if (infinote_connection_ready) {
@@ -28,8 +45,12 @@ function FN_infinote_connect_to_server(callback) {
         }, 300);
     };
     connection.onerror = function(error) {
+        update_state_ui();
         console.log("socket error", error);
     };
+    connection.onclose = function() {
+        update_state_ui();
+    }
     connection.onmessage = function(msg) {
         infinote_filter(msg.data);
     };
@@ -205,19 +226,27 @@ function ace_init(file) {
         var start = $editor.session.doc.positionToIndex(e.data.range.start);
         var end = $editor.session.doc.positionToIndex(e.data.range.end);
 
+        console.log(e.data);
+
         with_current_buffer(buffer, function() {
             if (e.data.action === "insertText" || e.data.action === "insertLines") {
-                with_current_buffer
                 FN_infinote_before_change(start + 1, start + 1);
                 $current_buffer.str = $editor.getValue();
                 FN_infinote_after_change(start + 1, end + 1, 0);
-            } else if (e.data.action === "removeText" || e.data.action === "removeLines") {
+            } else if (e.data.action === "removeText") {
+                end = start + e.data.text.length;
+                FN_infinote_before_change(start + 1, end + 1);
+                $current_buffer.str = $editor.getValue();
+                FN_infinote_after_change(start + 1, start + 1, end - start);
+            } else if (e.data.action === "removeLines") {
+                end = start;
+                for (var l = 0; l < e.data.lines.length; l++) {
+                    end += e.data.lines[l].length + e.data.nl.length;
+                }
                 FN_infinote_before_change(start + 1, end + 1);
                 $current_buffer.str = $editor.getValue();
                 FN_infinote_after_change(start + 1, start + 1, end - start);
             }
         });
-
-        console.log(e.data);
     });
 }

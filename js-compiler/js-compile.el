@@ -476,4 +476,4 @@
   (c-mode)
   (insert result)
   ;;(indent-region (point-min) (point-max))
-  (write-region nil nil "tmp")))
+  (write-region nil nil "_compiled.js")))
