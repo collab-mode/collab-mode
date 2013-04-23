@@ -1,5 +1,8 @@
 ;;; -*- lexical-binding: t -*-
 
+(load-file "../xml.el")
+(load-file "../xmlgen.el")
+
 (defvar js-uninterned-sym-trans-table nil)
 (defun js-uninterned-sym-trans (sym)
  (or
@@ -22,6 +25,7 @@
       (`?_ "$_")
       (`?> "$GT_")
       (`?< "$LT_")
+      (`?/ "$SLASH_")
       (`?= "$EQ_")
       (`?+ "$PLUS_")
       (`?? "$HUH_")

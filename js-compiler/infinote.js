@@ -4,7 +4,7 @@ function FN_infinote_connect_to_server(callback) {
         return;
     }
 
-    var url = 'ws://' + /*infinote_server*/ 'localhost' + ':' +
+    var url = 'ws://' + /*infinote_server*/ 'collab-mode.com' + ':' +
         (infinote_port + 1);
     var connection = new WebSocket(url, ['binary']);
     connection.onopen = function() {
