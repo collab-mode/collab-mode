@@ -41,10 +41,9 @@ so it doesn't rebroadcast itself into an infinite loop")
  (setq collab-mode-cm-network-connection
   (collab-mode-network-connect))
  (setq collab-mode-cm-should-finish-login-after-users t)
- (collab-list-users)
+ (collab-list-users t)
  (if (and username password)
-  (collab-mode-cm-xmpp-login username password)
-  (collab-mode-cm-post-login)))
+  (collab-mode-cm-xmpp-login username password)))
 
 (defun collab-mode-cm-post-login ()
  (setq infinote-user-name (collab-self-username))
