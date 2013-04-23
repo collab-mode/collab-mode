@@ -43,12 +43,12 @@ changed$HUH_ = arg$changed$HUH_;
 var old$inserted$HUH_ = ((typeof(inserted$HUH_) !== 'undefined') ? inserted$HUH_ : undefined);
 inserted$HUH_ = arg$inserted$HUH_;
 try {
-return ((((false), ((function (arg$exp4440044401) {
-var old$exp4440044401 = ((typeof(exp4440044401) !== 'undefined') ? exp4440044401 : undefined);
-exp4440044401 = arg$exp4440044401;
+return ((((false), ((function (arg$exp6922869229) {
+var old$exp6922869229 = ((typeof(exp6922869229) !== 'undefined') ? exp6922869229 : undefined);
+exp6922869229 = arg$exp6922869229;
 try {
-return ((((exp4440044401) !== false) ? (exp4440044401) : ((FN_signal)(("cl-assertion-failed"), ((FN_list)((FN_cons(">=", FN_cons("end", FN_cons("start", false))))))))));
-} finally {exp4440044401 = old$exp4440044401;
+return ((((exp6922869229) !== false) ? (exp6922869229) : ((FN_signal)(("cl-assertion-failed"), ((FN_list)((FN_cons(">=", FN_cons("end", FN_cons("start", false))))))))));
+} finally {exp6922869229 = old$exp6922869229;
 }})(((FN_$GT_$EQ_)((end), (start))))), (false))),
 (((changed$HUH_) !== false) ? ((FN_infinote_local_delete)((start), (infinote_before_change_text))) : (false)),
 (((inserted$HUH_) !== false) ? ((FN_infinote_local_insert)((start), (insert_text))) : (false)));
@@ -103,12 +103,12 @@ group = arg$group;
 try {
 return (((FN_infinote_send_xml)(((FN_list)(("group"), (":name"), (group), (":publisher"), ("you"), (xml_data))))));
 } finally {group = old$group;
-}})(((function (arg$exp4440244403) {
-var old$exp4440244403 = ((typeof(exp4440244403) !== 'undefined') ? exp4440244403 : undefined);
-exp4440244403 = arg$exp4440244403;
+}})(((function (arg$exp6923069231) {
+var old$exp6923069231 = ((typeof(exp6923069231) !== 'undefined') ? exp6923069231 : undefined);
+exp6923069231 = arg$exp6923069231;
 try {
-return ((((exp4440244403) !== false) ? (exp4440244403) : (infinote_group_name)));
-} finally {exp4440244403 = old$exp4440244403;
+return ((((exp6923069231) !== false) ? (exp6923069231) : (infinote_group_name)));
+} finally {exp6923069231 = old$exp6923069231;
 }})((group_name))))));
 } finally {xml_data = old$xml_data;
 group_name = old$group_name;
@@ -293,22 +293,22 @@ return (((function (arg$new_buffer) {
 var old$new_buffer = ((typeof(new_buffer) !== 'undefined') ? new_buffer : undefined);
 new_buffer = arg$new_buffer;
 try {
-return (((((function (arg$exp4440444405) {
-var old$exp4440444405 = ((typeof(exp4440444405) !== 'undefined') ? exp4440444405 : undefined);
-exp4440444405 = arg$exp4440444405;
+return (((((function (arg$exp6923269233) {
+var old$exp6923269233 = ((typeof(exp6923269233) !== 'undefined') ? exp6923269233 : undefined);
+exp6923269233 = arg$exp6923269233;
 try {
-return ((((exp4440444405) !== false) ? (exp4440444405) : ((FN_save_current_buffer_fn)(((function () {
+return ((((exp6923269233) !== false) ? (exp6923269233) : ((FN_save_current_buffer_fn)(((function () {
 try {
 return (((FN_set_buffer)((new_buffer))),
-((function (arg$exp4440644407) {
-var old$exp4440644407 = ((typeof(exp4440644407) !== 'undefined') ? exp4440644407 : undefined);
-exp4440644407 = arg$exp4440644407;
+((function (arg$exp6923469235) {
+var old$exp6923469235 = ((typeof(exp6923469235) !== 'undefined') ? exp6923469235 : undefined);
+exp6923469235 = arg$exp6923469235;
 try {
-return ((((exp4440644407) !== false) ? (exp4440644407) : (infinote_node_id)));
-} finally {exp4440644407 = old$exp4440644407;
+return ((((exp6923469235) !== false) ? (exp6923469235) : (infinote_node_id)));
+} finally {exp6923469235 = old$exp6923469235;
 }})(((FN_not)((infinote_mode))))));
 } finally {}}))))));
-} finally {exp4440444405 = old$exp4440444405;
+} finally {exp6923269233 = old$exp6923269233;
 }})(((FN_not)((new_buffer))))) !== false) ? ((new_buffer=((FN_generate_new_buffer)((name))))) : (false)),
 ((FN_save_current_buffer_fn)(((function () {
 try {
@@ -343,12 +343,12 @@ var old$status = ((typeof(status) !== 'undefined') ? status : undefined);
 status = arg$status;
 try {
 return (((infinote_users=((FN_lax_plist_put)((infinote_users), (id), ((FN_list)(("name"), (name), ("id"), (id), ("vector"), (((((syncing) !== false) ? ((FN_equal)((name), (infinote_user_name))) : (false)) !== false) ? (false) : (vector)), ("hue"), (hue), ("caret"), (caret), ("selection"), (selection), ("status"), (status))))))),
-((((FN_equal)((name), (infinote_user_name))) !== false) ? (((false), ((infinote_user_id=(id))), ((((function (arg$exp4440844409) {
-var old$exp4440844409 = ((typeof(exp4440844409) !== 'undefined') ? exp4440844409 : undefined);
-exp4440844409 = arg$exp4440844409;
+((((FN_equal)((name), (infinote_user_name))) !== false) ? (((false), ((infinote_user_id=(id))), ((((function (arg$exp6923669237) {
+var old$exp6923669237 = ((typeof(exp6923669237) !== 'undefined') ? exp6923669237 : undefined);
+exp6923669237 = arg$exp6923669237;
 try {
-return ((((exp4440844409) !== false) ? (exp4440844409) : ((FN_$EQ_)(((FN_point_min)()), ((FN_point_max)())))));
-} finally {exp4440844409 = old$exp4440844409;
+return ((((exp6923669237) !== false) ? (exp6923669237) : ((FN_$EQ_)(((FN_point_min)()), ((FN_point_max)())))));
+} finally {exp6923669237 = old$exp6923669237;
 }})((infinote_syncing))) !== false) ? (false) : ((FN_infinote_local_insert)((1), ((FN_buffer_substring_no_properties)(((FN_point_min)()), ((FN_point_max)())))))), ((infinote_syncing=(false))))) : (false)));
 } finally {name = old$name;
 id = old$id;
@@ -476,13 +476,13 @@ return (((function (arg$user_operation) {
 var old$user_operation = ((typeof(user_operation) !== 'undefined') ? user_operation : undefined);
 user_operation = arg$user_operation;
 try {
-return (((function (arg$__cl_var__44410) {
-var old$__cl_var__44410 = ((typeof(__cl_var__44410) !== 'undefined') ? __cl_var__44410 : undefined);
-__cl_var__44410 = arg$__cl_var__44410;
+return (((function (arg$__cl_var__69238) {
+var old$__cl_var__69238 = ((typeof(__cl_var__69238) !== 'undefined') ? __cl_var__69238 : undefined);
+__cl_var__69238 = arg$__cl_var__69238;
 try {
-return (((function (arg$__cl_var__44411) {
-var old$__cl_var__44411 = ((typeof(__cl_var__44411) !== 'undefined') ? __cl_var__44411 : undefined);
-__cl_var__44411 = arg$__cl_var__44411;
+return (((function (arg$__cl_var__69239) {
+var old$__cl_var__69239 = ((typeof(__cl_var__69239) !== 'undefined') ? __cl_var__69239 : undefined);
+__cl_var__69239 = arg$__cl_var__69239;
 try {
 return (((function () {
 try {
@@ -496,13 +496,13 @@ try {
 return (((FN_not)(((FN_equal)((op_count), ((FN_infinote_operation_count)((user_id), (vector_1))))))));
 } finally {user_id = old$user_id;
 op_count = old$op_count;
-}})(((FN_car)((user_operation))), ((FN_cadr)((user_operation))))) !== false) ? ((__cl_var__44411=(false), ((__cl_var__44410=(false))))) : (true)) : (false)) !== false) {(user_operation=((FN_cddr)((user_operation))))};
+}})(((FN_car)((user_operation))), ((FN_cadr)((user_operation))))) !== false) ? ((__cl_var__69239=(false), ((__cl_var__69238=(false))))) : (true)) : (false)) !== false) {(user_operation=((FN_cddr)((user_operation))))};
 })()),
-(((__cl_var__44410) !== false) ? (true) : (__cl_var__44411)));
+(((__cl_var__69238) !== false) ? (true) : (__cl_var__69239)));
 } finally {}})()));
-} finally {__cl_var__44411 = old$__cl_var__44411;
+} finally {__cl_var__69239 = old$__cl_var__69239;
 }})((false))));
-} finally {__cl_var__44410 = old$__cl_var__44410;
+} finally {__cl_var__69238 = old$__cl_var__69238;
 }})((true))));
 } finally {user_operation = old$user_operation;
 }})((vector_2))));
@@ -685,12 +685,12 @@ user_id = arg$user_id;
 var old$vector = ((typeof(vector) !== 'undefined') ? vector : undefined);
 vector = arg$vector;
 try {
-return (((function (arg$exp4441244413) {
-var old$exp4441244413 = ((typeof(exp4441244413) !== 'undefined') ? exp4441244413 : undefined);
-exp4441244413 = arg$exp4441244413;
+return (((function (arg$exp6924069241) {
+var old$exp6924069241 = ((typeof(exp6924069241) !== 'undefined') ? exp6924069241 : undefined);
+exp6924069241 = arg$exp6924069241;
 try {
-return ((((exp4441244413) !== false) ? (exp4441244413) : (0)));
-} finally {exp4441244413 = old$exp4441244413;
+return ((((exp6924069241) !== false) ? (exp6924069241) : (0)));
+} finally {exp6924069241 = old$exp6924069241;
 }})(((FN_lax_plist_get)((vector), (user_id))))));
 } finally {user_id = old$user_id;
 vector = old$vector;
@@ -701,36 +701,36 @@ user_id = arg$user_id;
 var old$n = ((typeof(n) !== 'undefined') ? n : undefined);
 n = arg$n;
 try {
-return (((function (arg$__cl_var__44414) {
-var old$__cl_var__44414 = ((typeof(__cl_var__44414) !== 'undefined') ? __cl_var__44414 : undefined);
-__cl_var__44414 = arg$__cl_var__44414;
+return (((function (arg$__cl_var__69242) {
+var old$__cl_var__69242 = ((typeof(__cl_var__69242) !== 'undefined') ? __cl_var__69242 : undefined);
+__cl_var__69242 = arg$__cl_var__69242;
 try {
 return (((function (arg$request) {
 var old$request = ((typeof(request) !== 'undefined') ? request : undefined);
 request = arg$request;
 try {
-return (((function (arg$__cl_var__44415) {
-var old$__cl_var__44415 = ((typeof(__cl_var__44415) !== 'undefined') ? __cl_var__44415 : undefined);
-__cl_var__44415 = arg$__cl_var__44415;
+return (((function (arg$__cl_var__69243) {
+var old$__cl_var__69243 = ((typeof(__cl_var__69243) !== 'undefined') ? __cl_var__69243 : undefined);
+__cl_var__69243 = arg$__cl_var__69243;
 try {
-return (((function (arg$__cl_var__44416) {
-var old$__cl_var__44416 = ((typeof(__cl_var__44416) !== 'undefined') ? __cl_var__44416 : undefined);
-__cl_var__44416 = arg$__cl_var__44416;
-try {
-return (((function () {
+return (((function (arg$__cl_var__69244) {
+var old$__cl_var__69244 = ((typeof(__cl_var__69244) !== 'undefined') ? __cl_var__69244 : undefined);
+__cl_var__69244 = arg$__cl_var__69244;
 try {
 return (((function () {
-while (((((FN_consp)((__cl_var__44414))) !== false) ? (((false), ((request=((FN_car)((__cl_var__44414))))), ((((((FN_equal)(((FN_car)((request))), (user_id))) !== false) ? ((FN_$EQ_)(((FN__)((n), (1))), ((FN_infinote_operation_count)((user_id), ((FN_cadr)((request))))))) : (false)) !== false) ? ((__cl_var__44416=(request), ((__cl_var__44415=(false))))) : (true)))) : (false)) !== false) {(__cl_var__44414=((FN_cdr)((__cl_var__44414))))};
+try {
+return (((function () {
+while (((((FN_consp)((__cl_var__69242))) !== false) ? (((false), ((request=((FN_car)((__cl_var__69242))))), ((((((FN_equal)(((FN_car)((request))), (user_id))) !== false) ? ((FN_$EQ_)(((FN__)((n), (1))), ((FN_infinote_operation_count)((user_id), ((FN_cadr)((request))))))) : (false)) !== false) ? ((__cl_var__69244=(request), ((__cl_var__69243=(false))))) : (true)))) : (false)) !== false) {(__cl_var__69242=((FN_cdr)((__cl_var__69242))))};
 })()),
-(((__cl_var__44415) !== false) ? (false) : (__cl_var__44416)));
+(((__cl_var__69243) !== false) ? (false) : (__cl_var__69244)));
 } finally {}})()));
-} finally {__cl_var__44416 = old$__cl_var__44416;
+} finally {__cl_var__69244 = old$__cl_var__69244;
 }})((false))));
-} finally {__cl_var__44415 = old$__cl_var__44415;
+} finally {__cl_var__69243 = old$__cl_var__69243;
 }})((true))));
 } finally {request = old$request;
 }})((false))));
-} finally {__cl_var__44414 = old$__cl_var__44414;
+} finally {__cl_var__69242 = old$__cl_var__69242;
 }})((infinote_request_log))));
 } finally {user_id = old$user_id;
 n = old$n;
@@ -747,13 +747,13 @@ return (((function (arg$target_operation) {
 var old$target_operation = ((typeof(target_operation) !== 'undefined') ? target_operation : undefined);
 target_operation = arg$target_operation;
 try {
-return (((function (arg$__cl_var__44417) {
-var old$__cl_var__44417 = ((typeof(__cl_var__44417) !== 'undefined') ? __cl_var__44417 : undefined);
-__cl_var__44417 = arg$__cl_var__44417;
+return (((function (arg$__cl_var__69245) {
+var old$__cl_var__69245 = ((typeof(__cl_var__69245) !== 'undefined') ? __cl_var__69245 : undefined);
+__cl_var__69245 = arg$__cl_var__69245;
 try {
-return (((function (arg$__cl_var__44418) {
-var old$__cl_var__44418 = ((typeof(__cl_var__44418) !== 'undefined') ? __cl_var__44418 : undefined);
-__cl_var__44418 = arg$__cl_var__44418;
+return (((function (arg$__cl_var__69246) {
+var old$__cl_var__69246 = ((typeof(__cl_var__69246) !== 'undefined') ? __cl_var__69246 : undefined);
+__cl_var__69246 = arg$__cl_var__69246;
 try {
 return (((function () {
 try {
@@ -767,13 +767,13 @@ try {
 return (((((FN_$SLASH_$EQ_)((target_user_id), (request_user_id))) !== false) ? ((FN_$GT_)((target_operation_count), ((FN_infinote_operation_count)((target_user_id), (request_vector))))) : (false)));
 } finally {target_user_id = old$target_user_id;
 target_operation_count = old$target_operation_count;
-}})(((FN_car)((target_operation))), ((FN_cadr)((target_operation))))) !== false) ? ((__cl_var__44418=((FN_car)((target_operation))), ((__cl_var__44417=(false))))) : (true)) : (false)) !== false) {(target_operation=((FN_cddr)((target_operation))))};
+}})(((FN_car)((target_operation))), ((FN_cadr)((target_operation))))) !== false) ? ((__cl_var__69246=((FN_car)((target_operation))), ((__cl_var__69245=(false))))) : (true)) : (false)) !== false) {(target_operation=((FN_cddr)((target_operation))))};
 })()),
-(((__cl_var__44417) !== false) ? (false) : (__cl_var__44418)));
+(((__cl_var__69245) !== false) ? (false) : (__cl_var__69246)));
 } finally {}})()));
-} finally {__cl_var__44418 = old$__cl_var__44418;
+} finally {__cl_var__69246 = old$__cl_var__69246;
 }})((false))));
-} finally {__cl_var__44417 = old$__cl_var__44417;
+} finally {__cl_var__69245 = old$__cl_var__69245;
 }})((true))));
 } finally {target_operation = old$target_operation;
 }})((target_vector))));
@@ -843,43 +843,43 @@ var old$cid_is_op = ((typeof(cid_is_op) !== 'undefined') ? cid_is_op : undefined
 cid_is_op = arg$cid_is_op;
 try {
 return (("Get an operation transformed against another operation."),
-((function (arg$pcase_144419, arg$x44420) {
-var old$pcase_144419 = ((typeof(pcase_144419) !== 'undefined') ? pcase_144419 : undefined);
-pcase_144419 = arg$pcase_144419;
-var old$x44420 = ((typeof(x44420) !== 'undefined') ? x44420 : undefined);
-x44420 = arg$x44420;
+((function (arg$pcase_169119, arg$x69120) {
+var old$pcase_169119 = ((typeof(pcase_169119) !== 'undefined') ? pcase_169119 : undefined);
+pcase_169119 = arg$pcase_169119;
+var old$x69120 = ((typeof(x69120) !== 'undefined') ? x69120 : undefined);
+x69120 = arg$x69120;
 try {
-return (((((FN_consp)((x44420))) !== false) ? ((function (arg$xcar44421, arg$xcdr44422) {
-var old$xcar44421 = ((typeof(xcar44421) !== 'undefined') ? xcar44421 : undefined);
-xcar44421 = arg$xcar44421;
-var old$xcdr44422 = ((typeof(xcdr44422) !== 'undefined') ? xcdr44422 : undefined);
-xcdr44422 = arg$xcdr44422;
+return (((((FN_consp)((x69120))) !== false) ? ((function (arg$xcar69121, arg$xcdr69122) {
+var old$xcar69121 = ((typeof(xcar69121) !== 'undefined') ? xcar69121 : undefined);
+xcar69121 = arg$xcar69121;
+var old$xcdr69122 = ((typeof(xcdr69122) !== 'undefined') ? xcdr69122 : undefined);
+xcdr69122 = arg$xcdr69122;
 try {
-return (((((FN_consp)((xcar44421))) !== false) ? ((function (arg$xcar44423, arg$xcdr44424) {
-var old$xcar44423 = ((typeof(xcar44423) !== 'undefined') ? xcar44423 : undefined);
-xcar44423 = arg$xcar44423;
-var old$xcdr44424 = ((typeof(xcdr44424) !== 'undefined') ? xcdr44424 : undefined);
-xcdr44424 = arg$xcdr44424;
+return (((((FN_consp)((xcar69121))) !== false) ? ((function (arg$xcar69123, arg$xcdr69124) {
+var old$xcar69123 = ((typeof(xcar69123) !== 'undefined') ? xcar69123 : undefined);
+xcar69123 = arg$xcar69123;
+var old$xcdr69124 = ((typeof(xcdr69124) !== 'undefined') ? xcdr69124 : undefined);
+xcdr69124 = arg$xcdr69124;
 try {
-return (((((FN_eq)((xcar44423), ("split"))) !== false) ? ((((FN_consp)((xcdr44424))) !== false) ? ((function (arg$xcar44425, arg$xcdr44426) {
-var old$xcar44425 = ((typeof(xcar44425) !== 'undefined') ? xcar44425 : undefined);
-xcar44425 = arg$xcar44425;
-var old$xcdr44426 = ((typeof(xcdr44426) !== 'undefined') ? xcdr44426 : undefined);
-xcdr44426 = arg$xcdr44426;
+return (((((FN_eq)((xcar69123), ("split"))) !== false) ? ((((FN_consp)((xcdr69124))) !== false) ? ((function (arg$xcar69125, arg$xcdr69126) {
+var old$xcar69125 = ((typeof(xcar69125) !== 'undefined') ? xcar69125 : undefined);
+xcar69125 = arg$xcar69125;
+var old$xcdr69126 = ((typeof(xcdr69126) !== 'undefined') ? xcdr69126 : undefined);
+xcdr69126 = arg$xcdr69126;
 try {
-return (((((FN_consp)((xcdr44426))) !== false) ? ((function (arg$xcar44427, arg$xcdr44428) {
-var old$xcar44427 = ((typeof(xcar44427) !== 'undefined') ? xcar44427 : undefined);
-xcar44427 = arg$xcar44427;
-var old$xcdr44428 = ((typeof(xcdr44428) !== 'undefined') ? xcdr44428 : undefined);
-xcdr44428 = arg$xcdr44428;
+return (((((FN_consp)((xcdr69126))) !== false) ? ((function (arg$xcar69127, arg$xcdr69128) {
+var old$xcar69127 = ((typeof(xcar69127) !== 'undefined') ? xcar69127 : undefined);
+xcar69127 = arg$xcar69127;
+var old$xcdr69128 = ((typeof(xcdr69128) !== 'undefined') ? xcdr69128 : undefined);
+xcdr69128 = arg$xcdr69128;
 try {
-return (((((FN_eq)((xcdr44428), (false))) !== false) ? ((((FN_consp)((xcdr44422))) !== false) ? ((function (arg$xcar44429, arg$xcdr44430) {
-var old$xcar44429 = ((typeof(xcar44429) !== 'undefined') ? xcar44429 : undefined);
-xcar44429 = arg$xcar44429;
-var old$xcdr44430 = ((typeof(xcdr44430) !== 'undefined') ? xcdr44430 : undefined);
-xcdr44430 = arg$xcdr44430;
+return (((((FN_eq)((xcdr69128), (false))) !== false) ? ((((FN_consp)((xcdr69122))) !== false) ? ((function (arg$xcar69129, arg$xcdr69130) {
+var old$xcar69129 = ((typeof(xcar69129) !== 'undefined') ? xcar69129 : undefined);
+xcar69129 = arg$xcar69129;
+var old$xcdr69130 = ((typeof(xcdr69130) !== 'undefined') ? xcdr69130 : undefined);
+xcdr69130 = arg$xcdr69130;
 try {
-return (((((FN_eq)((xcdr44430), (false))) !== false) ? ((function (arg$against_operation, arg$operation_2, arg$operation_1) {
+return (((((FN_eq)((xcdr69130), (false))) !== false) ? ((function (arg$against_operation, arg$operation_2, arg$operation_1) {
 var old$against_operation = ((typeof(against_operation) !== 'undefined') ? against_operation : undefined);
 against_operation = arg$against_operation;
 var old$operation_2 = ((typeof(operation_2) !== 'undefined') ? operation_2 : undefined);
@@ -891,178 +891,178 @@ return (((FN_list)(("split"), ((FN_infinote_transform_operation)((operation_1), 
 } finally {against_operation = old$against_operation;
 operation_2 = old$operation_2;
 operation_1 = old$operation_1;
-}})((xcar44429), (xcar44427), (xcar44425))) : (false)));
-} finally {xcar44429 = old$xcar44429;
-xcdr44430 = old$xcdr44430;
-}})(((FN_car)((xcdr44422))), ((FN_cdr)((xcdr44422))))) : (false)) : ((((FN_consp)((xcdr44422))) !== false) ? ((function (arg$xcar44431, arg$xcdr44432) {
-var old$xcar44431 = ((typeof(xcar44431) !== 'undefined') ? xcar44431 : undefined);
-xcar44431 = arg$xcar44431;
-var old$xcdr44432 = ((typeof(xcdr44432) !== 'undefined') ? xcdr44432 : undefined);
-xcdr44432 = arg$xcdr44432;
+}})((xcar69129), (xcar69127), (xcar69125))) : (false)));
+} finally {xcar69129 = old$xcar69129;
+xcdr69130 = old$xcdr69130;
+}})(((FN_car)((xcdr69122))), ((FN_cdr)((xcdr69122))))) : (false)) : ((((FN_consp)((xcdr69122))) !== false) ? ((function (arg$xcar69131, arg$xcdr69132) {
+var old$xcar69131 = ((typeof(xcar69131) !== 'undefined') ? xcar69131 : undefined);
+xcar69131 = arg$xcar69131;
+var old$xcdr69132 = ((typeof(xcdr69132) !== 'undefined') ? xcdr69132 : undefined);
+xcdr69132 = arg$xcdr69132;
 try {
-return (((((FN_consp)((xcar44431))) !== false) ? ((function (arg$xcar44433, arg$xcdr44434) {
-var old$xcar44433 = ((typeof(xcar44433) !== 'undefined') ? xcar44433 : undefined);
-xcar44433 = arg$xcar44433;
-var old$xcdr44434 = ((typeof(xcdr44434) !== 'undefined') ? xcdr44434 : undefined);
-xcdr44434 = arg$xcdr44434;
+return (((((FN_consp)((xcar69131))) !== false) ? ((function (arg$xcar69133, arg$xcdr69134) {
+var old$xcar69133 = ((typeof(xcar69133) !== 'undefined') ? xcar69133 : undefined);
+xcar69133 = arg$xcar69133;
+var old$xcdr69134 = ((typeof(xcdr69134) !== 'undefined') ? xcdr69134 : undefined);
+xcdr69134 = arg$xcdr69134;
 try {
-return (((((FN_not)(((FN_eq)((xcar44433), ("split"))))) !== false) ? (false) : ((((FN_consp)((xcdr44434))) !== false) ? ((function (arg$xcar44435, arg$xcdr44436) {
-var old$xcar44435 = ((typeof(xcar44435) !== 'undefined') ? xcar44435 : undefined);
-xcar44435 = arg$xcar44435;
-var old$xcdr44436 = ((typeof(xcdr44436) !== 'undefined') ? xcdr44436 : undefined);
-xcdr44436 = arg$xcdr44436;
+return (((((FN_not)(((FN_eq)((xcar69133), ("split"))))) !== false) ? (false) : ((((FN_consp)((xcdr69134))) !== false) ? ((function (arg$xcar69135, arg$xcdr69136) {
+var old$xcar69135 = ((typeof(xcar69135) !== 'undefined') ? xcar69135 : undefined);
+xcar69135 = arg$xcar69135;
+var old$xcdr69136 = ((typeof(xcdr69136) !== 'undefined') ? xcdr69136 : undefined);
+xcdr69136 = arg$xcdr69136;
 try {
-return (((((FN_consp)((xcdr44436))) !== false) ? ((function (arg$xcar44437, arg$xcdr44438) {
-var old$xcar44437 = ((typeof(xcar44437) !== 'undefined') ? xcar44437 : undefined);
-xcar44437 = arg$xcar44437;
-var old$xcdr44438 = ((typeof(xcdr44438) !== 'undefined') ? xcdr44438 : undefined);
-xcdr44438 = arg$xcdr44438;
+return (((((FN_consp)((xcdr69136))) !== false) ? ((function (arg$xcar69137, arg$xcdr69138) {
+var old$xcar69137 = ((typeof(xcar69137) !== 'undefined') ? xcar69137 : undefined);
+xcar69137 = arg$xcar69137;
+var old$xcdr69138 = ((typeof(xcdr69138) !== 'undefined') ? xcdr69138 : undefined);
+xcdr69138 = arg$xcdr69138;
 try {
-return (((((FN_not)(((FN_eq)((xcdr44438), (false))))) !== false) ? (false) : ((((FN_eq)((xcdr44432), (false))) !== false) ? ((FN_funcall)((pcase_144419), (xcar44437), (xcar44435), (xcar44421))) : (((true) !== false) ? (false) : (false)))));
-} finally {xcar44437 = old$xcar44437;
-xcdr44438 = old$xcdr44438;
-}})(((FN_car)((xcdr44436))), ((FN_cdr)((xcdr44436))))) : (false)));
-} finally {xcar44435 = old$xcar44435;
-xcdr44436 = old$xcdr44436;
-}})(((FN_car)((xcdr44434))), ((FN_cdr)((xcdr44434))))) : (((true) !== false) ? (false) : (false)))));
-} finally {xcar44433 = old$xcar44433;
-xcdr44434 = old$xcdr44434;
-}})(((FN_car)((xcar44431))), ((FN_cdr)((xcar44431))))) : (false)));
-} finally {xcar44431 = old$xcar44431;
-xcdr44432 = old$xcdr44432;
-}})(((FN_car)((xcdr44422))), ((FN_cdr)((xcdr44422))))) : (((true) !== false) ? (false) : (false)))));
-} finally {xcar44427 = old$xcar44427;
-xcdr44428 = old$xcdr44428;
-}})(((FN_car)((xcdr44426))), ((FN_cdr)((xcdr44426))))) : ((((FN_consp)((xcdr44422))) !== false) ? ((function (arg$xcar44439, arg$xcdr44440) {
-var old$xcar44439 = ((typeof(xcar44439) !== 'undefined') ? xcar44439 : undefined);
-xcar44439 = arg$xcar44439;
-var old$xcdr44440 = ((typeof(xcdr44440) !== 'undefined') ? xcdr44440 : undefined);
-xcdr44440 = arg$xcdr44440;
+return (((((FN_not)(((FN_eq)((xcdr69138), (false))))) !== false) ? (false) : ((((FN_eq)((xcdr69132), (false))) !== false) ? ((FN_funcall)((pcase_169119), (xcar69137), (xcar69135), (xcar69121))) : (((true) !== false) ? (false) : (false)))));
+} finally {xcar69137 = old$xcar69137;
+xcdr69138 = old$xcdr69138;
+}})(((FN_car)((xcdr69136))), ((FN_cdr)((xcdr69136))))) : (false)));
+} finally {xcar69135 = old$xcar69135;
+xcdr69136 = old$xcdr69136;
+}})(((FN_car)((xcdr69134))), ((FN_cdr)((xcdr69134))))) : (((true) !== false) ? (false) : (false)))));
+} finally {xcar69133 = old$xcar69133;
+xcdr69134 = old$xcdr69134;
+}})(((FN_car)((xcar69131))), ((FN_cdr)((xcar69131))))) : (false)));
+} finally {xcar69131 = old$xcar69131;
+xcdr69132 = old$xcdr69132;
+}})(((FN_car)((xcdr69122))), ((FN_cdr)((xcdr69122))))) : (((true) !== false) ? (false) : (false)))));
+} finally {xcar69127 = old$xcar69127;
+xcdr69128 = old$xcdr69128;
+}})(((FN_car)((xcdr69126))), ((FN_cdr)((xcdr69126))))) : ((((FN_consp)((xcdr69122))) !== false) ? ((function (arg$xcar69139, arg$xcdr69140) {
+var old$xcar69139 = ((typeof(xcar69139) !== 'undefined') ? xcar69139 : undefined);
+xcar69139 = arg$xcar69139;
+var old$xcdr69140 = ((typeof(xcdr69140) !== 'undefined') ? xcdr69140 : undefined);
+xcdr69140 = arg$xcdr69140;
 try {
-return (((((FN_consp)((xcar44439))) !== false) ? ((function (arg$xcar44441, arg$xcdr44442) {
-var old$xcar44441 = ((typeof(xcar44441) !== 'undefined') ? xcar44441 : undefined);
-xcar44441 = arg$xcar44441;
-var old$xcdr44442 = ((typeof(xcdr44442) !== 'undefined') ? xcdr44442 : undefined);
-xcdr44442 = arg$xcdr44442;
+return (((((FN_consp)((xcar69139))) !== false) ? ((function (arg$xcar69141, arg$xcdr69142) {
+var old$xcar69141 = ((typeof(xcar69141) !== 'undefined') ? xcar69141 : undefined);
+xcar69141 = arg$xcar69141;
+var old$xcdr69142 = ((typeof(xcdr69142) !== 'undefined') ? xcdr69142 : undefined);
+xcdr69142 = arg$xcdr69142;
 try {
-return (((((FN_not)(((FN_eq)((xcar44441), ("split"))))) !== false) ? (false) : ((((FN_consp)((xcdr44442))) !== false) ? ((function (arg$xcar44443, arg$xcdr44444) {
-var old$xcar44443 = ((typeof(xcar44443) !== 'undefined') ? xcar44443 : undefined);
-xcar44443 = arg$xcar44443;
-var old$xcdr44444 = ((typeof(xcdr44444) !== 'undefined') ? xcdr44444 : undefined);
-xcdr44444 = arg$xcdr44444;
+return (((((FN_not)(((FN_eq)((xcar69141), ("split"))))) !== false) ? (false) : ((((FN_consp)((xcdr69142))) !== false) ? ((function (arg$xcar69143, arg$xcdr69144) {
+var old$xcar69143 = ((typeof(xcar69143) !== 'undefined') ? xcar69143 : undefined);
+xcar69143 = arg$xcar69143;
+var old$xcdr69144 = ((typeof(xcdr69144) !== 'undefined') ? xcdr69144 : undefined);
+xcdr69144 = arg$xcdr69144;
 try {
-return (((((FN_consp)((xcdr44444))) !== false) ? ((function (arg$xcar44445, arg$xcdr44446) {
-var old$xcar44445 = ((typeof(xcar44445) !== 'undefined') ? xcar44445 : undefined);
-xcar44445 = arg$xcar44445;
-var old$xcdr44446 = ((typeof(xcdr44446) !== 'undefined') ? xcdr44446 : undefined);
-xcdr44446 = arg$xcdr44446;
+return (((((FN_consp)((xcdr69144))) !== false) ? ((function (arg$xcar69145, arg$xcdr69146) {
+var old$xcar69145 = ((typeof(xcar69145) !== 'undefined') ? xcar69145 : undefined);
+xcar69145 = arg$xcar69145;
+var old$xcdr69146 = ((typeof(xcdr69146) !== 'undefined') ? xcdr69146 : undefined);
+xcdr69146 = arg$xcdr69146;
 try {
-return (((((FN_not)(((FN_eq)((xcdr44446), (false))))) !== false) ? (false) : ((((FN_eq)((xcdr44440), (false))) !== false) ? ((FN_funcall)((pcase_144419), (xcar44445), (xcar44443), (xcar44421))) : (((true) !== false) ? (false) : (false)))));
-} finally {xcar44445 = old$xcar44445;
-xcdr44446 = old$xcdr44446;
-}})(((FN_car)((xcdr44444))), ((FN_cdr)((xcdr44444))))) : (false)));
-} finally {xcar44443 = old$xcar44443;
-xcdr44444 = old$xcdr44444;
-}})(((FN_car)((xcdr44442))), ((FN_cdr)((xcdr44442))))) : (((true) !== false) ? (false) : (false)))));
-} finally {xcar44441 = old$xcar44441;
-xcdr44442 = old$xcdr44442;
-}})(((FN_car)((xcar44439))), ((FN_cdr)((xcar44439))))) : (false)));
-} finally {xcar44439 = old$xcar44439;
-xcdr44440 = old$xcdr44440;
-}})(((FN_car)((xcdr44422))), ((FN_cdr)((xcdr44422))))) : (((true) !== false) ? (false) : (false)))));
-} finally {xcar44425 = old$xcar44425;
-xcdr44426 = old$xcdr44426;
-}})(((FN_car)((xcdr44424))), ((FN_cdr)((xcdr44424))))) : ((((FN_consp)((xcdr44422))) !== false) ? ((function (arg$xcar44447, arg$xcdr44448) {
-var old$xcar44447 = ((typeof(xcar44447) !== 'undefined') ? xcar44447 : undefined);
-xcar44447 = arg$xcar44447;
-var old$xcdr44448 = ((typeof(xcdr44448) !== 'undefined') ? xcdr44448 : undefined);
-xcdr44448 = arg$xcdr44448;
+return (((((FN_not)(((FN_eq)((xcdr69146), (false))))) !== false) ? (false) : ((((FN_eq)((xcdr69140), (false))) !== false) ? ((FN_funcall)((pcase_169119), (xcar69145), (xcar69143), (xcar69121))) : (((true) !== false) ? (false) : (false)))));
+} finally {xcar69145 = old$xcar69145;
+xcdr69146 = old$xcdr69146;
+}})(((FN_car)((xcdr69144))), ((FN_cdr)((xcdr69144))))) : (false)));
+} finally {xcar69143 = old$xcar69143;
+xcdr69144 = old$xcdr69144;
+}})(((FN_car)((xcdr69142))), ((FN_cdr)((xcdr69142))))) : (((true) !== false) ? (false) : (false)))));
+} finally {xcar69141 = old$xcar69141;
+xcdr69142 = old$xcdr69142;
+}})(((FN_car)((xcar69139))), ((FN_cdr)((xcar69139))))) : (false)));
+} finally {xcar69139 = old$xcar69139;
+xcdr69140 = old$xcdr69140;
+}})(((FN_car)((xcdr69122))), ((FN_cdr)((xcdr69122))))) : (((true) !== false) ? (false) : (false)))));
+} finally {xcar69125 = old$xcar69125;
+xcdr69126 = old$xcdr69126;
+}})(((FN_car)((xcdr69124))), ((FN_cdr)((xcdr69124))))) : ((((FN_consp)((xcdr69122))) !== false) ? ((function (arg$xcar69147, arg$xcdr69148) {
+var old$xcar69147 = ((typeof(xcar69147) !== 'undefined') ? xcar69147 : undefined);
+xcar69147 = arg$xcar69147;
+var old$xcdr69148 = ((typeof(xcdr69148) !== 'undefined') ? xcdr69148 : undefined);
+xcdr69148 = arg$xcdr69148;
 try {
-return (((((FN_consp)((xcar44447))) !== false) ? ((function (arg$xcar44449, arg$xcdr44450) {
-var old$xcar44449 = ((typeof(xcar44449) !== 'undefined') ? xcar44449 : undefined);
-xcar44449 = arg$xcar44449;
-var old$xcdr44450 = ((typeof(xcdr44450) !== 'undefined') ? xcdr44450 : undefined);
-xcdr44450 = arg$xcdr44450;
+return (((((FN_consp)((xcar69147))) !== false) ? ((function (arg$xcar69149, arg$xcdr69150) {
+var old$xcar69149 = ((typeof(xcar69149) !== 'undefined') ? xcar69149 : undefined);
+xcar69149 = arg$xcar69149;
+var old$xcdr69150 = ((typeof(xcdr69150) !== 'undefined') ? xcdr69150 : undefined);
+xcdr69150 = arg$xcdr69150;
 try {
-return (((((FN_not)(((FN_eq)((xcar44449), ("split"))))) !== false) ? (false) : ((((FN_consp)((xcdr44450))) !== false) ? ((function (arg$xcar44451, arg$xcdr44452) {
-var old$xcar44451 = ((typeof(xcar44451) !== 'undefined') ? xcar44451 : undefined);
-xcar44451 = arg$xcar44451;
-var old$xcdr44452 = ((typeof(xcdr44452) !== 'undefined') ? xcdr44452 : undefined);
-xcdr44452 = arg$xcdr44452;
+return (((((FN_not)(((FN_eq)((xcar69149), ("split"))))) !== false) ? (false) : ((((FN_consp)((xcdr69150))) !== false) ? ((function (arg$xcar69151, arg$xcdr69152) {
+var old$xcar69151 = ((typeof(xcar69151) !== 'undefined') ? xcar69151 : undefined);
+xcar69151 = arg$xcar69151;
+var old$xcdr69152 = ((typeof(xcdr69152) !== 'undefined') ? xcdr69152 : undefined);
+xcdr69152 = arg$xcdr69152;
 try {
-return (((((FN_consp)((xcdr44452))) !== false) ? ((function (arg$xcar44453, arg$xcdr44454) {
-var old$xcar44453 = ((typeof(xcar44453) !== 'undefined') ? xcar44453 : undefined);
-xcar44453 = arg$xcar44453;
-var old$xcdr44454 = ((typeof(xcdr44454) !== 'undefined') ? xcdr44454 : undefined);
-xcdr44454 = arg$xcdr44454;
+return (((((FN_consp)((xcdr69152))) !== false) ? ((function (arg$xcar69153, arg$xcdr69154) {
+var old$xcar69153 = ((typeof(xcar69153) !== 'undefined') ? xcar69153 : undefined);
+xcar69153 = arg$xcar69153;
+var old$xcdr69154 = ((typeof(xcdr69154) !== 'undefined') ? xcdr69154 : undefined);
+xcdr69154 = arg$xcdr69154;
 try {
-return (((((FN_not)(((FN_eq)((xcdr44454), (false))))) !== false) ? (false) : ((((FN_eq)((xcdr44448), (false))) !== false) ? ((FN_funcall)((pcase_144419), (xcar44453), (xcar44451), (xcar44421))) : (((true) !== false) ? (false) : (false)))));
-} finally {xcar44453 = old$xcar44453;
-xcdr44454 = old$xcdr44454;
-}})(((FN_car)((xcdr44452))), ((FN_cdr)((xcdr44452))))) : (false)));
-} finally {xcar44451 = old$xcar44451;
-xcdr44452 = old$xcdr44452;
-}})(((FN_car)((xcdr44450))), ((FN_cdr)((xcdr44450))))) : (((true) !== false) ? (false) : (false)))));
-} finally {xcar44449 = old$xcar44449;
-xcdr44450 = old$xcdr44450;
-}})(((FN_car)((xcar44447))), ((FN_cdr)((xcar44447))))) : (false)));
-} finally {xcar44447 = old$xcar44447;
-xcdr44448 = old$xcdr44448;
-}})(((FN_car)((xcdr44422))), ((FN_cdr)((xcdr44422))))) : (((true) !== false) ? (false) : (false)))) : ((((FN_consp)((xcdr44422))) !== false) ? ((function (arg$xcar44455, arg$xcdr44456) {
-var old$xcar44455 = ((typeof(xcar44455) !== 'undefined') ? xcar44455 : undefined);
-xcar44455 = arg$xcar44455;
-var old$xcdr44456 = ((typeof(xcdr44456) !== 'undefined') ? xcdr44456 : undefined);
-xcdr44456 = arg$xcdr44456;
+return (((((FN_not)(((FN_eq)((xcdr69154), (false))))) !== false) ? (false) : ((((FN_eq)((xcdr69148), (false))) !== false) ? ((FN_funcall)((pcase_169119), (xcar69153), (xcar69151), (xcar69121))) : (((true) !== false) ? (false) : (false)))));
+} finally {xcar69153 = old$xcar69153;
+xcdr69154 = old$xcdr69154;
+}})(((FN_car)((xcdr69152))), ((FN_cdr)((xcdr69152))))) : (false)));
+} finally {xcar69151 = old$xcar69151;
+xcdr69152 = old$xcdr69152;
+}})(((FN_car)((xcdr69150))), ((FN_cdr)((xcdr69150))))) : (((true) !== false) ? (false) : (false)))));
+} finally {xcar69149 = old$xcar69149;
+xcdr69150 = old$xcdr69150;
+}})(((FN_car)((xcar69147))), ((FN_cdr)((xcar69147))))) : (false)));
+} finally {xcar69147 = old$xcar69147;
+xcdr69148 = old$xcdr69148;
+}})(((FN_car)((xcdr69122))), ((FN_cdr)((xcdr69122))))) : (((true) !== false) ? (false) : (false)))) : ((((FN_consp)((xcdr69122))) !== false) ? ((function (arg$xcar69155, arg$xcdr69156) {
+var old$xcar69155 = ((typeof(xcar69155) !== 'undefined') ? xcar69155 : undefined);
+xcar69155 = arg$xcar69155;
+var old$xcdr69156 = ((typeof(xcdr69156) !== 'undefined') ? xcdr69156 : undefined);
+xcdr69156 = arg$xcdr69156;
 try {
-return (((((FN_consp)((xcar44455))) !== false) ? ((function (arg$xcar44457, arg$xcdr44458) {
-var old$xcar44457 = ((typeof(xcar44457) !== 'undefined') ? xcar44457 : undefined);
-xcar44457 = arg$xcar44457;
-var old$xcdr44458 = ((typeof(xcdr44458) !== 'undefined') ? xcdr44458 : undefined);
-xcdr44458 = arg$xcdr44458;
+return (((((FN_consp)((xcar69155))) !== false) ? ((function (arg$xcar69157, arg$xcdr69158) {
+var old$xcar69157 = ((typeof(xcar69157) !== 'undefined') ? xcar69157 : undefined);
+xcar69157 = arg$xcar69157;
+var old$xcdr69158 = ((typeof(xcdr69158) !== 'undefined') ? xcdr69158 : undefined);
+xcdr69158 = arg$xcdr69158;
 try {
-return (((((FN_eq)((xcar44457), ("split"))) !== false) ? ((((FN_consp)((xcdr44458))) !== false) ? ((function (arg$xcar44459, arg$xcdr44460) {
-var old$xcar44459 = ((typeof(xcar44459) !== 'undefined') ? xcar44459 : undefined);
-xcar44459 = arg$xcar44459;
-var old$xcdr44460 = ((typeof(xcdr44460) !== 'undefined') ? xcdr44460 : undefined);
-xcdr44460 = arg$xcdr44460;
+return (((((FN_eq)((xcar69157), ("split"))) !== false) ? ((((FN_consp)((xcdr69158))) !== false) ? ((function (arg$xcar69159, arg$xcdr69160) {
+var old$xcar69159 = ((typeof(xcar69159) !== 'undefined') ? xcar69159 : undefined);
+xcar69159 = arg$xcar69159;
+var old$xcdr69160 = ((typeof(xcdr69160) !== 'undefined') ? xcdr69160 : undefined);
+xcdr69160 = arg$xcdr69160;
 try {
-return (((((FN_consp)((xcdr44460))) !== false) ? ((function (arg$xcar44461, arg$xcdr44462) {
-var old$xcar44461 = ((typeof(xcar44461) !== 'undefined') ? xcar44461 : undefined);
-xcar44461 = arg$xcar44461;
-var old$xcdr44462 = ((typeof(xcdr44462) !== 'undefined') ? xcdr44462 : undefined);
-xcdr44462 = arg$xcdr44462;
+return (((((FN_consp)((xcdr69160))) !== false) ? ((function (arg$xcar69161, arg$xcdr69162) {
+var old$xcar69161 = ((typeof(xcar69161) !== 'undefined') ? xcar69161 : undefined);
+xcar69161 = arg$xcar69161;
+var old$xcdr69162 = ((typeof(xcdr69162) !== 'undefined') ? xcdr69162 : undefined);
+xcdr69162 = arg$xcdr69162;
 try {
-return (((((FN_not)(((FN_eq)((xcdr44462), (false))))) !== false) ? (false) : ((((FN_eq)((xcdr44456), (false))) !== false) ? ((FN_funcall)((pcase_144419), (xcar44461), (xcar44459), (xcar44421))) : (((true) !== false) ? (false) : (false)))));
-} finally {xcar44461 = old$xcar44461;
-xcdr44462 = old$xcdr44462;
-}})(((FN_car)((xcdr44460))), ((FN_cdr)((xcdr44460))))) : (false)));
-} finally {xcar44459 = old$xcar44459;
-xcdr44460 = old$xcdr44460;
-}})(((FN_car)((xcdr44458))), ((FN_cdr)((xcdr44458))))) : (false)) : ((((FN_consp)((xcdr44424))) !== false) ? ((function (arg$xcar44463, arg$xcdr44464) {
-var old$xcar44463 = ((typeof(xcar44463) !== 'undefined') ? xcar44463 : undefined);
-xcar44463 = arg$xcar44463;
-var old$xcdr44464 = ((typeof(xcdr44464) !== 'undefined') ? xcdr44464 : undefined);
-xcdr44464 = arg$xcdr44464;
+return (((((FN_not)(((FN_eq)((xcdr69162), (false))))) !== false) ? (false) : ((((FN_eq)((xcdr69156), (false))) !== false) ? ((FN_funcall)((pcase_169119), (xcar69161), (xcar69159), (xcar69121))) : (((true) !== false) ? (false) : (false)))));
+} finally {xcar69161 = old$xcar69161;
+xcdr69162 = old$xcdr69162;
+}})(((FN_car)((xcdr69160))), ((FN_cdr)((xcdr69160))))) : (false)));
+} finally {xcar69159 = old$xcar69159;
+xcdr69160 = old$xcdr69160;
+}})(((FN_car)((xcdr69158))), ((FN_cdr)((xcdr69158))))) : (false)) : ((((FN_consp)((xcdr69124))) !== false) ? ((function (arg$xcar69163, arg$xcdr69164) {
+var old$xcar69163 = ((typeof(xcar69163) !== 'undefined') ? xcar69163 : undefined);
+xcar69163 = arg$xcar69163;
+var old$xcdr69164 = ((typeof(xcdr69164) !== 'undefined') ? xcdr69164 : undefined);
+xcdr69164 = arg$xcdr69164;
 try {
-return (((((FN_consp)((xcdr44464))) !== false) ? ((function (arg$xcar44465, arg$xcdr44466) {
-var old$xcar44465 = ((typeof(xcar44465) !== 'undefined') ? xcar44465 : undefined);
-xcar44465 = arg$xcar44465;
-var old$xcdr44466 = ((typeof(xcdr44466) !== 'undefined') ? xcdr44466 : undefined);
-xcdr44466 = arg$xcdr44466;
+return (((((FN_consp)((xcdr69164))) !== false) ? ((function (arg$xcar69165, arg$xcdr69166) {
+var old$xcar69165 = ((typeof(xcar69165) !== 'undefined') ? xcar69165 : undefined);
+xcar69165 = arg$xcar69165;
+var old$xcdr69166 = ((typeof(xcdr69166) !== 'undefined') ? xcdr69166 : undefined);
+xcdr69166 = arg$xcdr69166;
 try {
-return (((((FN_not)(((FN_eq)((xcdr44466), (false))))) !== false) ? (false) : ((((FN_consp)((xcdr44458))) !== false) ? ((function (arg$xcar44467, arg$xcdr44468) {
-var old$xcar44467 = ((typeof(xcar44467) !== 'undefined') ? xcar44467 : undefined);
-xcar44467 = arg$xcar44467;
-var old$xcdr44468 = ((typeof(xcdr44468) !== 'undefined') ? xcdr44468 : undefined);
-xcdr44468 = arg$xcdr44468;
+return (((((FN_not)(((FN_eq)((xcdr69166), (false))))) !== false) ? (false) : ((((FN_consp)((xcdr69158))) !== false) ? ((function (arg$xcar69167, arg$xcdr69168) {
+var old$xcar69167 = ((typeof(xcar69167) !== 'undefined') ? xcar69167 : undefined);
+xcar69167 = arg$xcar69167;
+var old$xcdr69168 = ((typeof(xcdr69168) !== 'undefined') ? xcdr69168 : undefined);
+xcdr69168 = arg$xcdr69168;
 try {
-return (((((FN_consp)((xcdr44468))) !== false) ? ((function (arg$xcar44469, arg$xcdr44470) {
-var old$xcar44469 = ((typeof(xcar44469) !== 'undefined') ? xcar44469 : undefined);
-xcar44469 = arg$xcar44469;
-var old$xcdr44470 = ((typeof(xcdr44470) !== 'undefined') ? xcdr44470 : undefined);
-xcdr44470 = arg$xcdr44470;
+return (((((FN_consp)((xcdr69168))) !== false) ? ((function (arg$xcar69169, arg$xcdr69170) {
+var old$xcar69169 = ((typeof(xcar69169) !== 'undefined') ? xcar69169 : undefined);
+xcar69169 = arg$xcar69169;
+var old$xcdr69170 = ((typeof(xcdr69170) !== 'undefined') ? xcdr69170 : undefined);
+xcdr69170 = arg$xcdr69170;
 try {
-return (((((FN_not)(((FN_eq)((xcdr44470), (false))))) !== false) ? (false) : ((((FN_eq)((xcdr44456), (false))) !== false) ? ((function (arg$text_or_length_2, arg$position_2, arg$op_2, arg$text_or_length_1, arg$position_1, arg$op_1) {
+return (((((FN_not)(((FN_eq)((xcdr69170), (false))))) !== false) ? (false) : ((((FN_eq)((xcdr69156), (false))) !== false) ? ((function (arg$text_or_length_2, arg$position_2, arg$op_2, arg$text_or_length_1, arg$position_1, arg$op_1) {
 var old$text_or_length_2 = ((typeof(text_or_length_2) !== 'undefined') ? text_or_length_2 : undefined);
 text_or_length_2 = arg$text_or_length_2;
 var old$position_2 = ((typeof(position_2) !== 'undefined') ? position_2 : undefined);
@@ -1102,57 +1102,57 @@ end_2 = arg$end_2;
 try {
 return (((function () {
 try {
-return (((function (arg$x44471) {
-var old$x44471 = ((typeof(x44471) !== 'undefined') ? x44471 : undefined);
-x44471 = arg$x44471;
+return (((function (arg$x69171) {
+var old$x69171 = ((typeof(x69171) !== 'undefined') ? x69171 : undefined);
+x69171 = arg$x69171;
 try {
-return (((((FN_consp)((x44471))) !== false) ? ((function (arg$xcar44472, arg$xcdr44473) {
-var old$xcar44472 = ((typeof(xcar44472) !== 'undefined') ? xcar44472 : undefined);
-xcar44472 = arg$xcar44472;
-var old$xcdr44473 = ((typeof(xcdr44473) !== 'undefined') ? xcdr44473 : undefined);
-xcdr44473 = arg$xcdr44473;
+return (((((FN_consp)((x69171))) !== false) ? ((function (arg$xcar69172, arg$xcdr69173) {
+var old$xcar69172 = ((typeof(xcar69172) !== 'undefined') ? xcar69172 : undefined);
+xcar69172 = arg$xcar69172;
+var old$xcdr69173 = ((typeof(xcdr69173) !== 'undefined') ? xcdr69173 : undefined);
+xcdr69173 = arg$xcdr69173;
 try {
-return (((((FN_eq)((xcar44472), ("insert"))) !== false) ? ((((FN_consp)((xcdr44473))) !== false) ? ((function (arg$xcar44474, arg$xcdr44475) {
-var old$xcar44474 = ((typeof(xcar44474) !== 'undefined') ? xcar44474 : undefined);
-xcar44474 = arg$xcar44474;
-var old$xcdr44475 = ((typeof(xcdr44475) !== 'undefined') ? xcdr44475 : undefined);
-xcdr44475 = arg$xcdr44475;
+return (((((FN_eq)((xcar69172), ("insert"))) !== false) ? ((((FN_consp)((xcdr69173))) !== false) ? ((function (arg$xcar69174, arg$xcdr69175) {
+var old$xcar69174 = ((typeof(xcar69174) !== 'undefined') ? xcar69174 : undefined);
+xcar69174 = arg$xcar69174;
+var old$xcdr69175 = ((typeof(xcdr69175) !== 'undefined') ? xcdr69175 : undefined);
+xcdr69175 = arg$xcdr69175;
 try {
-return (((((FN_eq)((xcar44474), ("insert"))) !== false) ? ((((FN_eq)((xcdr44475), (false))) !== false) ? ((function () {
+return (((((FN_eq)((xcar69174), ("insert"))) !== false) ? ((((FN_eq)((xcdr69175), (false))) !== false) ? ((function () {
 try {
-return (((((function (arg$exp4447644477) {
-var old$exp4447644477 = ((typeof(exp4447644477) !== 'undefined') ? exp4447644477 : undefined);
-exp4447644477 = arg$exp4447644477;
+return (((((function (arg$exp6924769248) {
+var old$exp6924769248 = ((typeof(exp6924769248) !== 'undefined') ? exp6924769248 : undefined);
+exp6924769248 = arg$exp6924769248;
 try {
-return ((((exp4447644477) !== false) ? (exp4447644477) : ((((FN_$EQ_)((position_1), (position_2))) !== false) ? ((FN_not)((cid_is_op))) : (false))));
-} finally {exp4447644477 = old$exp4447644477;
+return ((((exp6924769248) !== false) ? (exp6924769248) : ((((FN_$EQ_)((position_1), (position_2))) !== false) ? ((FN_not)((cid_is_op))) : (false))));
+} finally {exp6924769248 = old$exp6924769248;
 }})(((FN_$LT_)((position_1), (position_2))))) !== false) ? ((FN_list)((op_1), (position_1), (text_1))) : ((FN_list)((op_1), ((FN_$PLUS_)((position_1), (length_2))), (text_1)))));
-} finally {}})()) : (false)) : ((((FN_not)(((FN_eq)((xcar44474), ("delete"))))) !== false) ? (false) : ((((FN_eq)((xcdr44475), (false))) !== false) ? ((function () {
+} finally {}})()) : (false)) : ((((FN_not)(((FN_eq)((xcar69174), ("delete"))))) !== false) ? (false) : ((((FN_eq)((xcdr69175), (false))) !== false) ? ((function () {
 try {
 return (((((FN_$GT_$EQ_)((position_1), (end_2))) !== false) ? ((FN_list)((op_1), ((FN__)((position_1), (length_2))), (text_1))) : ((((FN_$LT_)((position_1), (position_2))) !== false) ? ((FN_list)((op_1), (position_1), (text_1))) : (((true) !== false) ? ((FN_list)((op_1), (position_2), (text_1))) : (false)))));
 } finally {}})()) : (((true) !== false) ? (false) : (false))))));
-} finally {xcar44474 = old$xcar44474;
-xcdr44475 = old$xcdr44475;
-}})(((FN_car)((xcdr44473))), ((FN_cdr)((xcdr44473))))) : (false)) : ((((FN_not)(((FN_eq)((xcar44472), ("delete"))))) !== false) ? (false) : ((((FN_consp)((xcdr44473))) !== false) ? ((function (arg$xcar44478, arg$xcdr44479) {
-var old$xcar44478 = ((typeof(xcar44478) !== 'undefined') ? xcar44478 : undefined);
-xcar44478 = arg$xcar44478;
-var old$xcdr44479 = ((typeof(xcdr44479) !== 'undefined') ? xcdr44479 : undefined);
-xcdr44479 = arg$xcdr44479;
+} finally {xcar69174 = old$xcar69174;
+xcdr69175 = old$xcdr69175;
+}})(((FN_car)((xcdr69173))), ((FN_cdr)((xcdr69173))))) : (false)) : ((((FN_not)(((FN_eq)((xcar69172), ("delete"))))) !== false) ? (false) : ((((FN_consp)((xcdr69173))) !== false) ? ((function (arg$xcar69178, arg$xcdr69179) {
+var old$xcar69178 = ((typeof(xcar69178) !== 'undefined') ? xcar69178 : undefined);
+xcar69178 = arg$xcar69178;
+var old$xcdr69179 = ((typeof(xcdr69179) !== 'undefined') ? xcdr69179 : undefined);
+xcdr69179 = arg$xcdr69179;
 try {
-return (((((FN_eq)((xcar44478), ("insert"))) !== false) ? ((((FN_eq)((xcdr44479), (false))) !== false) ? ((function () {
+return (((((FN_eq)((xcar69178), ("insert"))) !== false) ? ((((FN_eq)((xcdr69179), (false))) !== false) ? ((function () {
 try {
 return (((((FN_$GT_$EQ_)((position_2), (end_1))) !== false) ? ((FN_list)((op_1), (position_1), (length_1))) : ((((FN_$LT_$EQ_)((position_2), (position_1))) !== false) ? ((FN_list)((op_1), ((FN_$PLUS_)((position_1), (length_2))), (length_1))) : ((((((FN_$GT_)((position_2), (position_1))) !== false) ? ((FN_$LT_)((position_2), (end_1))) : (false)) !== false) ? ((FN_infinote_split_operation)((operation), ((FN__)((position_2), (position_1))), (length_2))) : (false)))));
-} finally {}})()) : (false)) : ((((FN_not)(((FN_eq)((xcar44478), ("delete"))))) !== false) ? (false) : ((((FN_eq)((xcdr44479), (false))) !== false) ? ((function () {
+} finally {}})()) : (false)) : ((((FN_not)(((FN_eq)((xcar69178), ("delete"))))) !== false) ? (false) : ((((FN_eq)((xcdr69179), (false))) !== false) ? ((function () {
 try {
 return (((((FN_$LT_$EQ_)((end_1), (position_2))) !== false) ? ((FN_list)((op_1), (position_1), (length_1))) : ((((FN_$GT_$EQ_)((position_1), (end_2))) !== false) ? ((FN_list)((op_1), ((FN__)((position_1), (length_2))), (length_1))) : ((((FN_$GT_$EQ_)((position_1), (position_2))) !== false) ? ((((FN_$LT_$EQ_)((end_1), (end_2))) !== false) ? ((FN_list)((op_1), (position_2), (0))) : ((FN_list)((op_1), (position_2), ((FN__)((end_1), (end_2)))))) : ((((FN_$LT_)((position_1), (position_2))) !== false) ? ((((FN_$LT_$EQ_)((end_1), (end_2))) !== false) ? ((FN_list)((op_1), (position_1), ((FN__)((position_2), (position_1))))) : ((FN_list)((op_1), (position_1), ((FN__)((length_1), (length_2)))))) : (false))))));
 } finally {}})()) : (((true) !== false) ? (false) : (false))))));
-} finally {xcar44478 = old$xcar44478;
-xcdr44479 = old$xcdr44479;
-}})(((FN_car)((xcdr44473))), ((FN_cdr)((xcdr44473))))) : (((true) !== false) ? (false) : (false))))));
-} finally {xcar44472 = old$xcar44472;
-xcdr44473 = old$xcdr44473;
-}})(((FN_car)((x44471))), ((FN_cdr)((x44471))))) : (false)));
-} finally {x44471 = old$x44471;
+} finally {xcar69178 = old$xcar69178;
+xcdr69179 = old$xcdr69179;
+}})(((FN_car)((xcdr69173))), ((FN_cdr)((xcdr69173))))) : (((true) !== false) ? (false) : (false))))));
+} finally {xcar69172 = old$xcar69172;
+xcdr69173 = old$xcdr69173;
+}})(((FN_car)((x69171))), ((FN_cdr)((x69171))))) : (false)));
+} finally {x69171 = old$x69171;
 }})(((FN_list)(((FN_infinote_op_type)((op_1))), ((FN_infinote_op_type)((op_2))))))));
 } finally {}})()));
 } finally {end_2 = old$end_2;
@@ -1160,20 +1160,20 @@ xcdr44473 = old$xcdr44473;
 } finally {end_1 = old$end_1;
 }})(((FN_$PLUS_)((position_1), (length_1))))));
 } finally {length_2 = old$length_2;
-}})(((function (arg$exp4448044481) {
-var old$exp4448044481 = ((typeof(exp4448044481) !== 'undefined') ? exp4448044481 : undefined);
-exp4448044481 = arg$exp4448044481;
+}})(((function (arg$exp6924969250) {
+var old$exp6924969250 = ((typeof(exp6924969250) !== 'undefined') ? exp6924969250 : undefined);
+exp6924969250 = arg$exp6924969250;
 try {
-return ((((exp4448044481) !== false) ? (exp4448044481) : (text_or_length_2)));
-} finally {exp4448044481 = old$exp4448044481;
+return ((((exp6924969250) !== false) ? (exp6924969250) : (text_or_length_2)));
+} finally {exp6924969250 = old$exp6924969250;
 }})((((text_2) !== false) ? ((FN_length)((text_2))) : (false)))))));
 } finally {length_1 = old$length_1;
-}})(((function (arg$exp4448244483) {
-var old$exp4448244483 = ((typeof(exp4448244483) !== 'undefined') ? exp4448244483 : undefined);
-exp4448244483 = arg$exp4448244483;
+}})(((function (arg$exp6925169252) {
+var old$exp6925169252 = ((typeof(exp6925169252) !== 'undefined') ? exp6925169252 : undefined);
+exp6925169252 = arg$exp6925169252;
 try {
-return ((((exp4448244483) !== false) ? (exp4448244483) : (text_or_length_1)));
-} finally {exp4448244483 = old$exp4448244483;
+return ((((exp6925169252) !== false) ? (exp6925169252) : (text_or_length_1)));
+} finally {exp6925169252 = old$exp6925169252;
 }})((((text_1) !== false) ? ((FN_length)((text_1))) : (false)))))));
 } finally {text_2 = old$text_2;
 }})(((((FN_stringp)((text_or_length_2))) !== false) ? (text_or_length_2) : (false)))));
@@ -1185,69 +1185,69 @@ op_2 = old$op_2;
 text_or_length_1 = old$text_or_length_1;
 position_1 = old$position_1;
 op_1 = old$op_1;
-}})((xcar44469), (xcar44467), (xcar44457), (xcar44465), (xcar44463), (xcar44423))) : (((true) !== false) ? (false) : (false)))));
-} finally {xcar44469 = old$xcar44469;
-xcdr44470 = old$xcdr44470;
-}})(((FN_car)((xcdr44468))), ((FN_cdr)((xcdr44468))))) : (false)));
-} finally {xcar44467 = old$xcar44467;
-xcdr44468 = old$xcdr44468;
-}})(((FN_car)((xcdr44458))), ((FN_cdr)((xcdr44458))))) : (((true) !== false) ? (false) : (false)))));
-} finally {xcar44465 = old$xcar44465;
-xcdr44466 = old$xcdr44466;
-}})(((FN_car)((xcdr44464))), ((FN_cdr)((xcdr44464))))) : (false)));
-} finally {xcar44463 = old$xcar44463;
-xcdr44464 = old$xcdr44464;
-}})(((FN_car)((xcdr44424))), ((FN_cdr)((xcdr44424))))) : (((true) !== false) ? (false) : (false)))));
-} finally {xcar44457 = old$xcar44457;
-xcdr44458 = old$xcdr44458;
-}})(((FN_car)((xcar44455))), ((FN_cdr)((xcar44455))))) : (false)));
-} finally {xcar44455 = old$xcar44455;
-xcdr44456 = old$xcdr44456;
-}})(((FN_car)((xcdr44422))), ((FN_cdr)((xcdr44422))))) : (((true) !== false) ? (false) : (false)))));
-} finally {xcar44423 = old$xcar44423;
-xcdr44424 = old$xcdr44424;
-}})(((FN_car)((xcar44421))), ((FN_cdr)((xcar44421))))) : ((((FN_consp)((xcdr44422))) !== false) ? ((function (arg$xcar44484, arg$xcdr44485) {
-var old$xcar44484 = ((typeof(xcar44484) !== 'undefined') ? xcar44484 : undefined);
-xcar44484 = arg$xcar44484;
-var old$xcdr44485 = ((typeof(xcdr44485) !== 'undefined') ? xcdr44485 : undefined);
-xcdr44485 = arg$xcdr44485;
+}})((xcar69169), (xcar69167), (xcar69157), (xcar69165), (xcar69163), (xcar69123))) : (((true) !== false) ? (false) : (false)))));
+} finally {xcar69169 = old$xcar69169;
+xcdr69170 = old$xcdr69170;
+}})(((FN_car)((xcdr69168))), ((FN_cdr)((xcdr69168))))) : (false)));
+} finally {xcar69167 = old$xcar69167;
+xcdr69168 = old$xcdr69168;
+}})(((FN_car)((xcdr69158))), ((FN_cdr)((xcdr69158))))) : (((true) !== false) ? (false) : (false)))));
+} finally {xcar69165 = old$xcar69165;
+xcdr69166 = old$xcdr69166;
+}})(((FN_car)((xcdr69164))), ((FN_cdr)((xcdr69164))))) : (false)));
+} finally {xcar69163 = old$xcar69163;
+xcdr69164 = old$xcdr69164;
+}})(((FN_car)((xcdr69124))), ((FN_cdr)((xcdr69124))))) : (((true) !== false) ? (false) : (false)))));
+} finally {xcar69157 = old$xcar69157;
+xcdr69158 = old$xcdr69158;
+}})(((FN_car)((xcar69155))), ((FN_cdr)((xcar69155))))) : (false)));
+} finally {xcar69155 = old$xcar69155;
+xcdr69156 = old$xcdr69156;
+}})(((FN_car)((xcdr69122))), ((FN_cdr)((xcdr69122))))) : (((true) !== false) ? (false) : (false)))));
+} finally {xcar69123 = old$xcar69123;
+xcdr69124 = old$xcdr69124;
+}})(((FN_car)((xcar69121))), ((FN_cdr)((xcar69121))))) : ((((FN_consp)((xcdr69122))) !== false) ? ((function (arg$xcar69184, arg$xcdr69185) {
+var old$xcar69184 = ((typeof(xcar69184) !== 'undefined') ? xcar69184 : undefined);
+xcar69184 = arg$xcar69184;
+var old$xcdr69185 = ((typeof(xcdr69185) !== 'undefined') ? xcdr69185 : undefined);
+xcdr69185 = arg$xcdr69185;
 try {
-return (((((FN_consp)((xcar44484))) !== false) ? ((function (arg$xcar44486, arg$xcdr44487) {
-var old$xcar44486 = ((typeof(xcar44486) !== 'undefined') ? xcar44486 : undefined);
-xcar44486 = arg$xcar44486;
-var old$xcdr44487 = ((typeof(xcdr44487) !== 'undefined') ? xcdr44487 : undefined);
-xcdr44487 = arg$xcdr44487;
+return (((((FN_consp)((xcar69184))) !== false) ? ((function (arg$xcar69186, arg$xcdr69187) {
+var old$xcar69186 = ((typeof(xcar69186) !== 'undefined') ? xcar69186 : undefined);
+xcar69186 = arg$xcar69186;
+var old$xcdr69187 = ((typeof(xcdr69187) !== 'undefined') ? xcdr69187 : undefined);
+xcdr69187 = arg$xcdr69187;
 try {
-return (((((FN_not)(((FN_eq)((xcar44486), ("split"))))) !== false) ? (false) : ((((FN_consp)((xcdr44487))) !== false) ? ((function (arg$xcar44488, arg$xcdr44489) {
-var old$xcar44488 = ((typeof(xcar44488) !== 'undefined') ? xcar44488 : undefined);
-xcar44488 = arg$xcar44488;
-var old$xcdr44489 = ((typeof(xcdr44489) !== 'undefined') ? xcdr44489 : undefined);
-xcdr44489 = arg$xcdr44489;
+return (((((FN_not)(((FN_eq)((xcar69186), ("split"))))) !== false) ? (false) : ((((FN_consp)((xcdr69187))) !== false) ? ((function (arg$xcar69188, arg$xcdr69189) {
+var old$xcar69188 = ((typeof(xcar69188) !== 'undefined') ? xcar69188 : undefined);
+xcar69188 = arg$xcar69188;
+var old$xcdr69189 = ((typeof(xcdr69189) !== 'undefined') ? xcdr69189 : undefined);
+xcdr69189 = arg$xcdr69189;
 try {
-return (((((FN_consp)((xcdr44489))) !== false) ? ((function (arg$xcar44490, arg$xcdr44491) {
-var old$xcar44490 = ((typeof(xcar44490) !== 'undefined') ? xcar44490 : undefined);
-xcar44490 = arg$xcar44490;
-var old$xcdr44491 = ((typeof(xcdr44491) !== 'undefined') ? xcdr44491 : undefined);
-xcdr44491 = arg$xcdr44491;
+return (((((FN_consp)((xcdr69189))) !== false) ? ((function (arg$xcar69190, arg$xcdr69191) {
+var old$xcar69190 = ((typeof(xcar69190) !== 'undefined') ? xcar69190 : undefined);
+xcar69190 = arg$xcar69190;
+var old$xcdr69191 = ((typeof(xcdr69191) !== 'undefined') ? xcdr69191 : undefined);
+xcdr69191 = arg$xcdr69191;
 try {
-return (((((FN_not)(((FN_eq)((xcdr44491), (false))))) !== false) ? (false) : ((((FN_eq)((xcdr44485), (false))) !== false) ? ((FN_funcall)((pcase_144419), (xcar44490), (xcar44488), (xcar44421))) : (((true) !== false) ? (false) : (false)))));
-} finally {xcar44490 = old$xcar44490;
-xcdr44491 = old$xcdr44491;
-}})(((FN_car)((xcdr44489))), ((FN_cdr)((xcdr44489))))) : (false)));
-} finally {xcar44488 = old$xcar44488;
-xcdr44489 = old$xcdr44489;
-}})(((FN_car)((xcdr44487))), ((FN_cdr)((xcdr44487))))) : (((true) !== false) ? (false) : (false)))));
-} finally {xcar44486 = old$xcar44486;
-xcdr44487 = old$xcdr44487;
-}})(((FN_car)((xcar44484))), ((FN_cdr)((xcar44484))))) : (false)));
-} finally {xcar44484 = old$xcar44484;
-xcdr44485 = old$xcdr44485;
-}})(((FN_car)((xcdr44422))), ((FN_cdr)((xcdr44422))))) : (((true) !== false) ? (false) : (false)))));
-} finally {xcar44421 = old$xcar44421;
-xcdr44422 = old$xcdr44422;
-}})(((FN_car)((x44420))), ((FN_cdr)((x44420))))) : (false)));
-} finally {pcase_144419 = old$pcase_144419;
-x44420 = old$x44420;
+return (((((FN_not)(((FN_eq)((xcdr69191), (false))))) !== false) ? (false) : ((((FN_eq)((xcdr69185), (false))) !== false) ? ((FN_funcall)((pcase_169119), (xcar69190), (xcar69188), (xcar69121))) : (((true) !== false) ? (false) : (false)))));
+} finally {xcar69190 = old$xcar69190;
+xcdr69191 = old$xcdr69191;
+}})(((FN_car)((xcdr69189))), ((FN_cdr)((xcdr69189))))) : (false)));
+} finally {xcar69188 = old$xcar69188;
+xcdr69189 = old$xcdr69189;
+}})(((FN_car)((xcdr69187))), ((FN_cdr)((xcdr69187))))) : (((true) !== false) ? (false) : (false)))));
+} finally {xcar69186 = old$xcar69186;
+xcdr69187 = old$xcdr69187;
+}})(((FN_car)((xcar69184))), ((FN_cdr)((xcar69184))))) : (false)));
+} finally {xcar69184 = old$xcar69184;
+xcdr69185 = old$xcdr69185;
+}})(((FN_car)((xcdr69122))), ((FN_cdr)((xcdr69122))))) : (((true) !== false) ? (false) : (false)))));
+} finally {xcar69121 = old$xcar69121;
+xcdr69122 = old$xcdr69122;
+}})(((FN_car)((x69120))), ((FN_cdr)((x69120))))) : (false)));
+} finally {pcase_169119 = old$pcase_169119;
+x69120 = old$x69120;
 }})(((function (arg$operation_2, arg$operation_1, arg$operation) {
 var old$operation_2 = ((typeof(operation_2) !== 'undefined') ? operation_2 : undefined);
 operation_2 = arg$operation_2;
@@ -1279,9 +1279,9 @@ return (((((FN_infinote_vector_equal)((request_vector), (target_vector))) !== fa
 var old$closer_target_request = ((typeof(closer_target_request) !== 'undefined') ? closer_target_request : undefined);
 closer_target_request = arg$closer_target_request;
 try {
-return (((function (arg$__cl_rest__44492) {
-var old$__cl_rest__44492 = ((typeof(__cl_rest__44492) !== 'undefined') ? __cl_rest__44492 : undefined);
-__cl_rest__44492 = arg$__cl_rest__44492;
+return (((function (arg$__cl_rest__69253) {
+var old$__cl_rest__69253 = ((typeof(__cl_rest__69253) !== 'undefined') ? __cl_rest__69253 : undefined);
+__cl_rest__69253 = arg$__cl_rest__69253;
 try {
 return (((function (arg$closer_target_user) {
 var old$closer_target_user = ((typeof(closer_target_user) !== 'undefined') ? closer_target_user : undefined);
@@ -1306,22 +1306,22 @@ return (((FN_infinote_transform_operation)((translated_operation), (closer_targe
 }})(((FN_infinote_translate_operation)((user_id), (request_vector), (closer_target_vector), (operation))))));
 } finally {}})()));
 } finally {closer_target_operation = old$closer_target_operation;
-}})(((FN_car)((__cl_rest__44492))))));
+}})(((FN_car)((__cl_rest__69253))))));
 } finally {closer_target_vector = old$closer_target_vector;
 }})(((FN_car)(((function () {
-var $ret = (__cl_rest__44492);
+var $ret = (__cl_rest__69253);
 false;
- (__cl_rest__44492=((FN_cdr)((__cl_rest__44492))));
+ (__cl_rest__69253=((FN_cdr)((__cl_rest__69253))));
 return $ret;
 })()))))));
 } finally {closer_target_user = old$closer_target_user;
-}})(((((FN_$EQ_)(((FN_length)((__cl_rest__44492))), (3))) !== false) ? ((FN_car)(((function () {
-var $ret = (__cl_rest__44492);
+}})(((((FN_$EQ_)(((FN_length)((__cl_rest__69253))), (3))) !== false) ? ((FN_car)(((function () {
+var $ret = (__cl_rest__69253);
 false;
- (__cl_rest__44492=((FN_cdr)((__cl_rest__44492))));
+ (__cl_rest__69253=((FN_cdr)((__cl_rest__69253))));
 return $ret;
-})()))) : ((FN_signal)(("wrong-number-of-arguments"), ((FN_list)((false), ((FN_length)((__cl_rest__44492)))))))))));
-} finally {__cl_rest__44492 = old$__cl_rest__44492;
+})()))) : ((FN_signal)(("wrong-number-of-arguments"), ((FN_list)((false), ((FN_length)((__cl_rest__69253)))))))))));
+} finally {__cl_rest__69253 = old$__cl_rest__69253;
 }})((closer_target_request))));
 } finally {closer_target_request = old$closer_target_request;
 }})(((FN_infinote_closer_target_request)((user_id), (request_vector), (target_vector)))))));
@@ -1344,13 +1344,13 @@ return (((function (arg$user_operations) {
 var old$user_operations = ((typeof(user_operations) !== 'undefined') ? user_operations : undefined);
 user_operations = arg$user_operations;
 try {
-return (((function (arg$__cl_var__44493) {
-var old$__cl_var__44493 = ((typeof(__cl_var__44493) !== 'undefined') ? __cl_var__44493 : undefined);
-__cl_var__44493 = arg$__cl_var__44493;
+return (((function (arg$__cl_var__69254) {
+var old$__cl_var__69254 = ((typeof(__cl_var__69254) !== 'undefined') ? __cl_var__69254 : undefined);
+__cl_var__69254 = arg$__cl_var__69254;
 try {
-return (((function (arg$__cl_var__44494) {
-var old$__cl_var__44494 = ((typeof(__cl_var__44494) !== 'undefined') ? __cl_var__44494 : undefined);
-__cl_var__44494 = arg$__cl_var__44494;
+return (((function (arg$__cl_var__69255) {
+var old$__cl_var__69255 = ((typeof(__cl_var__69255) !== 'undefined') ? __cl_var__69255 : undefined);
+__cl_var__69255 = arg$__cl_var__69255;
 try {
 return (((function () {
 try {
@@ -1364,13 +1364,13 @@ try {
 return (((FN_$GT_)((operation_count), ((FN_infinote_operation_count)((user_id), (onto_vector))))));
 } finally {user_id = old$user_id;
 operation_count = old$operation_count;
-}})(((FN_car)((user_operations))), ((FN_cadr)((user_operations))))) !== false) ? ((__cl_var__44494=(false), ((__cl_var__44493=(false))))) : (true)) : (false)) !== false) {(user_operations=((FN_cddr)((user_operations))))};
+}})(((FN_car)((user_operations))), ((FN_cadr)((user_operations))))) !== false) ? ((__cl_var__69255=(false), ((__cl_var__69254=(false))))) : (true)) : (false)) !== false) {(user_operations=((FN_cddr)((user_operations))))};
 })()),
-(((__cl_var__44493) !== false) ? (true) : (__cl_var__44494)));
+(((__cl_var__69254) !== false) ? (true) : (__cl_var__69255)));
 } finally {}})()));
-} finally {__cl_var__44494 = old$__cl_var__44494;
+} finally {__cl_var__69255 = old$__cl_var__69255;
 }})((false))));
-} finally {__cl_var__44493 = old$__cl_var__44493;
+} finally {__cl_var__69254 = old$__cl_var__69254;
 }})((true))));
 } finally {user_operations = old$user_operations;
 }})((vector))));
@@ -1383,28 +1383,28 @@ return (((function (arg$my_vector) {
 var old$my_vector = ((typeof(my_vector) !== 'undefined') ? my_vector : undefined);
 my_vector = arg$my_vector;
 try {
-return (((function (arg$__cl_var__44495) {
-var old$__cl_var__44495 = ((typeof(__cl_var__44495) !== 'undefined') ? __cl_var__44495 : undefined);
-__cl_var__44495 = arg$__cl_var__44495;
+return (((function (arg$__cl_var__69256) {
+var old$__cl_var__69256 = ((typeof(__cl_var__69256) !== 'undefined') ? __cl_var__69256 : undefined);
+__cl_var__69256 = arg$__cl_var__69256;
 try {
 return (((function (arg$request) {
 var old$request = ((typeof(request) !== 'undefined') ? request : undefined);
 request = arg$request;
 try {
-return (((function (arg$__cl_var__44496) {
-var old$__cl_var__44496 = ((typeof(__cl_var__44496) !== 'undefined') ? __cl_var__44496 : undefined);
-__cl_var__44496 = arg$__cl_var__44496;
+return (((function (arg$__cl_var__69257) {
+var old$__cl_var__69257 = ((typeof(__cl_var__69257) !== 'undefined') ? __cl_var__69257 : undefined);
+__cl_var__69257 = arg$__cl_var__69257;
 try {
-return (((function (arg$__cl_var__44497) {
-var old$__cl_var__44497 = ((typeof(__cl_var__44497) !== 'undefined') ? __cl_var__44497 : undefined);
-__cl_var__44497 = arg$__cl_var__44497;
-try {
-return (((function () {
+return (((function (arg$__cl_var__69258) {
+var old$__cl_var__69258 = ((typeof(__cl_var__69258) !== 'undefined') ? __cl_var__69258 : undefined);
+__cl_var__69258 = arg$__cl_var__69258;
 try {
 return (((function () {
-while (((((FN_consp)((__cl_var__44495))) !== false) ? (((false), ((request=((FN_car)((__cl_var__44495))))), ((((function (arg$__cl_rest__44498) {
-var old$__cl_rest__44498 = ((typeof(__cl_rest__44498) !== 'undefined') ? __cl_rest__44498 : undefined);
-__cl_rest__44498 = arg$__cl_rest__44498;
+try {
+return (((function () {
+while (((((FN_consp)((__cl_var__69256))) !== false) ? (((false), ((request=((FN_car)((__cl_var__69256))))), ((((function (arg$__cl_rest__69259) {
+var old$__cl_rest__69259 = ((typeof(__cl_rest__69259) !== 'undefined') ? __cl_rest__69259 : undefined);
+__cl_rest__69259 = arg$__cl_rest__69259;
 try {
 return (((function (arg$user_id) {
 var old$user_id = ((typeof(user_id) !== 'undefined') ? user_id : undefined);
@@ -1423,33 +1423,33 @@ try {
 return (((FN_infinote_can_apply)((vector), (my_vector))));
 } finally {}})()));
 } finally {operation = old$operation;
-}})(((FN_car)((__cl_rest__44498))))));
+}})(((FN_car)((__cl_rest__69259))))));
 } finally {vector = old$vector;
 }})(((FN_car)(((function () {
-var $ret = (__cl_rest__44498);
+var $ret = (__cl_rest__69259);
 false;
- (__cl_rest__44498=((FN_cdr)((__cl_rest__44498))));
+ (__cl_rest__69259=((FN_cdr)((__cl_rest__69259))));
 return $ret;
 })()))))));
 } finally {user_id = old$user_id;
-}})(((((FN_$EQ_)(((FN_length)((__cl_rest__44498))), (3))) !== false) ? ((FN_car)(((function () {
-var $ret = (__cl_rest__44498);
+}})(((((FN_$EQ_)(((FN_length)((__cl_rest__69259))), (3))) !== false) ? ((FN_car)(((function () {
+var $ret = (__cl_rest__69259);
 false;
- (__cl_rest__44498=((FN_cdr)((__cl_rest__44498))));
+ (__cl_rest__69259=((FN_cdr)((__cl_rest__69259))));
 return $ret;
-})()))) : ((FN_signal)(("wrong-number-of-arguments"), ((FN_list)((false), ((FN_length)((__cl_rest__44498)))))))))));
-} finally {__cl_rest__44498 = old$__cl_rest__44498;
-}})((request))) !== false) ? (((false), ((infinote_request_queue=((FN_remove)((request), (infinote_request_queue))))), ((FN_apply)((FN_infinote_handle_request), (request))), ((__cl_var__44497=(false), ((__cl_var__44496=(false))))))) : (true)))) : (false)) !== false) {(__cl_var__44495=((FN_cdr)((__cl_var__44495))))};
+})()))) : ((FN_signal)(("wrong-number-of-arguments"), ((FN_list)((false), ((FN_length)((__cl_rest__69259)))))))))));
+} finally {__cl_rest__69259 = old$__cl_rest__69259;
+}})((request))) !== false) ? (((false), ((infinote_request_queue=((FN_remove)((request), (infinote_request_queue))))), ((FN_apply)((FN_infinote_handle_request), (request))), ((__cl_var__69258=(false), ((__cl_var__69257=(false))))))) : (true)))) : (false)) !== false) {(__cl_var__69256=((FN_cdr)((__cl_var__69256))))};
 })()),
-(__cl_var__44497));
+(__cl_var__69258));
 } finally {}})()));
-} finally {__cl_var__44497 = old$__cl_var__44497;
+} finally {__cl_var__69258 = old$__cl_var__69258;
 }})((false))));
-} finally {__cl_var__44496 = old$__cl_var__44496;
+} finally {__cl_var__69257 = old$__cl_var__69257;
 }})((true))));
 } finally {request = old$request;
 }})((false))));
-} finally {__cl_var__44495 = old$__cl_var__44495;
+} finally {__cl_var__69256 = old$__cl_var__69256;
 }})((infinote_request_queue))));
 } finally {my_vector = old$my_vector;
 }})(((FN_infinote_my_vector)()))));
@@ -1458,9 +1458,9 @@ FN_infinote_affected_text = (function (arg$operation) {
 var old$operation = ((typeof(operation) !== 'undefined') ? operation : undefined);
 operation = arg$operation;
 try {
-return (((function (arg$__cl_rest__44499) {
-var old$__cl_rest__44499 = ((typeof(__cl_rest__44499) !== 'undefined') ? __cl_rest__44499 : undefined);
-__cl_rest__44499 = arg$__cl_rest__44499;
+return (((function (arg$__cl_rest__69260) {
+var old$__cl_rest__69260 = ((typeof(__cl_rest__69260) !== 'undefined') ? __cl_rest__69260 : undefined);
+__cl_rest__69260 = arg$__cl_rest__69260;
 try {
 return (((function (arg$op) {
 var old$op = ((typeof(op) !== 'undefined') ? op : undefined);
@@ -1488,22 +1488,22 @@ end = old$end;
 }})(((FN_$PLUS_)((pos), (1))), ((FN_$PLUS_)((pos), (1), (len))))));
 } finally {}})()));
 } finally {len = old$len;
-}})(((FN_car)((__cl_rest__44499))))));
+}})(((FN_car)((__cl_rest__69260))))));
 } finally {pos = old$pos;
 }})(((FN_car)(((function () {
-var $ret = (__cl_rest__44499);
+var $ret = (__cl_rest__69260);
 false;
- (__cl_rest__44499=((FN_cdr)((__cl_rest__44499))));
+ (__cl_rest__69260=((FN_cdr)((__cl_rest__69260))));
 return $ret;
 })()))))));
 } finally {op = old$op;
-}})(((((FN_$EQ_)(((FN_length)((__cl_rest__44499))), (3))) !== false) ? ((FN_car)(((function () {
-var $ret = (__cl_rest__44499);
+}})(((((FN_$EQ_)(((FN_length)((__cl_rest__69260))), (3))) !== false) ? ((FN_car)(((function () {
+var $ret = (__cl_rest__69260);
 false;
- (__cl_rest__44499=((FN_cdr)((__cl_rest__44499))));
+ (__cl_rest__69260=((FN_cdr)((__cl_rest__69260))));
 return $ret;
-})()))) : ((FN_signal)(("wrong-number-of-arguments"), ((FN_list)((false), ((FN_length)((__cl_rest__44499)))))))))));
-} finally {__cl_rest__44499 = old$__cl_rest__44499;
+})()))) : ((FN_signal)(("wrong-number-of-arguments"), ((FN_list)((false), ((FN_length)((__cl_rest__69260)))))))))));
+} finally {__cl_rest__69260 = old$__cl_rest__69260;
 }})((operation))));
 } finally {operation = old$operation;
 }});
@@ -1513,9 +1513,9 @@ operation = arg$operation;
 var old$currently_applicable_operation = ((typeof(currently_applicable_operation) !== 'undefined') ? currently_applicable_operation : undefined);
 currently_applicable_operation = arg$currently_applicable_operation;
 try {
-return (((function (arg$__cl_rest__44500) {
-var old$__cl_rest__44500 = ((typeof(__cl_rest__44500) !== 'undefined') ? __cl_rest__44500 : undefined);
-__cl_rest__44500 = arg$__cl_rest__44500;
+return (((function (arg$__cl_rest__69261) {
+var old$__cl_rest__69261 = ((typeof(__cl_rest__69261) !== 'undefined') ? __cl_rest__69261 : undefined);
+__cl_rest__69261 = arg$__cl_rest__69261;
 try {
 return (((function (arg$op) {
 var old$op = ((typeof(op) !== 'undefined') ? op : undefined);
@@ -1534,22 +1534,22 @@ try {
 return (((FN_list)((op), (pos), ((FN_infinote_affected_text)((currently_applicable_operation))))));
 } finally {}})()));
 } finally {len = old$len;
-}})(((FN_car)((__cl_rest__44500))))));
+}})(((FN_car)((__cl_rest__69261))))));
 } finally {pos = old$pos;
 }})(((FN_car)(((function () {
-var $ret = (__cl_rest__44500);
+var $ret = (__cl_rest__69261);
 false;
- (__cl_rest__44500=((FN_cdr)((__cl_rest__44500))));
+ (__cl_rest__69261=((FN_cdr)((__cl_rest__69261))));
 return $ret;
 })()))))));
 } finally {op = old$op;
-}})(((((FN_$EQ_)(((FN_length)((__cl_rest__44500))), (3))) !== false) ? ((FN_car)(((function () {
-var $ret = (__cl_rest__44500);
+}})(((((FN_$EQ_)(((FN_length)((__cl_rest__69261))), (3))) !== false) ? ((FN_car)(((function () {
+var $ret = (__cl_rest__69261);
 false;
- (__cl_rest__44500=((FN_cdr)((__cl_rest__44500))));
+ (__cl_rest__69261=((FN_cdr)((__cl_rest__69261))));
 return $ret;
-})()))) : ((FN_signal)(("wrong-number-of-arguments"), ((FN_list)((false), ((FN_length)((__cl_rest__44500)))))))))));
-} finally {__cl_rest__44500 = old$__cl_rest__44500;
+})()))) : ((FN_signal)(("wrong-number-of-arguments"), ((FN_list)((false), ((FN_length)((__cl_rest__69261)))))))))));
+} finally {__cl_rest__69261 = old$__cl_rest__69261;
 }})((operation))));
 } finally {operation = old$operation;
 currently_applicable_operation = old$currently_applicable_operation;
@@ -1605,25 +1605,25 @@ return (((function (arg$infinote_inhibit_change_hooks) {
 var old$infinote_inhibit_change_hooks = ((typeof(infinote_inhibit_change_hooks) !== 'undefined') ? infinote_inhibit_change_hooks : undefined);
 infinote_inhibit_change_hooks = arg$infinote_inhibit_change_hooks;
 try {
-return (((((FN_consp)((operation))) !== false) ? ((function (arg$xcar44501, arg$xcdr44502) {
-var old$xcar44501 = ((typeof(xcar44501) !== 'undefined') ? xcar44501 : undefined);
-xcar44501 = arg$xcar44501;
-var old$xcdr44502 = ((typeof(xcdr44502) !== 'undefined') ? xcdr44502 : undefined);
-xcdr44502 = arg$xcdr44502;
+return (((((FN_consp)((operation))) !== false) ? ((function (arg$xcar69201, arg$xcdr69202) {
+var old$xcar69201 = ((typeof(xcar69201) !== 'undefined') ? xcar69201 : undefined);
+xcar69201 = arg$xcar69201;
+var old$xcdr69202 = ((typeof(xcdr69202) !== 'undefined') ? xcdr69202 : undefined);
+xcdr69202 = arg$xcdr69202;
 try {
-return (((((FN_eq)((xcar44501), ("split"))) !== false) ? ((((FN_consp)((xcdr44502))) !== false) ? ((function (arg$xcar44503, arg$xcdr44504) {
-var old$xcar44503 = ((typeof(xcar44503) !== 'undefined') ? xcar44503 : undefined);
-xcar44503 = arg$xcar44503;
-var old$xcdr44504 = ((typeof(xcdr44504) !== 'undefined') ? xcdr44504 : undefined);
-xcdr44504 = arg$xcdr44504;
+return (((((FN_eq)((xcar69201), ("split"))) !== false) ? ((((FN_consp)((xcdr69202))) !== false) ? ((function (arg$xcar69203, arg$xcdr69204) {
+var old$xcar69203 = ((typeof(xcar69203) !== 'undefined') ? xcar69203 : undefined);
+xcar69203 = arg$xcar69203;
+var old$xcdr69204 = ((typeof(xcdr69204) !== 'undefined') ? xcdr69204 : undefined);
+xcdr69204 = arg$xcdr69204;
 try {
-return (((((FN_consp)((xcdr44504))) !== false) ? ((function (arg$xcar44505, arg$xcdr44506) {
-var old$xcar44505 = ((typeof(xcar44505) !== 'undefined') ? xcar44505 : undefined);
-xcar44505 = arg$xcar44505;
-var old$xcdr44506 = ((typeof(xcdr44506) !== 'undefined') ? xcdr44506 : undefined);
-xcdr44506 = arg$xcdr44506;
+return (((((FN_consp)((xcdr69204))) !== false) ? ((function (arg$xcar69205, arg$xcdr69206) {
+var old$xcar69205 = ((typeof(xcar69205) !== 'undefined') ? xcar69205 : undefined);
+xcar69205 = arg$xcar69205;
+var old$xcdr69206 = ((typeof(xcdr69206) !== 'undefined') ? xcdr69206 : undefined);
+xcdr69206 = arg$xcdr69206;
 try {
-return (((((FN_eq)((xcdr44506), (false))) !== false) ? ((function (arg$operation_2, arg$operation_1) {
+return (((((FN_eq)((xcdr69206), (false))) !== false) ? ((function (arg$operation_2, arg$operation_1) {
 var old$operation_2 = ((typeof(operation_2) !== 'undefined') ? operation_2 : undefined);
 operation_2 = arg$operation_2;
 var old$operation_1 = ((typeof(operation_1) !== 'undefined') ? operation_1 : undefined);
@@ -1633,25 +1633,25 @@ return (((FN_infinote_apply_operation)((user_id), (operation_1))),
 ((FN_infinote_apply_operation)((user_id), ((FN_infinote_transform_operation)((operation_2), (operation_1), (true))))));
 } finally {operation_2 = old$operation_2;
 operation_1 = old$operation_1;
-}})((xcar44505), (xcar44503))) : (false)));
-} finally {xcar44505 = old$xcar44505;
-xcdr44506 = old$xcdr44506;
-}})(((FN_car)((xcdr44504))), ((FN_cdr)((xcdr44504))))) : (false)));
-} finally {xcar44503 = old$xcar44503;
-xcdr44504 = old$xcdr44504;
-}})(((FN_car)((xcdr44502))), ((FN_cdr)((xcdr44502))))) : (false)) : ((((FN_eq)((xcar44501), ("insert"))) !== false) ? ((((FN_consp)((xcdr44502))) !== false) ? ((function (arg$xcar44507, arg$xcdr44508) {
-var old$xcar44507 = ((typeof(xcar44507) !== 'undefined') ? xcar44507 : undefined);
-xcar44507 = arg$xcar44507;
-var old$xcdr44508 = ((typeof(xcdr44508) !== 'undefined') ? xcdr44508 : undefined);
-xcdr44508 = arg$xcdr44508;
+}})((xcar69205), (xcar69203))) : (false)));
+} finally {xcar69205 = old$xcar69205;
+xcdr69206 = old$xcdr69206;
+}})(((FN_car)((xcdr69204))), ((FN_cdr)((xcdr69204))))) : (false)));
+} finally {xcar69203 = old$xcar69203;
+xcdr69204 = old$xcdr69204;
+}})(((FN_car)((xcdr69202))), ((FN_cdr)((xcdr69202))))) : (false)) : ((((FN_eq)((xcar69201), ("insert"))) !== false) ? ((((FN_consp)((xcdr69202))) !== false) ? ((function (arg$xcar69207, arg$xcdr69208) {
+var old$xcar69207 = ((typeof(xcar69207) !== 'undefined') ? xcar69207 : undefined);
+xcar69207 = arg$xcar69207;
+var old$xcdr69208 = ((typeof(xcdr69208) !== 'undefined') ? xcdr69208 : undefined);
+xcdr69208 = arg$xcdr69208;
 try {
-return (((((FN_consp)((xcdr44508))) !== false) ? ((function (arg$xcar44509, arg$xcdr44510) {
-var old$xcar44509 = ((typeof(xcar44509) !== 'undefined') ? xcar44509 : undefined);
-xcar44509 = arg$xcar44509;
-var old$xcdr44510 = ((typeof(xcdr44510) !== 'undefined') ? xcdr44510 : undefined);
-xcdr44510 = arg$xcdr44510;
+return (((((FN_consp)((xcdr69208))) !== false) ? ((function (arg$xcar69209, arg$xcdr69210) {
+var old$xcar69209 = ((typeof(xcar69209) !== 'undefined') ? xcar69209 : undefined);
+xcar69209 = arg$xcar69209;
+var old$xcdr69210 = ((typeof(xcdr69210) !== 'undefined') ? xcdr69210 : undefined);
+xcdr69210 = arg$xcdr69210;
 try {
-return (((((FN_eq)((xcdr44510), (false))) !== false) ? ((function (arg$text, arg$pos) {
+return (((((FN_eq)((xcdr69210), (false))) !== false) ? ((function (arg$text, arg$pos) {
 var old$text = ((typeof(text) !== 'undefined') ? text : undefined);
 text = arg$text;
 var old$pos = ((typeof(pos) !== 'undefined') ? pos : undefined);
@@ -1664,25 +1664,25 @@ return (((FN_goto_char)(((FN_$PLUS_)((1), (pos))))),
 } finally {}})))));
 } finally {text = old$text;
 pos = old$pos;
-}})((xcar44509), (xcar44507))) : (false)));
-} finally {xcar44509 = old$xcar44509;
-xcdr44510 = old$xcdr44510;
-}})(((FN_car)((xcdr44508))), ((FN_cdr)((xcdr44508))))) : (false)));
-} finally {xcar44507 = old$xcar44507;
-xcdr44508 = old$xcdr44508;
-}})(((FN_car)((xcdr44502))), ((FN_cdr)((xcdr44502))))) : (false)) : ((((FN_eq)((xcar44501), ("insert-caret"))) !== false) ? ((((FN_consp)((xcdr44502))) !== false) ? ((function (arg$xcar44511, arg$xcdr44512) {
-var old$xcar44511 = ((typeof(xcar44511) !== 'undefined') ? xcar44511 : undefined);
-xcar44511 = arg$xcar44511;
-var old$xcdr44512 = ((typeof(xcdr44512) !== 'undefined') ? xcdr44512 : undefined);
-xcdr44512 = arg$xcdr44512;
+}})((xcar69209), (xcar69207))) : (false)));
+} finally {xcar69209 = old$xcar69209;
+xcdr69210 = old$xcdr69210;
+}})(((FN_car)((xcdr69208))), ((FN_cdr)((xcdr69208))))) : (false)));
+} finally {xcar69207 = old$xcar69207;
+xcdr69208 = old$xcdr69208;
+}})(((FN_car)((xcdr69202))), ((FN_cdr)((xcdr69202))))) : (false)) : ((((FN_eq)((xcar69201), ("insert-caret"))) !== false) ? ((((FN_consp)((xcdr69202))) !== false) ? ((function (arg$xcar69211, arg$xcdr69212) {
+var old$xcar69211 = ((typeof(xcar69211) !== 'undefined') ? xcar69211 : undefined);
+xcar69211 = arg$xcar69211;
+var old$xcdr69212 = ((typeof(xcdr69212) !== 'undefined') ? xcdr69212 : undefined);
+xcdr69212 = arg$xcdr69212;
 try {
-return (((((FN_consp)((xcdr44512))) !== false) ? ((function (arg$xcar44513, arg$xcdr44514) {
-var old$xcar44513 = ((typeof(xcar44513) !== 'undefined') ? xcar44513 : undefined);
-xcar44513 = arg$xcar44513;
-var old$xcdr44514 = ((typeof(xcdr44514) !== 'undefined') ? xcdr44514 : undefined);
-xcdr44514 = arg$xcdr44514;
+return (((((FN_consp)((xcdr69212))) !== false) ? ((function (arg$xcar69213, arg$xcdr69214) {
+var old$xcar69213 = ((typeof(xcar69213) !== 'undefined') ? xcar69213 : undefined);
+xcar69213 = arg$xcar69213;
+var old$xcdr69214 = ((typeof(xcdr69214) !== 'undefined') ? xcdr69214 : undefined);
+xcdr69214 = arg$xcdr69214;
 try {
-return (((((FN_eq)((xcdr44514), (false))) !== false) ? ((function (arg$text, arg$pos) {
+return (((((FN_eq)((xcdr69214), (false))) !== false) ? ((function (arg$text, arg$pos) {
 var old$text = ((typeof(text) !== 'undefined') ? text : undefined);
 text = arg$text;
 var old$pos = ((typeof(pos) !== 'undefined') ? pos : undefined);
@@ -1695,25 +1695,25 @@ return (((FN_goto_char)(((FN_$PLUS_)((1), (pos))))),
 } finally {}})))));
 } finally {text = old$text;
 pos = old$pos;
-}})((xcar44513), (xcar44511))) : (false)));
-} finally {xcar44513 = old$xcar44513;
-xcdr44514 = old$xcdr44514;
-}})(((FN_car)((xcdr44512))), ((FN_cdr)((xcdr44512))))) : (false)));
-} finally {xcar44511 = old$xcar44511;
-xcdr44512 = old$xcdr44512;
-}})(((FN_car)((xcdr44502))), ((FN_cdr)((xcdr44502))))) : (false)) : ((((FN_eq)((xcar44501), ("delete"))) !== false) ? ((((FN_consp)((xcdr44502))) !== false) ? ((function (arg$xcar44515, arg$xcdr44516) {
-var old$xcar44515 = ((typeof(xcar44515) !== 'undefined') ? xcar44515 : undefined);
-xcar44515 = arg$xcar44515;
-var old$xcdr44516 = ((typeof(xcdr44516) !== 'undefined') ? xcdr44516 : undefined);
-xcdr44516 = arg$xcdr44516;
+}})((xcar69213), (xcar69211))) : (false)));
+} finally {xcar69213 = old$xcar69213;
+xcdr69214 = old$xcdr69214;
+}})(((FN_car)((xcdr69212))), ((FN_cdr)((xcdr69212))))) : (false)));
+} finally {xcar69211 = old$xcar69211;
+xcdr69212 = old$xcdr69212;
+}})(((FN_car)((xcdr69202))), ((FN_cdr)((xcdr69202))))) : (false)) : ((((FN_eq)((xcar69201), ("delete"))) !== false) ? ((((FN_consp)((xcdr69202))) !== false) ? ((function (arg$xcar69215, arg$xcdr69216) {
+var old$xcar69215 = ((typeof(xcar69215) !== 'undefined') ? xcar69215 : undefined);
+xcar69215 = arg$xcar69215;
+var old$xcdr69216 = ((typeof(xcdr69216) !== 'undefined') ? xcdr69216 : undefined);
+xcdr69216 = arg$xcdr69216;
 try {
-return (((((FN_consp)((xcdr44516))) !== false) ? ((function (arg$xcar44517, arg$xcdr44518) {
-var old$xcar44517 = ((typeof(xcar44517) !== 'undefined') ? xcar44517 : undefined);
-xcar44517 = arg$xcar44517;
-var old$xcdr44518 = ((typeof(xcdr44518) !== 'undefined') ? xcdr44518 : undefined);
-xcdr44518 = arg$xcdr44518;
+return (((((FN_consp)((xcdr69216))) !== false) ? ((function (arg$xcar69217, arg$xcdr69218) {
+var old$xcar69217 = ((typeof(xcar69217) !== 'undefined') ? xcar69217 : undefined);
+xcar69217 = arg$xcar69217;
+var old$xcdr69218 = ((typeof(xcdr69218) !== 'undefined') ? xcdr69218 : undefined);
+xcdr69218 = arg$xcdr69218;
 try {
-return (((((FN_eq)((xcdr44518), (false))) !== false) ? ((function (arg$len, arg$pos) {
+return (((((FN_eq)((xcdr69218), (false))) !== false) ? ((function (arg$len, arg$pos) {
 var old$len = ((typeof(len) !== 'undefined') ? len : undefined);
 len = arg$len;
 var old$pos = ((typeof(pos) !== 'undefined') ? pos : undefined);
@@ -1725,25 +1725,25 @@ return (((FN_delete_region)(((FN_$PLUS_)((1), (pos))), ((FN_$PLUS_)((1), (pos), 
 } finally {}})))));
 } finally {len = old$len;
 pos = old$pos;
-}})((xcar44517), (xcar44515))) : (false)));
-} finally {xcar44517 = old$xcar44517;
-xcdr44518 = old$xcdr44518;
-}})(((FN_car)((xcdr44516))), ((FN_cdr)((xcdr44516))))) : (false)));
-} finally {xcar44515 = old$xcar44515;
-xcdr44516 = old$xcdr44516;
-}})(((FN_car)((xcdr44502))), ((FN_cdr)((xcdr44502))))) : (false)) : ((((FN_not)(((FN_eq)((xcar44501), ("delete-caret"))))) !== false) ? (false) : ((((FN_consp)((xcdr44502))) !== false) ? ((function (arg$xcar44519, arg$xcdr44520) {
-var old$xcar44519 = ((typeof(xcar44519) !== 'undefined') ? xcar44519 : undefined);
-xcar44519 = arg$xcar44519;
-var old$xcdr44520 = ((typeof(xcdr44520) !== 'undefined') ? xcdr44520 : undefined);
-xcdr44520 = arg$xcdr44520;
+}})((xcar69217), (xcar69215))) : (false)));
+} finally {xcar69217 = old$xcar69217;
+xcdr69218 = old$xcdr69218;
+}})(((FN_car)((xcdr69216))), ((FN_cdr)((xcdr69216))))) : (false)));
+} finally {xcar69215 = old$xcar69215;
+xcdr69216 = old$xcdr69216;
+}})(((FN_car)((xcdr69202))), ((FN_cdr)((xcdr69202))))) : (false)) : ((((FN_not)(((FN_eq)((xcar69201), ("delete-caret"))))) !== false) ? (false) : ((((FN_consp)((xcdr69202))) !== false) ? ((function (arg$xcar69219, arg$xcdr69220) {
+var old$xcar69219 = ((typeof(xcar69219) !== 'undefined') ? xcar69219 : undefined);
+xcar69219 = arg$xcar69219;
+var old$xcdr69220 = ((typeof(xcdr69220) !== 'undefined') ? xcdr69220 : undefined);
+xcdr69220 = arg$xcdr69220;
 try {
-return (((((FN_consp)((xcdr44520))) !== false) ? ((function (arg$xcar44521, arg$xcdr44522) {
-var old$xcar44521 = ((typeof(xcar44521) !== 'undefined') ? xcar44521 : undefined);
-xcar44521 = arg$xcar44521;
-var old$xcdr44522 = ((typeof(xcdr44522) !== 'undefined') ? xcdr44522 : undefined);
-xcdr44522 = arg$xcdr44522;
+return (((((FN_consp)((xcdr69220))) !== false) ? ((function (arg$xcar69221, arg$xcdr69222) {
+var old$xcar69221 = ((typeof(xcar69221) !== 'undefined') ? xcar69221 : undefined);
+xcar69221 = arg$xcar69221;
+var old$xcdr69222 = ((typeof(xcdr69222) !== 'undefined') ? xcdr69222 : undefined);
+xcdr69222 = arg$xcdr69222;
 try {
-return (((((FN_eq)((xcdr44522), (false))) !== false) ? ((function (arg$len, arg$pos) {
+return (((((FN_eq)((xcdr69222), (false))) !== false) ? ((function (arg$len, arg$pos) {
 var old$len = ((typeof(len) !== 'undefined') ? len : undefined);
 len = arg$len;
 var old$pos = ((typeof(pos) !== 'undefined') ? pos : undefined);
@@ -1755,15 +1755,15 @@ return (((FN_delete_region)(((FN_$PLUS_)((1), (pos))), ((FN_$PLUS_)((1), (pos), 
 } finally {}})))));
 } finally {len = old$len;
 pos = old$pos;
-}})((xcar44521), (xcar44519))) : (false)));
-} finally {xcar44521 = old$xcar44521;
-xcdr44522 = old$xcdr44522;
-}})(((FN_car)((xcdr44520))), ((FN_cdr)((xcdr44520))))) : (false)));
-} finally {xcar44519 = old$xcar44519;
-xcdr44520 = old$xcdr44520;
-}})(((FN_car)((xcdr44502))), ((FN_cdr)((xcdr44502))))) : (((true) !== false) ? (false) : (false)))))))));
-} finally {xcar44501 = old$xcar44501;
-xcdr44502 = old$xcdr44502;
+}})((xcar69221), (xcar69219))) : (false)));
+} finally {xcar69221 = old$xcar69221;
+xcdr69222 = old$xcdr69222;
+}})(((FN_car)((xcdr69220))), ((FN_cdr)((xcdr69220))))) : (false)));
+} finally {xcar69219 = old$xcar69219;
+xcdr69220 = old$xcdr69220;
+}})(((FN_car)((xcdr69202))), ((FN_cdr)((xcdr69202))))) : (((true) !== false) ? (false) : (false)))))))));
+} finally {xcar69201 = old$xcar69201;
+xcdr69202 = old$xcdr69202;
 }})(((FN_car)((operation))), ((FN_cdr)((operation))))) : (false)));
 } finally {infinote_inhibit_change_hooks = old$infinote_inhibit_change_hooks;
 }})((true))));
@@ -1778,24 +1778,24 @@ return (((function (arg$node) {
 var old$node = ((typeof(node) !== 'undefined') ? node : undefined);
 node = arg$node;
 try {
-return (((function (arg$__cl_var__44523) {
-var old$__cl_var__44523 = ((typeof(__cl_var__44523) !== 'undefined') ? __cl_var__44523 : undefined);
-__cl_var__44523 = arg$__cl_var__44523;
+return (((function (arg$__cl_var__69262) {
+var old$__cl_var__69262 = ((typeof(__cl_var__69262) !== 'undefined') ? __cl_var__69262 : undefined);
+__cl_var__69262 = arg$__cl_var__69262;
 try {
-return (((function (arg$__cl_var__44524) {
-var old$__cl_var__44524 = ((typeof(__cl_var__44524) !== 'undefined') ? __cl_var__44524 : undefined);
-__cl_var__44524 = arg$__cl_var__44524;
-try {
-return (((function () {
+return (((function (arg$__cl_var__69263) {
+var old$__cl_var__69263 = ((typeof(__cl_var__69263) !== 'undefined') ? __cl_var__69263 : undefined);
+__cl_var__69263 = arg$__cl_var__69263;
 try {
 return (((function () {
-while (((((FN_consp)((node))) !== false) ? ((((FN_equal)((id), ((FN_lax_plist_get)(((FN_cadr)((node))), ("id"))))) !== false) ? ((__cl_var__44524=((FN_cadr)((node))), ((__cl_var__44523=(false))))) : (true)) : (false)) !== false) {(node=((FN_cddr)((node))))};
+try {
+return (((function () {
+while (((((FN_consp)((node))) !== false) ? ((((FN_equal)((id), ((FN_lax_plist_get)(((FN_cadr)((node))), ("id"))))) !== false) ? ((__cl_var__69263=((FN_cadr)((node))), ((__cl_var__69262=(false))))) : (true)) : (false)) !== false) {(node=((FN_cddr)((node))))};
 })()),
-(((__cl_var__44523) !== false) ? (false) : (__cl_var__44524)));
+(((__cl_var__69262) !== false) ? (false) : (__cl_var__69263)));
 } finally {}})()));
-} finally {__cl_var__44524 = old$__cl_var__44524;
+} finally {__cl_var__69263 = old$__cl_var__69263;
 }})((false))));
-} finally {__cl_var__44523 = old$__cl_var__44523;
+} finally {__cl_var__69262 = old$__cl_var__69262;
 }})((true))));
 } finally {node = old$node;
 }})((infinote_nodes))));
@@ -1973,9 +1973,9 @@ return (("Convert a sexp to xml:\n  '(p :class \"big\")) => \"<p class=\\\"big\\
 var old$level = ((typeof(level) !== 'undefined') ? level : undefined);
 level = arg$level;
 try {
-return (((((FN_numberp)((form))) !== false) ? ((FN_number_to_string)((form))) : ((((FN_stringp)((form))) !== false) ? (form) : ((((FN_listp)((form))) !== false) ? ((function (arg$__cl_rest__44525) {
-var old$__cl_rest__44525 = ((typeof(__cl_rest__44525) !== 'undefined') ? __cl_rest__44525 : undefined);
-__cl_rest__44525 = arg$__cl_rest__44525;
+return (((((FN_numberp)((form))) !== false) ? ((FN_number_to_string)((form))) : ((((FN_stringp)((form))) !== false) ? (form) : ((((FN_listp)((form))) !== false) ? ((function (arg$__cl_rest__69264) {
+var old$__cl_rest__69264 = ((typeof(__cl_rest__69264) !== 'undefined') ? __cl_rest__69264 : undefined);
+__cl_rest__69264 = arg$__cl_rest__69264;
 try {
 return (((function (arg$xml) {
 var old$xml = ((typeof(xml) !== 'undefined') ? xml : undefined);
@@ -2015,23 +2015,23 @@ return (((FN_xmlgen)((s), (el), ((FN_1$PLUS_)((level))))));
 }})(((FN_car)((xml))))));
 } finally {}})()));
 } finally {attrs = old$attrs;
-}})(((FN_car)((__cl_rest__44525))))));
+}})(((FN_car)((__cl_rest__69264))))));
 } finally {xml = old$xml;
-}})(((((FN_$EQ_)(((FN_length)((__cl_rest__44525))), (2))) !== false) ? ((FN_car)(((function () {
-var $ret = (__cl_rest__44525);
+}})(((((FN_$EQ_)(((FN_length)((__cl_rest__69264))), (2))) !== false) ? ((FN_car)(((function () {
+var $ret = (__cl_rest__69264);
 false;
- (__cl_rest__44525=((FN_cdr)((__cl_rest__44525))));
+ (__cl_rest__69264=((FN_cdr)((__cl_rest__69264))));
 return $ret;
-})()))) : ((FN_signal)(("wrong-number-of-arguments"), ((FN_list)((false), ((FN_length)((__cl_rest__44525)))))))))));
-} finally {__cl_rest__44525 = old$__cl_rest__44525;
+})()))) : ((FN_signal)(("wrong-number-of-arguments"), ((FN_list)((false), ((FN_length)((__cl_rest__69264)))))))))));
+} finally {__cl_rest__69264 = old$__cl_rest__69264;
 }})(((FN_xmlgen_extract_plist)((form))))) : (false)))));
 } finally {level = old$level;
-}})(((function (arg$exp4452644527) {
-var old$exp4452644527 = ((typeof(exp4452644527) !== 'undefined') ? exp4452644527 : undefined);
-exp4452644527 = arg$exp4452644527;
+}})(((function (arg$exp6926569266) {
+var old$exp6926569266 = ((typeof(exp6926569266) !== 'undefined') ? exp6926569266 : undefined);
+exp6926569266 = arg$exp6926569266;
 try {
-return ((((exp4452644527) !== false) ? (exp4452644527) : (0)));
-} finally {exp4452644527 = old$exp4452644527;
+return ((((exp6926569266) !== false) ? (exp6926569266) : (0)));
+} finally {exp6926569266 = old$exp6926569266;
 }})((level))))));
 } finally {form = old$form;
 in_elm = old$in_elm;
@@ -2192,30 +2192,30 @@ children = arg$children;
 try {
 return (((function () {
 try {
-return (((((FN_consp)((xml_ns))) !== false) ? ((function (arg$__cl_dolist_temp__44528) {
-var old$__cl_dolist_temp__44528 = ((typeof(__cl_dolist_temp__44528) !== 'undefined') ? __cl_dolist_temp__44528 : undefined);
-__cl_dolist_temp__44528 = arg$__cl_dolist_temp__44528;
+return (((((FN_consp)((xml_ns))) !== false) ? ((function (arg$__cl_dolist_temp__69267) {
+var old$__cl_dolist_temp__69267 = ((typeof(__cl_dolist_temp__69267) !== 'undefined') ? __cl_dolist_temp__69267 : undefined);
+__cl_dolist_temp__69267 = arg$__cl_dolist_temp__69267;
 try {
 return (((function () {
-while ((__cl_dolist_temp__44528) !== false) {(function (arg$attr) {
+while ((__cl_dolist_temp__69267) !== false) {(function (arg$attr) {
 var old$attr = ((typeof(attr) !== 'undefined') ? attr : undefined);
 attr = arg$attr;
 try {
-return (((((((FN_consp)(((FN_car)((attr))))) !== false) ? ((FN_equal)(("http://www.w3.org/2000/xmlns/"), ((FN_caar)((attr))))) : (false)) !== false) ? ((((FN_symbolp)(((FN_car)((xml_ns))))) !== false) ? ((function (arg$__cl_arg1__44529) {
-var old$__cl_arg1__44529 = ((typeof(__cl_arg1__44529) !== 'undefined') ? __cl_arg1__44529 : undefined);
-__cl_arg1__44529 = arg$__cl_arg1__44529;
+return (((((((FN_consp)(((FN_car)((attr))))) !== false) ? ((FN_equal)(("http://www.w3.org/2000/xmlns/"), ((FN_caar)((attr))))) : (false)) !== false) ? ((((FN_symbolp)(((FN_car)((xml_ns))))) !== false) ? ((function (arg$__cl_arg1__69268) {
+var old$__cl_arg1__69268 = ((typeof(__cl_arg1__69268) !== 'undefined') ? __cl_arg1__69268 : undefined);
+__cl_arg1__69268 = arg$__cl_arg1__69268;
 try {
 return (((function () {
 try {
-return (((FN_setcdr)((xml_ns), ((FN_cons)((__cl_arg1__44529), ((FN_cdr)((xml_ns))))))));
+return (((FN_setcdr)((xml_ns), ((FN_cons)((__cl_arg1__69268), ((FN_cdr)((xml_ns))))))));
 } finally {}})()));
-} finally {__cl_arg1__44529 = old$__cl_arg1__44529;
+} finally {__cl_arg1__69268 = old$__cl_arg1__69268;
 }})(((FN_cons)(((FN_cdar)((attr))), ((FN_cdr)((attr))))))) : ((xml_ns=((FN_cons)(((FN_cons)(((FN_cdar)((attr))), ((FN_cdr)((attr))))), (xml_ns)))))) : (false)),
-((__cl_dolist_temp__44528=((FN_cdr)((__cl_dolist_temp__44528))))));
+((__cl_dolist_temp__69267=((FN_cdr)((__cl_dolist_temp__69267))))));
 } finally {attr = old$attr;
-}})(((FN_car)((__cl_dolist_temp__44528))))};
+}})(((FN_car)((__cl_dolist_temp__69267))))};
 })()));
-} finally {__cl_dolist_temp__44528 = old$__cl_dolist_temp__44528;
+} finally {__cl_dolist_temp__69267 = old$__cl_dolist_temp__69267;
 }})((attrs))) : (false)),
 ((children=((FN_list)((attrs), ((FN_xml_maybe_do_ns)((node_name), (""), (xml_ns))))))),
 ((((FN_looking_at)(("/>"))) !== false) ? (((false), ((FN_forward_char)((2))), ((FN_nreverse)((children))))) : ((((FN_eq)(((FN_char_after)()), (62))) !== false) ? (((false), ((FN_forward_char)((1))), ((function (arg$end) {
@@ -2261,20 +2261,20 @@ return $ret;
 }})(((FN_match_string_no_properties)((1))))))) : (((true) !== false) ? (((false), (((xml_sub_parser) !== false) ? (false) : ((FN_error)(("XML: (Well-Formed) Invalid character")))), ((FN_xml_parse_string)()))) : (false)))))))));
 } finally {}})()));
 } finally {xml_ns = old$xml_ns;
-}})(((((FN_eq)((parse_ns), ("symbol-qnames"))) !== false) ? ((FN_cons)(("symbol-qnames"), (xml_default_ns))) : ((((function (arg$exp4453044531) {
-var old$exp4453044531 = ((typeof(exp4453044531) !== 'undefined') ? exp4453044531 : undefined);
-exp4453044531 = arg$exp4453044531;
+}})(((((FN_eq)((parse_ns), ("symbol-qnames"))) !== false) ? ((FN_cons)(("symbol-qnames"), (xml_default_ns))) : ((((function (arg$exp6926969270) {
+var old$exp6926969270 = ((typeof(exp6926969270) !== 'undefined') ? exp6926969270 : undefined);
+exp6926969270 = arg$exp6926969270;
 try {
-return ((((exp4453044531) !== false) ? (exp4453044531) : ((((FN_eq)(((FN_car_safe)((parse_ns))), ("symbol-qnames"))) !== false) ? ((FN_listp)(((FN_cdr)((parse_ns))))) : (false))));
-} finally {exp4453044531 = old$exp4453044531;
+return ((((exp6926969270) !== false) ? (exp6926969270) : ((((FN_eq)(((FN_car_safe)((parse_ns))), ("symbol-qnames"))) !== false) ? ((FN_listp)(((FN_cdr)((parse_ns))))) : (false))));
+} finally {exp6926969270 = old$exp6926969270;
 }})(((FN_consp)(((FN_car_safe)((parse_ns))))))) !== false) ? (parse_ns) : (((parse_ns) !== false) ? (xml_default_ns) : (false)))))));
 } finally {xml_validating_parser = old$xml_validating_parser;
-}})(((function (arg$exp4453244533) {
-var old$exp4453244533 = ((typeof(exp4453244533) !== 'undefined') ? exp4453244533 : undefined);
-exp4453244533 = arg$exp4453244533;
+}})(((function (arg$exp6927169272) {
+var old$exp6927169272 = ((typeof(exp6927169272) !== 'undefined') ? exp6927169272 : undefined);
+exp6927169272 = arg$exp6927169272;
 try {
-return ((((exp4453244533) !== false) ? (exp4453244533) : (xml_validating_parser)));
-} finally {exp4453244533 = old$exp4453244533;
+return ((((exp6927169272) !== false) ? (exp6927169272) : (xml_validating_parser)));
+} finally {exp6927169272 = old$exp6927169272;
 }})((parse_dtd))))));
 } finally {parse_dtd = old$parse_dtd;
 parse_ns = old$parse_ns;
@@ -2363,12 +2363,12 @@ try {
 return ((((((symbol_qnames) !== false) ? ((FN_not)(((FN_string$EQ_)((prefix), ("xmlns"))))) : (false)) !== false) ? ((FN_intern)(((FN_concat)((ns), (lname))))) : ((FN_cons)((ns), (((special) !== false) ? ("") : (lname))))));
 } finally {}})()));
 } finally {ns = old$ns;
-}})(((function (arg$exp4453444535) {
-var old$exp4453444535 = ((typeof(exp4453444535) !== 'undefined') ? exp4453444535 : undefined);
-exp4453444535 = arg$exp4453444535;
+}})(((function (arg$exp6927369274) {
+var old$exp6927369274 = ((typeof(exp6927369274) !== 'undefined') ? exp6927369274 : undefined);
+exp6927369274 = arg$exp6927369274;
 try {
-return ((((exp4453444535) !== false) ? (exp4453444535) : ("")));
-} finally {exp4453444535 = old$exp4453444535;
+return ((((exp6927369274) !== false) ? (exp6927369274) : ("")));
+} finally {exp6927369274 = old$exp6927369274;
 }})(((FN_cdr)(((FN_assoc)((((special) !== false) ? ("xmlns") : (prefix)), (((symbol_qnames) !== false) ? ((FN_cdr)((xml_ns))) : (xml_ns)))))))))));
 } finally {special = old$special;
 }})(((((FN_string_equal)((lname), ("xmlns"))) !== false) ? ((FN_not)((prefix))) : (false)))));
@@ -2424,12 +2424,12 @@ val = arg$val;
 try {
 return (((string=((FN_concat)((val), (remainder))))));
 } finally {val = old$val;
-}})(((function (arg$exp4453644537) {
-var old$exp4453644537 = ((typeof(exp4453644537) !== 'undefined') ? exp4453644537 : undefined);
-exp4453644537 = arg$exp4453644537;
+}})(((function (arg$exp6927569276) {
+var old$exp6927569276 = ((typeof(exp6927569276) !== 'undefined') ? exp6927569276 : undefined);
+exp6927569276 = arg$exp6927569276;
 try {
-return ((((exp4453644537) !== false) ? (exp4453644537) : (((xml_validating_parser) !== false) ? ((FN_error)(("XML: (Validity) Undefined entity `%s'"), (ref))) : (xml_undefined_entity))));
-} finally {exp4453644537 = old$exp4453644537;
+return ((((exp6927569276) !== false) ? (exp6927569276) : (((xml_validating_parser) !== false) ? ((FN_error)(("XML: (Validity) Undefined entity `%s'"), (ref))) : (xml_undefined_entity))));
+} finally {exp6927569276 = old$exp6927569276;
 }})(((FN_cdr)(((FN_assoc)((ref), (xml_entity_alist))))))))), (((xml_entity_expansion_limit) !== false) ? ((((FN_$GT_)(((FN_length)((string))), ((FN_$PLUS_)((strlen), (xml_entity_expansion_limit))))) !== false) ? ((FN_error)(("XML: Passed `xml-entity-expansion-limit' while expanding `&%s;'"), (ref))) : (false)) : (false))))));
 } finally {}})()));
 } finally {ref = old$ref;
@@ -2470,12 +2470,12 @@ return (FN_decode_char)(("ucs"), ((FN_string_to_number)((ref), ((((FN_match_stri
 } finally {
 (FN_set_match_data)((save_match_data_internal), ("evaporate"))}})()));
 } finally {save_match_data_internal = old$save_match_data_internal;
-}})(((FN_match_data)()))))), ((((FN_null)((val))) !== false) ? (((xml_validating_parser) !== false) ? ((FN_error)(("XML: (Validity) Invalid character reference `%s'"), ((FN_match_string)((0))))) : (false)) : (false)), ((FN_replace_match)((((val) !== false) ? ((FN_string)((val))) : (xml_undefined_entity)), (true), (true))))) : (((false), ((ref=((FN_match_string)((3))), ((val=((FN_assoc)((ref), (xml_entity_alist))))))), ((((FN_null)((val))) !== false) ? (((xml_validating_parser) !== false) ? ((FN_error)(("XML: (Validity) Undefined entity `%s'"), (ref))) : (false)) : (false)), ((FN_replace_match)(((function (arg$exp4453844539) {
-var old$exp4453844539 = ((typeof(exp4453844539) !== 'undefined') ? exp4453844539 : undefined);
-exp4453844539 = arg$exp4453844539;
+}})(((FN_match_data)()))))), ((((FN_null)((val))) !== false) ? (((xml_validating_parser) !== false) ? ((FN_error)(("XML: (Validity) Invalid character reference `%s'"), ((FN_match_string)((0))))) : (false)) : (false)), ((FN_replace_match)((((val) !== false) ? ((FN_string)((val))) : (xml_undefined_entity)), (true), (true))))) : (((false), ((ref=((FN_match_string)((3))), ((val=((FN_assoc)((ref), (xml_entity_alist))))))), ((((FN_null)((val))) !== false) ? (((xml_validating_parser) !== false) ? ((FN_error)(("XML: (Validity) Undefined entity `%s'"), (ref))) : (false)) : (false)), ((FN_replace_match)(((function (arg$exp6927769278) {
+var old$exp6927769278 = ((typeof(exp6927769278) !== 'undefined') ? exp6927769278 : undefined);
+exp6927769278 = arg$exp6927769278;
 try {
-return ((((exp4453844539) !== false) ? (exp4453844539) : (xml_undefined_entity)));
-} finally {exp4453844539 = old$exp4453844539;
+return ((((exp6927769278) !== false) ? (exp6927769278) : (xml_undefined_entity)));
+} finally {exp6927769278 = old$exp6927769278;
 }})(((FN_cdr)((val))))), (true), (true))), ((FN_goto_char)(((FN_match_beginning)((0)))))))), (((xml_entity_expansion_limit) !== false) ? ((((FN_$GT_)(((FN__)(((FN_buffer_size)()), ((FN_point)()))), ((FN_$PLUS_)((old_remaining_size), (xml_entity_expansion_limit))))) !== false) ? ((FN_error)(("XML: Entity reference expansion surpassed `xml-entity-expansion-limit'"))) : (false)) : (false)))) : (false)};
 })()),
 ((function (arg$end_marker) {
@@ -2503,12 +2503,12 @@ var old$attribute = ((typeof(attribute) !== 'undefined') ? attribute : undefined
 attribute = arg$attribute;
 try {
 return (("Get from NODE the value of ATTRIBUTE.\nAn empty string is returned if the attribute was not found.\n\nSee also `xml-get-attribute-or-nil'."),
-((function (arg$exp4454044541) {
-var old$exp4454044541 = ((typeof(exp4454044541) !== 'undefined') ? exp4454044541 : undefined);
-exp4454044541 = arg$exp4454044541;
+((function (arg$exp6927969280) {
+var old$exp6927969280 = ((typeof(exp6927969280) !== 'undefined') ? exp6927969280 : undefined);
+exp6927969280 = arg$exp6927969280;
 try {
-return ((((exp4454044541) !== false) ? (exp4454044541) : ("")));
-} finally {exp4454044541 = old$exp4454044541;
+return ((((exp6927969280) !== false) ? (exp6927969280) : ("")));
+} finally {exp6927969280 = old$exp6927969280;
 }})(((FN_xml_get_attribute_or_nil)((node), (attribute))))));
 } finally {node = old$node;
 attribute = old$attribute;
@@ -2535,7 +2535,7 @@ return (("Return the list of attributes of NODE.\nThe list can be nil."),
 infinote_server = "irc.joelhough.com";
 infinote_port = 6523;
 infinote_user_name = "Andrew Cobb";
-infinote_hue = 0.20254063606262207;
+infinote_hue = 0.35588300228118896;
 infinote_connection = false;
 infinote_connection_buffer = false;
 infinote_connection_ready = false;
@@ -2595,3 +2595,4 @@ buffer_add_make_local_var('infinote_my_last_sent_vector');
 buffer_add_make_local_var('infinote_inhibit_change_hooks');
 buffer_add_make_local_var('infinote_text_before_change');
 buffer_add_make_local_var('infinote_syncing');
+$all_function_syms = ["FN_nth", "FN_xml_node_attributes", "FN_xml_get_attribute_or_nil", "FN_xml_get_attribute", "FN_point_marker", "FN_buffer_size", "FN_replace_match", "FN_null", "FN_match_data", "FN_set_match_data", "FN_skip_chars_forward", "FN_match_string", "FN_decode_char", "FN_string", "FN_string_match", "FN_string_equal", "FN_intern", "FN_string$EQ_", "FN_xml_substitute_special", "FN_assoc", "FN_car_safe", "FN_match_string_no_properties", "FN_xml_parse_attlist", "FN_point", "FN_re_search_forward", "FN_buffer_substring", "FN_char_after", "FN_nreverse", "FN_forward_char", "FN_xml_maybe_do_ns", "FN_cdar", "FN_setcdr", "FN_caar", "FN_eobp", "FN_xml_parse_dtd", "FN_match_end", "FN_xml_parse_string", "FN_match_beginning", "FN_skip_syntax_forward", "FN_search_forward", "FN_looking_at", "FN_xml_parse_tag_1", "FN_substring", "FN_keywordp", "FN_append", "FN_mapc", "FN_xmlgen_extract_plist", "FN_xmlgen_string_escape", "FN_xmlgen_attr_to_string", "FN_symbol_name", "FN_1$PLUS_", "FN_error", "FN_symbolp", "FN_number_to_string", "FN_numberp", "FN_message", "FN_infinote_handle_group_command", "FN_infinote_node_from_id", "FN_delete_region", "FN_goto_char", "FN_save_excursion_fn", "FN_infinote_apply_operation", "FN_infinote_contextualize_delete", "FN_infinote_affected_text", "FN_infinote_handle_request", "FN_remove", "FN_infinote_process_request_queue", "FN_infinote_can_apply", "FN_infinote_cid_is_op", "FN_stringp", "FN_infinote_split_operation", "FN_$LT_$EQ_", "FN_$LT_", "FN_funcall", "FN_infinote_transform_operation", "FN_member", "FN_infinote_op_type", "FN_infinote_translate_operation", "FN_infinote_closer_target_request", "FN_$SLASH_$EQ_", "FN_infinote_translatable_user", "FN_cdr", "FN_infinote_nth_user_request_from_log", "FN_insert", "FN_infinote_insert_segment", "FN_infinote_set_user_data", "FN_infinote_get_user_data", "FN_infinote_user_vector", "FN_infinote_diff_user_vector", "FN_$PLUS_", "FN_infinote_diffed_vector", "FN_copy_sequence", "FN_infinote_vector_equal", "FN_infinote_operation_count", "FN_infinote_vector_includes", "FN_listp", "FN_concat", "FN_apply", "FN_infinote_segment_xml_to_text", "FN_memql", "FN_infinote_xml_to_operation", "FN_split_string", "FN_string_to_number", "FN_mapcar", "FN_infinote_read_vector", "FN_point_max", "FN_point_min", "FN_$EQ_", "FN_equal", "FN_infinote_user_join", "FN_get_buffer", "FN_lax_plist_put", "FN_current_buffer", "FN_display_buffer", "FN_infinote_mode", "FN_generate_new_buffer", "FN_not", "FN_infinote_create_session", "FN_format", "FN_nconc", "FN_zerop", "FN_consp", "FN_identity", "FN_mapconcat", "FN_infinote_vector_subtract", "FN_length", "FN__", "FN_infinote_increment_my_vector", "FN_infinote_send_delete", "FN_infinote_send_insert", "FN_infinote_my_vector", "FN_infinote_send_user_join", "FN_infinote_send_sync_ack", "FN_infinote_send_subscribe_ack", "FN_cons", "FN_infinote_send_session_unsubscribe", "FN_infinote_send_explore", "FN_replace_regexp_in_string", "FN_base64_encode_string", "FN_infinote_diff_since_last_sent_vector", "FN_infinote_vector_to_string", "FN_infinote_send_request", "FN_infinote_send_group_command", "FN_xmlgen", "FN_infinote_send_string", "FN_infinote_send_xml", "FN_cadr", "FN_car", "FN_assoc_default", "FN_infinote_handle_group_commands", "FN_infinote_send_stream_header", "FN_infinote_send_sasl_response", "FN_infinote_send_auth", "FN_cddr", "FN_eq", "FN_infinote_handle_stanza", "FN_infinote_post_command", "FN_$GT_", "FN_infinote_local_insert", "FN_infinote_local_delete", "FN_$GT_$EQ_", "FN_list", "FN_signal", "FN_infinote_after_change", "FN_buffer_substring_no_properties", "FN_infinote_before_change", "FN_infinote_send_add_node", "FN_lax_plist_get", "FN_infinote_send_subscribe_session", "FN_process_buffer", "FN_set_buffer", "FN_save_current_buffer_fn", "FN_infinote_connect_to_server", "FN_infinote_find_file"];
