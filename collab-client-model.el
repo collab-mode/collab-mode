@@ -44,7 +44,7 @@ so it doesn't rebroadcast itself into an infinite loop")
 (defun collab-mode-cm-post-login ()
  (setq infinote-user-name (collab-self-username))
  (setq infinote-hue (collab-mode-cm-hue-for-user (collab-self-user)))
- (message "post-login, uname = %S, hue = %S"  infinote-user-name infinote-hue)
+ ;;(message "post-login, uname = %S, hue = %S" infinote-user-name infinote-hue)
  (infinote-connect-to-server))
 
 (defun collab-mode-cm-xmpp-login (username password)

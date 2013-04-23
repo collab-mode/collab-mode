@@ -7,7 +7,7 @@
   "infinote"
   :group 'communication)
 
-(defcustom infinote-server "irc.joelhough.com"
+(defcustom infinote-server "collab-mode.com"
   "infinote server"
   :group 'infinote
   :type 'string)
