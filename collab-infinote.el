@@ -69,7 +69,7 @@
 (make-variable-buffer-local 'infinote-original-mark)
 (defvar infinote-original-point 1 "The buffer point before syncing with the infinote server")
 (make-variable-buffer-local 'infinote-original-point)
-(defvar infinote-original-windows '() "The windows that should be displaed")
+(defvar infinote-original-windows '() "The windows that should be displayed")
 (make-variable-buffer-local 'infinote-original-windows)
 (defvar infinote-sync-finished nil "bool saying sync happened")
 (make-variable-buffer-local 'infinote-sync-finished)
