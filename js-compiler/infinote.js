@@ -235,8 +235,18 @@ function ace_init(file) {
         $editor.setValue($current_buffer.str, $current_buffer.point);
     };
     buffer.render_hook = {
-        inserted: just_nuke_it,
-        deleted: just_nuke_it
+        inserted: function(point, str) {
+            var pos = $editor.session.doc.indexToPosition(point);
+            $editor.session.doc.insert(pos, str);
+        },
+        deleted: function(s, e) {
+            var Range = ace.require('ace/range').Range;
+            var start = $editor.session.doc.indexToPosition(s);
+            var end = $editor.session.doc.indexToPosition(e);
+            var range = new Range(start.row, start.column,
+                                  end.row, end.column);
+            $editor.session.doc.remove(range);
+        }
     };
     $editor.on("change", function(e) {
         var start = $editor.session.doc.positionToIndex(e.data.range.start);
