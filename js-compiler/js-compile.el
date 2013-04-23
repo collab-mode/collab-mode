@@ -46,7 +46,9 @@
          (print-escape-multibyte nil))
     (prin1-to-string it)))))
 
+(defvar js-seen-fns '())
 (defun js-fn-trans (fn-sym)
+ (add-to-list 'js-seen-fns fn-sym)
  (concat "FN_" (js-sym-trans fn-sym)))
 
 (defun js-quote (exp)
@@ -305,7 +307,8 @@
 
 (require 'collab-mode)
 
-(let* ((interesting-functions
+(let* ((js-seen-fns nil)
+       (interesting-functions
         '(
           infinote-find-file
           infinote-before-change
@@ -471,7 +474,11 @@
                      (concat
                       "buffer_add_make_local_var('"
                       (js-sym-trans sym)
-                      "');\n"))))))
+                      "');\n"))
+                  "$all_function_syms = ["
+                  ,(mapconcat (lambda (x) (prin1-to-string (js-fn-trans x)))
+                    js-seen-fns ", ")
+                  "];\n"))))
  (with-temp-buffer
   (c-mode)
   (insert result)
