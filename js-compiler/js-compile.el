@@ -1,8 +1,5 @@
 ;;; -*- lexical-binding: t -*-
 
-(load-file "../xml.el")
-(load-file "../xmlgen.el")
-
 (defvar js-uninterned-sym-trans-table nil)
 (defun js-uninterned-sym-trans (sym)
  (or
@@ -46,7 +43,9 @@
          (print-escape-multibyte nil))
     (prin1-to-string it)))))
 
+(defvar js-seen-fns '())
 (defun js-fn-trans (fn-sym)
+ (add-to-list 'js-seen-fns fn-sym)
  (concat "FN_" (js-sym-trans fn-sym)))
 
 (defun js-quote (exp)
@@ -270,6 +269,14 @@
    (`(save-excursion . ,body)
     (list (make-js `(save-excursion-fn (lambda () . ,body)))))
 
+   (`(condition-case ,var ,body (error . ,handlers))
+    (js-stmt-to-expr
+     `("try {\n"
+       "return " ,(make-js body)
+       ";\n} catch (" ,(if var (js-sym-trans var) "e") ") {\n"
+       "return " ,(make-js `(progn . ,handlers))
+       ";\n}\n")))
+
    (`(,(pred
         (lambda (x)
          (member x
@@ -290,6 +297,9 @@
    (`t '("true"))
    (`nil '("false"))
 
+   ((pred keywordp)
+    (list (string-it (symbol-name exp))))
+
    ((pred symbolp)
     (list (js-sym-trans exp)))
 
@@ -305,14 +315,14 @@
 
 (require 'collab-mode)
 
-(let* ((interesting-functions
+(let* ((js-seen-fns nil)
+       (interesting-functions
         '(
           infinote-find-file
           infinote-before-change
           infinote-after-change
           infinote-post-command
           infinote-handle-stanza
-          ;;infinote-send-string
           infinote-send-xml
           infinote-send-group-command
           infinote-send-request
@@ -328,7 +338,6 @@
           infinote-send-user-join
           infinote-send-insert
           infinote-send-delete
-          ;;infinote-collab-text-properties
           infinote-local-insert
           infinote-local-delete
           infinote-diff-since-last-sent-vector
@@ -365,6 +374,48 @@
           infinote-node-from-id
           infinote-handle-group-commands
           infinote-handle-group-command
+          infinote-cid-is-op
+          infinote-split-operation
+
+collab-mode-cm-update-room-list
+collab-mode-cm-update-user-list
+collab-mode-cm-update-friend-list
+collab-mode-cm-connect
+collab-mode-cm-post-login
+collab-mode-cm-xmpp-login
+collab-mode-cm-rgb-to-color
+collab-mode-cm-color-for-user
+collab-mode-cm-hue-for-user
+collab-mode-cm-format-user
+collab-server-friends-minus-server-users
+collab-users
+collab-user-from-username
+collab-username-from-user
+collab-self-user
+collab-self-username
+collab-mode-cm-chat-font-for-username
+string/starts-with
+string/ends-with
+collab-friends-matching-prefix
+collab-mode-cm-send-chat
+collab-mode-cm-revert-user-list-buffer
+collab-mode-cm-new-users-received
+collab-mode-cm-new-friends-received
+collab-mode-cm-new-rooms-received
+collab-mode-cm-current-room
+collab-mode-cm-login-status-changed
+collab-mode-cm-post-change-hook
+collab-invite-user
+collab-mode-cm-invite-received
+collab-mode-cm-init-this-buffer
+collab-mode-cm-deinit-this-buffer
+collab-mode-connected-p
+collab-mode-network-connect
+
+collab-network-connect-to-server
+collab-network-receive-from-server
+collab-network-send-to-server
+collab-network-send-string-to-server
 
           xmlgen
           xmlgen-extract-plist
@@ -471,7 +522,11 @@
                      (concat
                       "buffer_add_make_local_var('"
                       (js-sym-trans sym)
-                      "');\n"))))))
+                      "');\n"))
+                  "$all_function_syms = ["
+                  ,(mapconcat (lambda (x) (prin1-to-string (js-fn-trans x)))
+                    js-seen-fns ", ")
+                  "];\n"))))
  (with-temp-buffer
   (c-mode)
   (insert result)

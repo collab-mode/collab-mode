@@ -1,4 +1,5 @@
 function FN_infinote_connect_to_server(callback) {
+    return;
     if (infinote_connection !== false &&
         infinote_connection.readyState !== 3) {
         return;

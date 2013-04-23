@@ -239,6 +239,19 @@ function FN_point_marker() {
     return $current_buffer.point + 1;
 }
 
+function FN_search_forward(str, bound, noerror, count) {
+    var re = "";
+    for (var i = 0; i < str.length; i++) {
+        var c = str[i];
+        if ('[]?()|\\$^*+.{}'.indexOf(x) === -1) {
+            re += c;
+        } else {
+            re += "\\" + c;
+        }
+    }
+    return FN_re_search_forward(re, bound, noerror, count);
+}
+
 function FN_re_search_forward(regexp, bound, noerror, count) {
     bound--;
     var sub_buf = $current_buffer.str.substring($current_buffer.point, bound);
