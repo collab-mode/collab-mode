@@ -1,6 +1,6 @@
 (:name collab-mode
        :type github
-       :branch "master"
+       :branch "install"
        :load "collab-mode.el"
        :username "collab-mode"
        :pkgname "collab-mode"
