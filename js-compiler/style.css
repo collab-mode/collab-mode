@@ -35,11 +35,14 @@ select {
     top: 0;
     left: 0;
     width: -webkit-calc(100%);
+    width: calc(100%);
     height: -webkit-calc(100% - 46px);
+    height: calc(100% - 46px);
     overflow: auto;
 }
 #log .in {
     width: -webkit-calc(100% - 20px);
+    width: calc(100% - 20px);
     margin: 10px;
     background-color: #cfc;
     white-space: pre-wrap;       /* css-3 */
@@ -50,6 +53,7 @@ select {
 }
 #log .out {
     width: -webkit-calc(100% - 20px);
+    width: calc(100% - 20px);
     margin: 10px;
     background-color: #fcc;
     white-space: pre-wrap;       /* css-3 */
@@ -62,6 +66,7 @@ select {
     position: relative;
     width: 100%;
     height: -webkit-calc(100% - 46px);
+    height: calc(100% - 46px);
     margin: auto;
 }
 #editor {
@@ -85,6 +90,7 @@ select {
     /*position: absolute;
       */
     margin-left: -webkit-calc(50% - 200px);
+    margin-left: calc(50% - 200px);
     margin-right: auto;
     margin-top: 100px;
     padding-top: 30px;
