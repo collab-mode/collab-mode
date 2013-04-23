@@ -245,7 +245,7 @@ so it doesn't rebroadcast itself into an infinite loop")
   finally return "main"))
 
 (defvar collab-mode-cm-timers '())
-(defun collab-mode-cm-kill-timers
+(defun collab-mode-cm-kill-timers ()
  (mapc #'cancel-timer collab-mode-cm-timers)
  (setq collab-mode-cm-timers '()))
 
@@ -255,8 +255,8 @@ so it doesn't rebroadcast itself into an infinite loop")
   (setq collab-mode-cm-XMPP-username nil))
 
  (collab-mode-cm-kill-timers)
- (add-to-list 'collab-mode-cm-kill-timers (run-at-time 3 nil #'collab-mode-cm-update-friend-list))
- (add-to-list 'collab-mode-cm-kill-timers (run-at-time t 5 #'collab-mode-cm-update-friend-list))
+ (add-to-list 'collab-mode-cm-timers (run-at-time 3 nil #'collab-mode-cm-update-friend-list))
+ (add-to-list 'collab-mode-cm-timers (run-at-time t 5 #'collab-mode-cm-update-friend-list))
 
  (setq collab-mode-cm-should-finish-login-after-users t)
  (collab-mode-cm-update-user-list))
