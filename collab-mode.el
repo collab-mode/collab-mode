@@ -9,7 +9,6 @@
 (defun collab-cursor (user position)
   "Places a cursor for USER at POSITION with COLOR.
 If POSITION is <= 1 then the overlay is deleted."
-  (interactive)
   (setq color (or (collab-user-color
                    (collab-mode-cm-format-user
                     (collab-user-from-username user)))
@@ -71,7 +70,6 @@ If POSITION is <= 1 then the overlay is deleted."
 (defun collab-get-entries ()
   "Returns the tabulated-list-entries argument for listing users. It gets the list of
 users, checks which are connected, and returns the appropriate list of entries."
-  (interactive)
   (let ((entries '()))
     (dolist (user (collab-users))
       (add-to-list 'entries

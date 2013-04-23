@@ -22,16 +22,13 @@ so it doesn't rebroadcast itself into an infinite loop")
 (defvar collab-server-rooms '())
 
 (defun collab-mode-cm-update-room-list ()
- (interactive)
  (collab-network-send-to-server nil "<list rooms>"))
 
 (defun collab-mode-cm-update-user-list ()
- (interactive)
  (collab-network-send-to-server nil "<list addr>")
  (collab-network-send-to-server nil "<list main addr>"))
 
 (defun collab-mode-cm-update-friend-list ()
- (interactive)
  (when (collab-mode-connected-p)
   (when collab-mode-cm-XMPP-username
    (collab-network-send-to-server nil "<xmpp friends>"))
