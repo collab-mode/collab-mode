@@ -18,6 +18,7 @@ so it doesn't rebroadcast itself into an infinite loop")
 (defvar collab-mode-cm-last-attempted-login nil "Last XMPP username we tried to log in as")
 (defvar collab-server-friends '())
 (defvar collab-server-users '())
+(defvar collab-server-main-users '())
 (defvar collab-server-rooms '())
 
 (defun collab-mode-cm-update-room-list ()
@@ -26,12 +27,15 @@ so it doesn't rebroadcast itself into an infinite loop")
 
 (defun collab-mode-cm-update-user-list ()
  (interactive)
- (collab-network-send-to-server nil "<list addr>"))
+ (collab-network-send-to-server nil "<list addr>")
+ (collab-network-send-to-server nil "<list main addr>"))
 
 (defun collab-mode-cm-update-friend-list ()
  (interactive)
- (when collab-mode-cm-XMPP-username
-  (collab-network-send-to-server nil "<xmpp friends>")))
+ (when (collab-mode-connected-p)
+  (when collab-mode-cm-XMPP-username
+   (collab-network-send-to-server nil "<xmpp friends>"))
+  (collab-network-send-to-server nil "<list main addr>")))
 
 (defun collab-mode-cm-connect (username password)
  (setq collab-mode-cm-network-connection
@@ -72,6 +76,10 @@ so it doesn't rebroadcast itself into an infinite loop")
   (`(,num ,ip ,port ,username ,r ,g ,b . ,_)
    (/ r 255.0))))
 
+(defun collab-mode-cm-user-in-room (user)
+ (member (collab-username-from-user user)
+  (mapcar #'collab-username-from-user collab-server-users)))
+
 (defun collab-mode-cm-format-user (user)
  (pcase user
   ;; Server user
@@ -79,7 +87,8 @@ so it doesn't rebroadcast itself into an infinite loop")
    (list
     (cond
      ((equal username (collab-self-username)) 'you)
-     (t 'collaborating))
+     ((collab-mode-cm-user-in-room user) 'collaborating)
+     (t 'not-collaborating))
     username
     (collab-mode-cm-rgb-to-color r g b)))
   ;; Friend list user
@@ -98,12 +107,37 @@ so it doesn't rebroadcast itself into an infinite loop")
       (not (equal (caddr friend) "offline")))
   collect friend))
 
+(defun collab-merged-users ()
+ "lists all the collab users in both main and the current room"
+ (remove-duplicates
+  (append collab-server-users collab-server-main-users)
+  :key #'collab-username-from-user
+  :test #'equal
+  :from-end t))
+
+(defun collab-user-status-order (status)
+ (case status
+  (you 0)
+  (collaborating 1)
+  (not-collaborating 2)
+  (available 3)
+  (offline 4)
+  (t 5)))
+
 (defun collab-users ()
- (mapcar #'collab-mode-cm-format-user
-  (append collab-server-users (collab-server-friends-minus-server-users))))
+ (sort
+  (mapcar #'collab-mode-cm-format-user
+   (append (collab-merged-users) (collab-server-friends-minus-server-users)))
+  (lambda (a b)
+   (let ((status-a (collab-user-status-order (car a)))
+         (status-b (collab-user-status-order (car b))))
+    (cond
+     ((= status-a status-b)
+      (not (string< (cadr a) (cadr b))))
+     (t (> status-a status-b)))))))
 
 (defun collab-user-from-username (username)
- (loop for user in collab-server-users
+ (loop for user in (collab-merged-users)
   if (equal (collab-username-from-user user) username)
   return user))
 
@@ -111,7 +145,7 @@ so it doesn't rebroadcast itself into an infinite loop")
  (cadddr user))
 
 (defun collab-self-user ()
- (let ((current-you (loop for user in collab-server-users
+ (let ((current-you (loop for user in (collab-merged-users)
                      if (equal (last user) '(:you))
                      return user)))
   (when current-you
@@ -193,6 +227,10 @@ so it doesn't rebroadcast itself into an infinite loop")
   (setq collab-mode-cm-should-finish-login-after-users nil)
   (collab-mode-cm-post-login)))
 
+(defun collab-mode-cm-new-main-users-received (users)
+ (setq collab-server-main-users users)
+ (collab-mode-cm-revert-user-list-buffer))
+
 (defun collab-mode-cm-new-friends-received (friends)
  (setq collab-server-friends friends)
  (collab-mode-cm-revert-user-list-buffer))
@@ -203,15 +241,23 @@ so it doesn't rebroadcast itself into an infinite loop")
 (defun collab-mode-cm-current-room ()
  (loop for room in collab-server-rooms
   if (equal (last room) '(:self-room))
-  return (cadr room)))
+  return (cadr room)
+  finally return "main"))
+
+(defvar collab-mode-cm-timers '())
+(defun collab-mode-cm-kill-timers
+ (mapc #'cancel-timer collab-mode-cm-timers)
+ (setq collab-mode-cm-timers '()))
 
 (defun collab-mode-cm-login-status-changed (logged-in)
  (if logged-in
-  (progn
-   (setq collab-mode-cm-XMPP-username collab-mode-cm-last-attempted-login)
-   (run-at-time 3 nil #'collab-mode-cm-update-friend-list)
-   (run-at-time t 5 #'collab-mode-cm-update-friend-list))
+  (setq collab-mode-cm-XMPP-username collab-mode-cm-last-attempted-login)
   (setq collab-mode-cm-XMPP-username nil))
+
+ (collab-mode-cm-kill-timers)
+ (add-to-list 'collab-mode-cm-kill-timers (run-at-time 3 nil #'collab-mode-cm-update-friend-list))
+ (add-to-list 'collab-mode-cm-kill-timers (run-at-time t 5 #'collab-mode-cm-update-friend-list))
+
  (setq collab-mode-cm-should-finish-login-after-users t)
  (collab-mode-cm-update-user-list))
 
@@ -223,19 +269,16 @@ so it doesn't rebroadcast itself into an infinite loop")
    (collab-network-send-to-server
     `(:cursor ,(collab-username-from-user (collab-self-user)) ,cursor-pos)))))
 
+(defun collab-mode-cm-switch-to-room (room)
+ (collab-network-send-string-to-server room "<create room>")
+ (collab-network-send-string-to-server room "<join room>")
+ (collab-mode-cm-update-room-list))
+
 (defun collab-invite-user (user)
- (let ((room (collab-mode-cm-current-room)))
-  (if (equal room "main")
-   (setq room (format "%x" (random))))
-  (collab-network-send-string-to-server room "<create room>")
-  (collab-network-send-string-to-server room "<join room>")
-  (collab-mode-cm-update-room-list)
-  (collab-network-send-string-to-server user "<invite>")))
+ (collab-network-send-string-to-server user "<invite>"))
 
 (defun collab-mode-cm-invite-received (room)
- (collab-network-send-string-to-server room "<join room>")
- (collab-mode-cm-update-room-list)
- (collab-mode-cm-update-user-list))
+ (infinote-find-file room))
 
 (defun collab-mode-cm-init-this-buffer ()
  "Initialization for the client model"
@@ -246,11 +289,15 @@ so it doesn't rebroadcast itself into an infinite loop")
  (setq collab-mode-cm-text-to-be-changed "")
  (add-hook 'post-command-hook #'collab-mode-cm-post-change-hook nil t)
  (if (not infinote-mode)
-  (infinote-share-this-file)))
+  (infinote-share-this-file))
+ (when infinote-file-name
+  (collab-mode-cm-switch-to-room infinote-file-name)))
 
 (defun collab-mode-cm-deinit-this-buffer ()
  (remove-hook 'post-command-hook #'collab-mode-cm-post-change-hook t)
- (infinote-deinit-this-buffer))
+ (collab-mode-cm-kill-timers)
+ (infinote-deinit-this-buffer)
+ (collab-mode-cm-switch-to-room "main"))
 
 (defun collab-mode-connected-p ()
  (when (boundp 'collab-server-process)

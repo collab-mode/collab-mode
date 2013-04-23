@@ -1,7 +1,11 @@
 (eval-when-compile (require 'cl))
 
-(load-file (concat (file-name-directory load-file-name) "xml.el"))
-(load-file (concat (file-name-directory load-file-name) "xmlgen.el"))
+(loop for file in '("xml.el" "xmlgen.el")
+ do (load-file
+     (concat
+      (file-name-directory
+       (or load-file-name buffer-file-name))
+      file)))
 
 (defgroup infinote nil
   "infinote"
@@ -73,6 +77,8 @@
 (make-variable-buffer-local 'infinote-original-windows)
 (defvar infinote-sync-finished nil "bool saying sync happened")
 (make-variable-buffer-local 'infinote-sync-finished)
+(defvar infinote-file-name nil "name of file infinote is editing")
+(make-variable-buffer-local 'infinote-file-name)
 
 (define-minor-mode infinote-mode
   "infinote"
@@ -450,6 +456,7 @@
     (with-current-buffer new-buffer
       (infinote-set-major-mode)
       (setq infinote-group-name group-name)
+      (setq infinote-file-name name)
       (setq infinote-node-id id)
       (setq infinote-node-type "InfText")
       (setq infinote-original-contents contents)

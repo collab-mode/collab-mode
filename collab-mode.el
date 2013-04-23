@@ -90,7 +90,8 @@ users, checks which are connected, and returns the appropriate list of entries."
 (defun collab-user-status (user)
   (cond
    ((equal (car user) 'you) "(you)")
-   ((equal (car user) 'collaborating) "(connected)")
+   ((equal (car user) 'collaborating) "(editing)")
+   ((equal (car user) 'not-collaborating) "(lobby)")
    ((equal (car user) 'available) "●")
    ((equal (car user) 'offline) "○")
    (t "")))
