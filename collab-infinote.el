@@ -79,6 +79,8 @@
 (make-variable-buffer-local 'infinote-sync-finished)
 (defvar infinote-file-name nil "name of file infinote is editing")
 (make-variable-buffer-local 'infinote-file-name)
+(defvar infinote-sync-vector nil "vector of changes being synced")
+(make-variable-buffer-local 'infinote-sync-vector)
 
 (define-minor-mode infinote-mode
   "infinote"
@@ -485,6 +487,7 @@
   (overlay-put (infinote-get-user-data id 'selection-overlay) 'face (infinote-user-selection-face id))
   (when (equal name infinote-user-name)
     (setq infinote-user-id id)
+    (infinote-set-my-vector-to-sync)
     (unless (or infinote-syncing
 		(not (= (point-min) (point-max)))
                 (equal infinote-original-contents ""))
@@ -588,6 +591,17 @@
   (assert user-id)
   (infinote-diff-user-vector infinote-user-id (list user-id 1)))
 
+(defun infinote-increment-sync-vector (user-id)
+  (setq infinote-sync-vector (infinote-diffed-vector infinote-sync-vector (list user-id 1))))
+
+(defun infinote-set-my-vector-to-sync ()
+  (setq infinote-users
+        (lax-plist-put infinote-users
+                       infinote-user-id
+                       (lax-plist-put (lax-plist-get infinote-users infinote-user-id)
+                                      'vector
+                                      infinote-sync-vector))))
+
 (defun infinote-user-vector (user-id)
   (assert user-id)
   (lax-plist-get (lax-plist-get infinote-users user-id) 'vector))
@@ -669,6 +683,7 @@
         finally return nil))
 
 (defun infinote-translatable-user (request-user-id request-vector target-vector)
+  (assert request-user-id)
   (loop for target-operation on target-vector by #'cddr
         if (let ((target-user-id (car target-operation))
                  (target-operation-count (cadr target-operation)))
@@ -678,19 +693,20 @@
         finally return nil))
 
 (defun infinote-closer-target-request (request-user-id request-vector target-vector)
-  (let* ((translatable-user (infinote-translatable-user request-user-id request-vector target-vector))
-         (translatable-request (infinote-nth-user-request-from-log
-                                translatable-user
-                                (infinote-operation-count translatable-user target-vector)))
-         (translatable-vector (cadr translatable-request))
-         (translatable-operation (caddr translatable-request))
-         (closer-vector (infinote-diffed-vector target-vector (list translatable-user -1))))
-    (list translatable-user closer-vector (infinote-translate-operation
-                                           translatable-user
-                                           translatable-vector
-                                           closer-vector
-                                           translatable-operation))))
-
+  (let ((translatable-user (infinote-translatable-user request-user-id request-vector target-vector)))
+    (assert translatable-user)
+    (let* ((translatable-request (infinote-nth-user-request-from-log
+                                  translatable-user
+                                  (infinote-operation-count translatable-user target-vector)))
+           (translatable-vector (cadr translatable-request))
+           (translatable-operation (caddr translatable-request))
+           (closer-vector (infinote-diffed-vector target-vector (list translatable-user -1))))
+      (list translatable-user closer-vector (infinote-translate-operation
+                                             translatable-user
+                                             translatable-vector
+                                             closer-vector
+                                             translatable-operation)))))
+  
 (defun infinote-op-type (op)
   (cond
    ((member op '(split)) 'split)
@@ -830,7 +846,7 @@
     (if syncing
         (progn
           (push request infinote-request-log)
-          (infinote-increment-my-vector user-id))
+          (infinote-increment-sync-vector user-id))
       (let ((op-type (infinote-op-type (car operation))))
 	(when (equal op-type 'move)
 	  (infinote-move-caret user-id (+ 1 (cadr operation)) (caddr operation)))
