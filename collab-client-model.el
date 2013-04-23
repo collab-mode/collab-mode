@@ -179,6 +179,7 @@ so it doesn't rebroadcast itself into an infinite loop")
      (revert-buffer t t t))
     (set-window-start window start)))))
 
+(defvar collab-mode-cm-should-finish-login-after-users nil)
 (defun collab-mode-cm-new-users-received (users)
  (collab-self-user) ;; call this so that it can be re-cached if needed
  (setq collab-server-users users)
