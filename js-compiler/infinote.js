@@ -214,6 +214,8 @@ function ace_init(file) {
         $editor.getSession().setMode("ace/mode/" + $("#mode-select").val());
     });
 
+    document.title = file;
+
     $editor = ace.edit("editor");
     var buffer = FN_generate_new_buffer(file);
     buffer.env.infinote_mode = true;
