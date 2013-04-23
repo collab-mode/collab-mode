@@ -1,14 +1,24 @@
+(defcustom collab-mode-server
+ '("collab-mode.com" 10069 t)
+ "(SERVER-ADDRESS PORT USE-SSL) for collab-mode to connect to.
+SERVER-ADDRESS is the string containing the domain name or ip address
+PORT is the port
+USE-SSL should be non-nil if the server is running ssl")
+
 (defvar collab-network-verbose nil "Set to t to see all messages")
+(defvar collab-server-input-buffer "")
 
 (defun collab-network-connect-to-server ()
  (when (boundp 'collab-server-process)
   (delete-process collab-server-process))
  (setq collab-server-process (open-network-stream "collab-server"
                               (get-buffer-create "*collab-server*")
-                              "collab-mode.com" 10069 :type 'ssl))
- (set-process-filter collab-server-process #'collab-network-receive-from-server))
-
-(setq collab-server-input-buffer "")
+                              (car collab-mode-server)
+                              (cadr collab-mode-server)
+                              :type (if (caddr collab-mode-server) 'ssl)))
+ (set-process-filter collab-server-process
+  #'collab-network-receive-from-server)
+ (setq collab-server-input-buffer ""))
 
 (defun collab-network-receive-from-server (process data)
   ; TODO: Handle fragments
@@ -24,10 +34,9 @@
        (`(:infinote ,infinote-message)
         (with-demoted-errors (infinote-execute infinote-message)))
        (`(:cursor ,user ,cursor-loc)
-        (with-current-buffer collab-mode-cm-buffer
-         (collab-cursor
-          (collab-mode-cm-format-user (collab-user-from-username user))
-          cursor-loc)))
+        (when (buffer-live-p collab-mode-cm-buffer)
+         (with-current-buffer collab-mode-cm-buffer
+          (collab-cursor user cursor-loc))))
        (`(:users . ,users)
         (collab-mode-cm-new-users-received users))
        (`(:xmppfriends . ,friends)
@@ -53,7 +62,7 @@
 
        (`(:error . ,_) nil)
 
-       (msg (error "unknown server message: %S" msg)))))))
+       (msg (message "unknown server message: %S" msg)))))))
 
 (defun collab-network-send-to-server (request &optional command)
  (collab-network-send-string-to-server

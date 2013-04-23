@@ -1,6 +1,5 @@
 (require 'ewoc)
 (require 'password-cache)
-(require 'xmlgen)
 (require 'collab-infinote)
 (require 'collab-network)
 (require 'collab-client-model)
@@ -11,12 +10,16 @@
   "Places a cursor for USER at POSITION with COLOR.
 If POSITION is <= 1 then the overlay is deleted."
   (interactive)
-  (setq color (collab-user-color user))
+  (setq color (or (collab-user-color
+                   (collab-mode-cm-format-user
+                    (collab-user-from-username user)))
+               "#808080"))
   (if (< position 1)
       (when (assoc user collab-users-list)
 	(progn
 	  (delete-overlay (cdr (assoc user collab-users-list)))
-	  (assq-delete-all user collab-users-list)))
+          (setq collab-users-list
+	    (delq (assoc user collab-users-list) collab-users-list))))
     (if (not (assoc user collab-users-list))
 	(progn
 	  (setq collab-users-list (append collab-users-list `(,(cons user (make-overlay position (+ position 1) (current-buffer) t)))))
@@ -24,11 +27,24 @@ If POSITION is <= 1 then the overlay is deleted."
       (move-overlay (cdr (assoc user collab-users-list)) position (+ position 1))
       (overlay-put (cdr (assoc user collab-users-list)) 'face `((foreground-color . "white") (background-color . ,color))))))
 
+(defun collab-restrict-cursors-to-users (users)
+ (mapc (lambda (u) (collab-cursor u 0))
+  (remove-if (lambda (u) (member u users)) (mapcar #'car collab-users-list))))
 
-(defun collab-mode (user-id)
-  "Starts collab-mode and opens users buffer."
-  (interactive "P")
-  (collab-mode-cm-init (or user-id 0)))
+(define-minor-mode collab-mode
+ "collab-mode is a collaborative editing mode based on the infinote protocol"
+ :lighter " collab-mode"
+ (if collab-mode
+  (progn
+   (when (not (collab-mode-connected-p))
+    (collab-connect))
+   (collab-mode-cm-init-this-buffer))
+  (collab-mode-cm-deinit-this-buffer)))
+
+;; (defun collab-mode ()
+;;   "Starts collab-mode and opens users buffer."
+;;   (interactive)
+;;   (collab-mode-cm-init))
 
 (define-derived-mode collab-users-mode tabulated-list-mode "Users Mode"
   "Major mode for managing connections with users"
@@ -40,12 +56,17 @@ If POSITION is <= 1 then the overlay is deleted."
 	      (setq tabulated-list-entries (collab-get-entries))
 	      (tabulated-list-print))))
 
-(defun collab-list-users ()
-  (interactive)
-  (pop-to-buffer "*Users*" nil)
-  (collab-users-mode)
-  (setq tabulated-list-entries (collab-get-entries))
-  (tabulated-list-print t))
+(defun collab-list-users (&optional dont-change-selected)
+ (interactive)
+ (let* ((buffer (get-buffer-create "*Collab Users*"))
+        (window (display-buffer buffer nil)))
+  (with-current-buffer buffer
+   (collab-users-mode)
+   (setq tabulated-list-entries (collab-get-entries))
+   (tabulated-list-print t))
+  (if (not dont-change-selected)
+   (select-window window))))
+
 
 (defun collab-get-entries ()
   "Returns the tabulated-list-entries argument for listing users. It gets the list of
@@ -96,7 +117,7 @@ users, checks which are connected, and returns the appropriate list of entries."
 
 (defvar collab-chat-keymap
   (let ((map (make-sparse-keymap)))
-    (define-key map "\r" 'collab-chat-buffer-send)
+    (define-key map "\r" #'collab-chat-buffer-send)
     map)
   "The keymap for collab-chat-mode.")
 
@@ -105,7 +126,7 @@ users, checks which are connected, and returns the appropriate list of entries."
   (interactive)
   ;;(setq collab-point-insert nil)
   ;;(setq collab-chat-ewoc nil)
-  (pop-to-buffer (get-buffer-create "chat"))
+  (pop-to-buffer (get-buffer-create "*Collab Chat*"))
   (unless collab-chat-ewoc
     (setq collab-chat-ewoc
 	  (ewoc-create 'collab-pp nil "---"))
@@ -140,12 +161,17 @@ users, checks which are connected, and returns the appropriate list of entries."
   (let* ((text (propertize msg 'face '(:slant italic))))
    (ewoc-enter-last collab-chat-ewoc text)))
 
-(defun collab-login ()
-  "Prompts for a username and password. Passes username and
-password to COLLAB-MODE-CM-XMPP-LOGIN."
-  (interactive)
-  (collab-mode-cm-xmpp-login
-   (read-from-minibuffer "Username: ")
-   (password-read "Password: ")))
+(defun collab-connect ()
+ (interactive)
+ (let* ((username-in (read-from-minibuffer "Google Talk username (or blank): "))
+        (username (if (> (length username-in) 0)
+                   username-in))
+        (password (if username
+                   (password-read "Password: "))))
+  (collab-mode-cm-connect username password)))
+
+(defun collab-insert-share-URL ()
+ (interactive)
+ (insert "http://collab-mode.com/collab-js?room=main"))
 
 (provide 'collab-mode)

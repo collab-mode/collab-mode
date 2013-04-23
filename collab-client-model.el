@@ -33,6 +33,23 @@ so it doesn't rebroadcast itself into an infinite loop")
  (when collab-mode-cm-XMPP-username
   (collab-network-send-to-server nil "<xmpp friends>")))
 
+(defun collab-mode-cm-connect (username password)
+ (setq collab-mode-cm-network-connection
+  (collab-mode-network-connect))
+ (setq collab-mode-cm-should-finish-login-after-users t)
+ (collab-list-users)
+ (if (and username password)
+  (collab-mode-cm-xmpp-login username password)
+  (collab-mode-cm-post-login)))
+
+(defun collab-mode-cm-post-login ()
+ (setq infinote-user-name (collab-self-username))
+ (setq infinote-hue (collab-mode-cm-hue-for-user (collab-self-user)))
+ (assert infinote-user-name)
+ (assert infinote-hue)
+ ;;(message "post-login, uname = %S, hue = %S" infinote-user-name infinote-hue)
+ (infinote-connect-to-server))
+
 (defun collab-mode-cm-xmpp-login (username password)
  "Perform XMPP login with provided username and password"
  (setq collab-mode-cm-last-attempted-login username)
@@ -41,12 +58,19 @@ so it doesn't rebroadcast itself into an infinite loop")
  (collab-mode-cm-update-user-list))
 
 (defun collab-mode-cm-rgb-to-color (r g b)
- (format "#%02x%02x%02x" r g b))
+ ;;(format "#%02x%02x%02x" r g b)
+ ;; err, it used to be rgb anyway...
+ (infinote-hue-to-color (/ r 255.0) 0.7 1.0))
 
 (defun collab-mode-cm-color-for-user (user)
  (pcase user
   (`(,num ,ip ,port ,username ,r ,g ,b . ,_)
    (collab-mode-cm-rgb-to-color r g b))))
+
+(defun collab-mode-cm-hue-for-user (user)
+ (pcase user
+  (`(,num ,ip ,port ,username ,r ,g ,b . ,_)
+   (/ r 255.0))))
 
 (defun collab-mode-cm-format-user (user)
  (pcase user
@@ -142,27 +166,36 @@ so it doesn't rebroadcast itself into an infinite loop")
       t)
      (n (collab-chat-system-message
          (format (concat "%s users starting with \"%s\" found,"
-                  " please be more specific.")
-          n prefix)))
-     nil))
+			 " please be more specific.")
+		 n prefix)))))
    (collab-network-send-to-server
     `(:chat ,(collab-self-username) ,msg))
    t)))
 
+(defun collab-mode-cm-revert-user-list-buffer ()
+ (let ((buffer (get-buffer "*Collab Users*")))
+  (when buffer
+   ;; workaround for a bug where revert scrolls another window
+   (let* ((window (selected-window))
+          (start (window-start window)))
+    (with-current-buffer buffer
+     (revert-buffer t t t))
+    (set-window-start window start)))))
+
+(defvar collab-mode-cm-should-finish-login-after-users nil)
 (defun collab-mode-cm-new-users-received (users)
  (collab-self-user) ;; call this so that it can be re-cached if needed
  (setq collab-server-users users)
- (let ((buffer (get-buffer "*Users*")))
-  (when buffer
-   (with-current-buffer buffer
-    (revert-buffer t t t)))))
+ (collab-restrict-cursors-to-users
+  (mapcar #'collab-username-from-user collab-server-users))
+ (collab-mode-cm-revert-user-list-buffer)
+ (when collab-mode-cm-should-finish-login-after-users
+  (setq collab-mode-cm-should-finish-login-after-users nil)
+  (collab-mode-cm-post-login)))
 
 (defun collab-mode-cm-new-friends-received (friends)
  (setq collab-server-friends friends)
- (let ((buffer (get-buffer "*Users*")))
-  (when buffer
-   (with-current-buffer buffer
-    (revert-buffer t t t)))))
+ (collab-mode-cm-revert-user-list-buffer))
 
 (defun collab-mode-cm-new-rooms-received (rooms)
  (setq collab-server-rooms rooms))
@@ -177,29 +210,10 @@ so it doesn't rebroadcast itself into an infinite loop")
   (progn
    (setq collab-mode-cm-XMPP-username collab-mode-cm-last-attempted-login)
    (run-at-time 3 nil #'collab-mode-cm-update-friend-list)
-   (run-at-time t 5 #'collab-mode-cm-update-friend-list)
-   (setq infinote-user-name collab-mode-cm-XMPP-username)
-   (infinote-connect-to-server))
-  (setq collab-mode-cm-XMPP-username nil)))
-
-(defun font-for-user (user)
- `(:box ,(if (= user 0) "firebrick" "dodger blue")))
-
-(defun collab-mode-cm-insert (string location)
- "inserts STRING into current buffer at LOCATION"
- (with-current-buffer collab-mode-cm-buffer
-  (when (not collab-mode-cm-updating-infinote)
-   (let ((collab-mode-cm-applying-changes t))
-    (save-excursion
-     (goto-char location)
-     (insert (propertize string 'font-lock-face (font-for-user (- 1 infinote-user)))))))))
-
-(defun collab-mode-cm-delete (start end)
- "removes text in current buffer from START to END"
- (with-current-buffer collab-mode-cm-buffer
-  (when (not collab-mode-cm-updating-infinote)
-   (let ((collab-mode-cm-applying-changes t))
-    (delete-region start end)))))
+   (run-at-time t 5 #'collab-mode-cm-update-friend-list))
+  (setq collab-mode-cm-XMPP-username nil))
+ (setq collab-mode-cm-should-finish-login-after-users t)
+ (collab-mode-cm-update-user-list))
 
 (defun collab-mode-cm-post-change-hook ()
  "send a cursor update if changed"
@@ -208,26 +222,6 @@ so it doesn't rebroadcast itself into an infinite loop")
    (setq collab-mode-cm-last-cursor-pos cursor-pos)
    (collab-network-send-to-server
     `(:cursor ,(collab-username-from-user (collab-self-user)) ,cursor-pos)))))
-
-(defun collab-mode-cm-before-change-hook (start end)
- "save string for region about to be deleted"
- (setq collab-mode-cm-text-to-be-changed
-  (buffer-substring-no-properties start end)))
-
-(defun collab-mode-cm-after-change-hook (start end previous-length)
- "handler for hook that the buffer just changed"
- (when (not collab-mode-cm-applying-changes)
-  (put-text-property start end 'font-lock-face (font-for-user infinote-user))
-  (let ((collab-mode-cm-updating-infinote t))
-   (when (/= previous-length 0)
-    (collab-mode-network-post-delete
-     collab-mode-cm-network-connection
-     start collab-mode-cm-text-to-be-changed))
-   (when (/= start end)
-    (collab-mode-network-post-insert
-     collab-mode-cm-network-connection
-     start (buffer-substring-no-properties start end)))))
- (setq collab-mode-cm-text-to-be-changed ""))
 
 (defun collab-invite-user (user)
  (let ((room (collab-mode-cm-current-room)))
@@ -243,45 +237,29 @@ so it doesn't rebroadcast itself into an infinite loop")
  (collab-mode-cm-update-room-list)
  (collab-mode-cm-update-user-list))
 
-(defun collab-mode-cm-init (user-id)
- "Initialization for the client model
-TBD: how many times is this called, and in what contexts"
+(defun collab-mode-cm-init-this-buffer ()
+ "Initialization for the client model"
+ (when (buffer-live-p collab-mode-cm-buffer)
+  (with-current-buffer collab-mode-cm-buffer
+   (collab-mode 0)))
  (setq collab-mode-cm-buffer (current-buffer))
- (set (make-local-variable 'collab-mode-cm-applying-changes) nil)
- ;(set (make-local-variable 'collab-mode-cm-other-buffer)
-  ;(or other-buffer (get-buffer-create "*mirror*")))
- (set (make-local-variable 'collab-mode-cm-network-connection)
-  (collab-mode-network-connect "ec2.alcobb.com" 10068))
  (setq collab-mode-cm-text-to-be-changed "")
+ (add-hook 'post-command-hook #'collab-mode-cm-post-change-hook nil t)
+ (if (not infinote-mode)
+  (infinote-share-this-file)))
+
+(defun collab-mode-cm-deinit-this-buffer ()
+ (remove-hook 'post-command-hook #'collab-mode-cm-post-change-hook t)
+ (infinote-deinit-this-buffer))
+
+(defun collab-mode-connected-p ()
+ (when (boundp 'collab-server-process)
+  (process-live-p collab-server-process)))
+
+(defun collab-mode-network-connect ()
  (setq collab-server-users '())
  (setq collab-server-friends '())
  (setq collab-server-rooms '())
- ;(setq infinote-user (if (> user-id 0) 1 0))
- ;(unless other-buffer
-   ;(collab-mode-network-init-remote-document collab-mode-cm-network-connection (buffer-string)))
- (add-hook 'post-command-hook #'collab-mode-cm-post-change-hook nil t)
- ;(add-hook 'before-change-functions #'collab-mode-cm-before-change-hook nil t)
- ;(add-hook 'after-change-functions #'collab-mode-cm-after-change-hook nil t)
- )
-
-(defun collab-mode-network-post-delete (network-obj start old-text)
- "send delete over the network"
- (infinote-delete start old-text))
-
-(defun collab-mode-network-post-insert (network-obj start string)
- "send insert over the network"
- (infinote-insert start string))
-
-;; (defun collab-mode-network-init-remote-document (network-obj string)
-;;  "pretends to send the entire document across the network to start editing"
-;;  (with-current-buffer (cadr network-obj)
-;;   (delete-region (point-min) (point-max))
-;;   (insert string)
-;;   (collab-mode-cm-init (caddr network-obj))))
-
-(defun collab-mode-network-connect (host port)
- "connect to collabserver located at host:port"
- ;(infinote-init)
  (collab-network-connect-to-server)
  (collab-mode-cm-update-user-list)
  `(opaque-network-object ,(current-buffer)))
