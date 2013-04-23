@@ -431,10 +431,6 @@ function FN_intern(x) {
 }
 
 function FN_assoc(key, list) {
-    if (list === xml_entity_alist) {
-        console.log(key);
-    }
-
     while (true) {
         if (!FN_consp(list)
             || (FN_consp(list.car)
@@ -519,6 +515,59 @@ function FN_nth(l, n) {
 
 function FN_decode_char(charset, code_point) {
     return code_point;
+}
+
+function FN_string_equal(a, b) {
+    return a === b;
+}
+
+function FN_string$EQ_(a, b) {
+    return a === b;
+}
+
+function FN_setcdr(cell, newcdr) {
+    return (cell.cdr = newcdr);
+}
+
+function FN_remove(e, l) {
+    while (l !== false && l.car !== e) {
+        l = l.cdr;
+    }
+    if (l === false) {
+        return false;
+    }
+    var x = l;
+    var start = new cons_t(x.car, false);
+    var y = start;
+    while (FN_consp(x.cdr)) {
+        x = x.cdr;
+        if (x.car === e) {
+            continue;
+        }
+        y.cdr = new cons_t(x.car, false);
+        y = y.cdr;
+    }
+    return start;
+}
+
+function FN_min() {
+    return Math.min.apply(this, arguments);
+}
+
+function test_functions() {
+    console.log("Testing functions...");
+    var good = 0;
+    var bad = 0;
+    for (var i = 0; i < $all_function_syms.length; i++) {
+        var fn = $all_function_syms[i];
+        if (!(fn in this)) {
+            console.log("`" + fn + "' not found");
+            bad++;
+        } else {
+            good++;
+        }
+    }
+    console.log(good + " good, " + bad + " bad");
 }
 
 var init = function() {

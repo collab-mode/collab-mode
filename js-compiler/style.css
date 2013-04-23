@@ -1,0 +1,109 @@
+html,body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+}
+body {
+    background-color: #aaa;
+}
+button {
+    margin-top: 10px;
+    margin-left: 10px;
+    float: left;
+    height: 26px;
+    width: 80px;
+}
+#connection-status-wrapper {
+    margin-top: 10px;
+    margin-left: 10px;
+    float: left;
+    line-height: 26px;
+}
+#connection-status {
+    font-family: Sans;
+}
+select {
+    margin-top: 10px;
+    margin-right: 10px;
+    float: right;
+    height: 26px;
+    width: 200px;
+}
+#log {
+    background-color: #fff;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: -webkit-calc(100%);
+    width: calc(100%);
+    height: -webkit-calc(100% - 46px);
+    height: calc(100% - 46px);
+    overflow: auto;
+}
+#log .in {
+    width: -webkit-calc(100% - 20px);
+    width: calc(100% - 20px);
+    margin: 10px;
+    background-color: #cfc;
+    white-space: pre-wrap;       /* css-3 */
+    white-space: -moz-pre-wrap;  /* Mozilla, since 1999 */
+    white-space: -pre-wrap;      /* Opera 4-6 */
+    white-space: -o-pre-wrap;    /* Opera 7 */
+    word-wrap: break-word;       /* Internet Explorer 5.5+ */
+}
+#log .out {
+    width: -webkit-calc(100% - 20px);
+    width: calc(100% - 20px);
+    margin: 10px;
+    background-color: #fcc;
+    white-space: pre-wrap;       /* css-3 */
+    white-space: -moz-pre-wrap;  /* Mozilla, since 1999 */
+    white-space: -pre-wrap;      /* Opera 4-6 */
+    white-space: -o-pre-wrap;    /* Opera 7 */
+    word-wrap: break-word;       /* Internet Explorer 5.5+ */
+}
+#editor-container {
+    position: relative;
+    width: 100%;
+    height: -webkit-calc(100% - 46px);
+    height: calc(100% - 46px);
+    margin: auto;
+}
+#editor {
+    position: absolute;
+    top: 0px;
+    bottom: 0px;
+    left: 0px;
+    right: 0px;
+}
+#login-box td {
+    text-align: right;
+}
+
+#main-app {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+}
+
+#login-box {
+    /*position: absolute;
+      */
+    margin-left: -webkit-calc(50% - 200px);
+    margin-left: calc(50% - 200px);
+    margin-right: auto;
+    margin-top: 100px;
+    padding-top: 30px;
+    padding-bottom: 30px;
+    width: 400px;
+    background-color: #fff;
+}
+
+#login-box table {
+    margin: auto;
+}
+
+#login-box h2 {
+    text-align: center;
+    font-family: Courier, Monospace;
+}

@@ -368,6 +368,8 @@
           infinote-node-from-id
           infinote-handle-group-commands
           infinote-handle-group-command
+          infinote-cid-is-op
+          infinote-split-operation
 
           xmlgen
           xmlgen-extract-plist

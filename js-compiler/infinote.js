@@ -131,8 +131,10 @@ function FN_current_buffer() {
     return $current_buffer;
 }
 
-function FN_infinote_mode() {}
-infinote_mode = false;
+function FN_infinote_mode() {
+    FN_infinote_init_this_buffer();
+    infinote_mode = true;
+}
 
 var $editor;
 function ace_init(file) {
@@ -162,7 +164,7 @@ function ace_init(file) {
         jsx: ["JSX", "jsx", "text/x-jsx", "other"],
         latex: ["LaTeX", "latex|tex|ltx|bib", "application/x-latex", "other"],
         less: ["LESS", "less", "text/x-less"],
-        lisp: ["Lisp", "lisp|scm|rkt|el", "text/x-lisp", "other"],
+        lisp: ["Lisp", "*\\*scratch\\*|lisp|scm|rkt|el", "text/x-lisp", "other"],
         liquid: ["Liquid", "liquid", "text/x-liquid", "other"],
         lua: ["Lua", "lua", "text/x-lua"],
         luapage: ["LuaPage", "lp", "text/x-luapage", "other"],
@@ -202,15 +204,29 @@ function ace_init(file) {
     mode_array.sort(function(a, b) {
         return SupportedModes[a][0].localeCompare(SupportedModes[b][0]);
     });
+    var selected_mode = "text";
     for (var i = 0; i < mode_array.length; i++) {
         $("<option/>")
             .attr("value", mode_array[i])
             .text(SupportedModes[mode_array[i]][0])
             .appendTo("#mode-select");
+
+        var pattern = SupportedModes[mode_array[i]][1];
+        var subPatterns = pattern.split('|');
+        for (var j = 0; j < subPatterns.length; j++) {
+            var p = subPatterns[j];
+            if (p[0] === '*') {
+                p = '^' + p.substring(1) + '$';
+            } else {
+                p = '\\.' + p + '$';
+            }
+            if (file.match(p)) {
+                selected_mode = mode_array[i];
+            }
+        }
     }
-    $("#mode-select").val("text").change(function() {
-        $editor.getSession().setMode("ace/mode/" + $("#mode-select").val());
-    });
+
+    document.title = file;
 
     $editor = ace.edit("editor");
     var buffer = FN_generate_new_buffer(file);
@@ -249,4 +265,61 @@ function ace_init(file) {
             }
         });
     });
+
+    $editor.getSession().setMode("ace/mode/" + selected_mode);
+    $("#mode-select").val(selected_mode).change(function() {
+        $editor.getSession().setMode("ace/mode/" + $("#mode-select").val());
+    });
 }
+
+$(function() {
+    init();
+    var room = unescape(window.location.hash).substring(1);
+    $("#room-input").val(room);
+
+    $("#login-box input[type=submit]").on('click', function (e) {
+        $("#login-box").hide();
+        $("#main-app").show();
+
+        var file = $("#room-input").val();
+        infinote_user_name = $("#username-input").val();
+        ace_init(file);
+
+        FN_infinote_connect_to_server(function() {
+            console.log("FIND ME " + file);
+            FN_infinote_find_file(file);
+        });
+
+        $editor.focus();
+
+        e.preventDefault();
+        return false;
+    });
+    $("#username-input").focus();
+});
+
+function toggle_log() {
+    var log = $("#log");
+    var ed = $("#editor");
+    if (log.is(":visible")) {
+        log.fadeOut(100, function() {
+            ed.fadeIn(100);
+        });
+    } else {
+        ed.fadeOut(100, function() {
+            log.fadeIn(100);
+        });
+    }
+}
+
+function FN_windows_showing_buffer() {
+    return false;
+}
+
+function FN_infinote_set_major_mode() {}
+function FN_infinote_user_selection_face() {}
+function FN_infinote_user_caret_face() {}
+function FN_infinote_user_face() {}
+function FN_infinote_send_move_caret() {}
+function FN_infinote_move_caret() {}
+infinote_max_op_eval_depth = 7;
