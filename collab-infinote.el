@@ -519,45 +519,38 @@
   ;; TODO: mark this with author ids
   (apply #'concat (mapcar #'(lambda (segment) (if (listp segment) (caddr segment) segment)) segment-xml)))
 
-(defun infinote-vector-includes (vector-1 vector-2)
+(defun infinote-vectors-users (vector-1 vector-2)
+  (let (users)
+    (loop
+     for user-counts on vector-1 by #'cddr
+     do (push (car user-counts) users))
+    (loop
+     for user-counts on vector-2 by #'cddr
+     do (push (car user-counts) users))
+    (delete-dups users)))
+
+(defun infinote-vectors-zipped (vector-1 vector-2)
   (loop
-   for user-operation on vector-2 by #'cddr
-   if (let ((user-id (car user-operation))
-            (op-count (cadr user-operation)))
-        (not (equal op-count
-                    (infinote-operation-count user-id vector-1))))
-   return nil
-   finally return t))
+   for user-id in (infinote-vectors-users vector-1 vector-2)
+   collect (list user-id
+		 (infinote-operation-count user-id vector-1)
+		 (infinote-operation-count user-id vector-2))
+   into zipped
+   finally return zipped))
+
+(defun infinote-map-vectors-counts (vector-1 vector-2 fun)
+  (let ((vec-fun (lambda (user-ops) (list (car user-ops) (apply fun (cdr user-ops))))))
+    (mapcar vec-fun (infinote-vectors-zipped vector-1 vector-2))))
 
 (defun infinote-vector-equal (vector-1 vector-2)
-  (and (infinote-vector-includes vector-1 vector-2)
-       (infinote-vector-includes vector-2 vector-1)))
+  (every (lambda (user-op-counts) (= (cadr user-op-counts) (caddr user-op-counts)))
+	 (infinote-vectors-zipped vector-1 vector-2)))
 
 (defun infinote-vector-subtract (vector-1 vector-2)
-  (loop
-   with new-vector = (copy-sequence vector-1)
-   for prop on vector-2 by #'cddr
-   do
-   (let ((user-id (car prop))
-         (op-count (cadr prop)))
-     (setq new-vector (lax-plist-put new-vector
-                                 user-id
-                                 (- (infinote-operation-count user-id new-vector)
-                                    op-count))))
-   finally return new-vector))
+  (infinote-map-vectors-counts vector-1 vector-2 #'-))
 
 (defun infinote-diffed-vector (vector diff)
-  (loop
-   with new-vector = (copy-sequence vector)
-   for prop on diff by #'cddr
-   do
-   (let ((user-id (car prop))
-         (op-count (cadr prop)))
-     (setq new-vector (lax-plist-put new-vector
-                                 user-id
-                                 (+ op-count
-                                    (infinote-operation-count user-id new-vector)))))
-   finally return new-vector))
+  (infinote-map-vectors-counts vector diff #'+))
 
 (defun infinote-vector-least-common-successor (vector-1 vector-2)
   (loop
@@ -573,20 +566,16 @@
    finally return new-vector))
 
 (defun infinote-diff-user-vector (user-id diff)
-  (let* ((user-data (lax-plist-get infinote-users user-id))
-         (vector (lax-plist-get user-data 'vector)))
-    (setq infinote-users
-          (lax-plist-put infinote-users
-                     user-id
-                     (lax-plist-put user-data
-                                'vector
-                                (infinote-diffed-vector vector diff))))))
+  (infinote-map-user-data user-id
+			  'vector
+			  (lambda (user-vec)
+			    (infinote-diffed-vector user-vec diff)))
 
 (defun infinote-increment-my-vector (user-id)
   (infinote-diff-user-vector infinote-user-id (list user-id 1)))
 
 (defun infinote-user-vector (user-id)
-  (lax-plist-get (lax-plist-get infinote-users user-id) 'vector))
+  (infinote-get-user-data user-id 'vector)
 
 (defun infinote-get-user-data (user-id field)
   (lax-plist-get (lax-plist-get infinote-users user-id) field))
@@ -597,6 +586,9 @@
           (lax-plist-put infinote-users
                      user-id
                      (lax-plist-put user-data field value)))))
+
+(defun infinote-map-user-data (user-id field fun)
+  (infinote-set-user-data user-id field (fun (infinote-get-user-data field))))
 
 (defun infinote-hue-to-color (hue &optional saturation value)
   "from hexrgb.el"
@@ -654,36 +646,6 @@
 
 (defun infinote-operation-count (user-id vector)
   (or (lax-plist-get vector user-id) 0))
-
-(defun infinote-nth-user-request-from-log (user-id n)
-  (loop for request in infinote-request-log
-        if (and (equal (car request) user-id)
-                (= (- n 1) (infinote-operation-count user-id (cadr request))))
-        return request
-        finally return nil))
-
-(defun infinote-translatable-user (request-user-id request-vector target-vector)
-  (loop for target-operation on target-vector by #'cddr
-        if (let ((target-user-id (car target-operation))
-                 (target-operation-count (cadr target-operation)))
-             (and (/= target-user-id request-user-id)
-                  (> target-operation-count (infinote-operation-count target-user-id request-vector))))
-        return (car target-operation)
-        finally return nil))
-
-(defun infinote-closer-target-request (request-user-id request-vector target-vector)
-  (let* ((translatable-user (infinote-translatable-user request-user-id request-vector target-vector))
-         (translatable-request (infinote-nth-user-request-from-log
-                                translatable-user
-                                (infinote-operation-count translatable-user target-vector)))
-         (translatable-vector (cadr translatable-request))
-         (translatable-operation (caddr translatable-request))
-         (closer-vector (infinote-diffed-vector target-vector (list translatable-user -1))))
-    (list translatable-user closer-vector (infinote-translate-operation
-                                           translatable-user
-                                           translatable-vector
-                                           closer-vector
-                                           translatable-operation))))
 
 (defun infinote-op-type (op)
   (cond
@@ -760,6 +722,34 @@
         (length (caddr operation)))
     (list 'split (list 'delete pos split-at) (list 'delete (+ split-at space) (- length split-at)))))
 
+(defun infinote-nth-user-request-from-log (user-id n)
+  (loop for request in infinote-request-log
+        if (and (equal (car request) user-id)
+                (= (- n 1) (infinote-operation-count user-id (cadr request))))
+        return request
+        finally return nil))
+
+(defun infinote-translatable-user (request-user-id request-vector target-vector)
+  (car (find-if (lambda (user-op-counts)
+		  (destructuring-bind (user-id request-op target-op) user-op-counts
+		    (and (/= user-id request-user-id)
+			 (> target-op request-op))))
+		(infinote-vectors-zipped request-vector target-vector))))
+
+(defun infinote-closer-target-request (request-user-id request-vector target-vector)
+  (let* ((translatable-user (infinote-translatable-user request-user-id request-vector target-vector))
+         (translatable-request (infinote-nth-user-request-from-log
+                                translatable-user
+                                (infinote-operation-count translatable-user target-vector)))
+         (translatable-vector (cadr translatable-request))
+         (translatable-operation (caddr translatable-request))
+         (closer-vector (infinote-diffed-vector target-vector (list translatable-user -1))))
+    (list translatable-user closer-vector (infinote-translate-operation
+                                           translatable-user
+                                           translatable-vector
+                                           closer-vector
+                                           translatable-operation))))
+
 (defun infinote-translate-operation (user-id request-vector target-vector operation)
   (if (infinote-vector-equal request-vector
                                      target-vector)
@@ -822,9 +812,9 @@
 (defun infinote-handle-request (user-id vector operation)
   (let ((request (list user-id vector operation)))
     (if syncing
-        (progn
+;        (progn
           (push request infinote-request-log)
-          (infinote-increment-my-vector user-id))
+;          (infinote-increment-my-vector user-id))
       (let ((op-type (infinote-op-type (car operation))))
 	(when (equal op-type 'move)
 	  (infinote-move-caret user-id (+ 1 (cadr operation)) (caddr operation)))
