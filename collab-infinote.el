@@ -36,7 +36,7 @@
 (defvar infinote-connection-buffer nil "Process buffer for connection to server")
 (defvar infinote-connection-ready nil "non-nil when the connection auth'd and handshook")
 (defvar infinote-verbose nil "Print debug messages")
-(defvar infinote-max-op-eval-depth 500 "Sometimes a rebase just isn't worth it")
+(defvar infinote-max-op-eval-depth 20 "Sometimes a rebase just isn't worth it")
 
 ;; connection (process-buffer) locals
 (defvar infinote-nodes nil "Nodes (documents and subdirectories) on a server")
