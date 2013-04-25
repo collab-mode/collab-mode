@@ -11,7 +11,7 @@
   "infinote"
   :group 'communication)
 
-(defcustom infinote-server "irc.joelhough.com";"collab-mode.com"
+(defcustom infinote-server "collab-mode.com"
   "infinote server"
   :group 'infinote
   :type 'string)
@@ -36,7 +36,7 @@
 (defvar infinote-connection-buffer nil "Process buffer for connection to server")
 (defvar infinote-connection-ready nil "non-nil when the connection auth'd and handshook")
 (defvar infinote-verbose nil "Print debug messages")
-(defvar infinote-max-op-eval-depth 10 "Sometimes a rebase just isn't worth it")
+(defvar infinote-max-op-eval-depth 500 "Sometimes a rebase just isn't worth it")
 
 ;; connection (process-buffer) locals
 (defvar infinote-nodes nil "Nodes (documents and subdirectories) on a server")
@@ -189,6 +189,7 @@
 (defun infinote-clean-up-connection ()
   (let ((sessions (cddr infinote-sessions)))
     (loop for session on sessions by #'cddr
+	  when (cadr session)
 	  do (kill-buffer (cadr session))))
   (setq infinote-connection nil)
   (setq infinote-connection-ready nil))
@@ -476,9 +477,11 @@
 			      'selection-overlay (make-overlay 0 0 nil t))))
   (overlay-put (infinote-get-user-data id 'caret-overlay) 'face (infinote-user-caret-face id))
   (overlay-put (infinote-get-user-data id 'selection-overlay) 'face (infinote-user-selection-face id))
+  (infinote-floor-sync-vector vector)
   (when (equal name infinote-user-name)
     (setq infinote-user-id id)
-    (setq infinote-my-last-sent-vector (infinote-my-vector))
+    (infinote-set-user-data infinote-user-id 'vector infinote-sync-vector)
+    (setq infinote-my-last-sent-vector infinote-sync-vector)
     (when (and (not syncing)
 	       (= (point-min) (point-max))
 	       (not (equal infinote-original-contents "")))
@@ -572,6 +575,13 @@
   (setq infinote-sync-vector
 	(infinote-diffed-vector infinote-sync-vector (list user-id 1))))
 
+(defun infinote-vector-max (vector-1 vector-2)
+  (infinote-map-vectors-counts vector-1 vector-2 #'max))
+
+(defun infinote-floor-sync-vector (min-vector)
+  (setq infinote-sync-vector
+	(infinote-vector-max infinote-sync-vector min-vector)))
+
 (defun infinote-increment-my-vector (user-id)
   (infinote-diff-user-vector infinote-user-id (list user-id 1)))
 
@@ -624,6 +634,7 @@
       (format "#%02x%02x%02x" red green blue))))
 
 (defun infinote-user-color (user-id saturation value)
+  (assert user-id)
   (let* ((name (infinote-get-user-data user-id 'name))
 	 (cm-user (when (fboundp 'collab-user-from-username)
 		    (collab-user-from-username name))))
@@ -632,20 +643,25 @@
       (infinote-hue-to-color (infinote-get-user-data user-id 'hue) saturation value))))
 
 (defun infinote-user-face (user-id)
+  (assert user-id)
   (list :background (infinote-user-color user-id 0.3 1.0)))
 
 (defun infinote-user-caret-face (user-id)
+  (assert user-id)
   (list :background (infinote-user-color user-id 0.9 1.0)))
 
 (defun infinote-user-selection-face (user-id)
+  (assert user-id)
   (list :background (infinote-user-color user-id 0.5 1.0)))
 
 (defun infinote-insert-segment (author-id text)
+  (assert author-id)
   (let ((infinote-inhibit-change-hooks t)
 	(face (infinote-user-face author-id)))
     (insert (propertize text 'font-lock-face face))))
 
 (defun infinote-operation-count (user-id vector)
+  (assert user-id)
   (or (lax-plist-get vector user-id) 0))
 
 (defun infinote-op-type (op)
@@ -803,9 +819,8 @@
 	     (infinote-can-apply vector (if infinote-user-id 
 					    (infinote-my-vector)
 					  infinote-sync-vector)))
-	do
-	(setq infinote-request-queue (remove request infinote-request-queue))
-	(apply #'infinote-handle-request request)
+	do (progn (setq infinote-request-queue (remove request infinote-request-queue))
+		  (apply #'infinote-handle-request (nconc request '(t))))
 	and return nil))
 
 (defun infinote-move-caret (user-id caret selection)
@@ -813,12 +828,12 @@
   (move-overlay (infinote-get-user-data user-id 'caret-overlay) caret (+ caret 1))
   (move-overlay (infinote-get-user-data user-id 'selection-overlay) caret (+ caret selection)))
 
-(defun infinote-handle-request (user-id vector operation)
+(defun infinote-handle-request (user-id vector operation &optional from-queue)
   (assert user-id)
   (let ((request (list user-id vector operation)))
     (if syncing
 	(progn (push request infinote-request-log)
-	       (increment-sync-vector user-id))
+	       (infinote-floor-sync-vector vector))
       (let ((op-type (infinote-op-type (car operation))))
 	(when (equal op-type 'move)
 	  (infinote-move-caret user-id (+ 1 (cadr operation)) (caddr operation)))
@@ -839,9 +854,10 @@
 		  (if infinote-user-id
 		      (infinote-increment-my-vector user-id)
 		    (infinote-increment-sync-vector user-id))
-                  (infinote-diff-user-vector user-id (list user-id 1))
+                  (unless from-queue (infinote-diff-user-vector user-id (list user-id 1)))
                   (infinote-process-request-queue))
-              (push request infinote-request-queue))))))))
+              (unless from-queue (infinote-diff-user-vector user-id (list user-id 1)))
+	      (push request infinote-request-queue))))))))
 
 (defun infinote-apply-operation (user-id operation)
   (let ((infinote-inhibit-change-hooks t)
@@ -971,7 +987,7 @@
 			(unless syncing (infinote-diff-user-vector user-id vector-diff))
 			(let ((request-vector (if syncing vector-diff (infinote-user-vector user-id))))
 			  (infinote-handle-request user-id request-vector (infinote-xml-to-operation operation-xml)))))))))
-      (nil (when session-buffer (with-current-buffer session-buffer (infinote-share-this-file)))))))
+      (error (when session-buffer (with-current-buffer session-buffer (infinote-share-this-file)))))))
 
 (defun infinote-test-session ()
   (with-current-buffer (get-buffer-create " *test-results*")
