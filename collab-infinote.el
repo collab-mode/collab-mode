@@ -1,4 +1,4 @@
-(eval-when-compile (require 'cl))
+(require 'cl)
 
 (loop for file in '("xml.el" "xmlgen.el")
       do (load-file
